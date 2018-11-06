@@ -9,6 +9,7 @@ public class Title extends JPanel{
 	final Toolkit tk = Toolkit.getDefaultToolkit();
 	
 	GameMain gm;
+	Network nw;
 	Image bg;
 	JButton soloBtn, duoBtn;
 	JTextField rivalIP;
@@ -16,14 +17,15 @@ public class Title extends JPanel{
 	Font btnFont = new Font("MS ゴシック", Font.PLAIN, 24);
 	Font labelFont = new Font("MS ゴシック", Font.PLAIN, 20);
 	
-	public Title(GameMain parent) {
+	Title(GameMain parent, Network client) {
 		gm = parent;
+		nw = client;
 		this.setLayout(null);
 		
 		//背景画像
 		bg = tk.getImage(getClass().getResource("title.png"));
 		//自分のIPアドレス
-        myIP = new JLabel(GetIPaddr());
+        myIP = new JLabel(getIPaddr());
         myIP.setBounds(225, 470, 400, 30);
         myIP.setFont(labelFont);
 		//1Pプレイ
@@ -42,7 +44,7 @@ public class Title extends JPanel{
 		duoBtn = new JButton("2Pプレイ");
 		duoBtn.setBounds(570, 530, 160, 60);
 		duoBtn.setFont(btnFont);
-		soloBtn.addActionListener(new DuoPlayBtn());
+		duoBtn.addActionListener(new DuoPlayBtn());
         
         this.add(soloBtn);
         this.add(duoBtn);
@@ -51,7 +53,7 @@ public class Title extends JPanel{
         this.add(myIP);
     }
 	
-	private String GetIPaddr() {
+	private String getIPaddr() {
 		try {
 			InetAddress addr = InetAddress.getLocalHost();
 			return "自分のIPアドレス: " + addr.getHostAddress();
@@ -62,14 +64,25 @@ public class Title extends JPanel{
 	
 	private class SoloPlayBtn implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
-			gm.gameStatus = 1;
+			gm.setStatus(GameMain.Status.GAME_SOLO);
 		}
 	}
 	
 	private class DuoPlayBtn implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
-			gm.gameStatus = 2;
+			if(nw.Connect(rivalIP.getText())) {
+				gm.setStatus(GameMain.Status.GAME_DUO);
+			} else {
+				JLabel label = new JLabel("接続に失敗しました");
+			    JOptionPane.showMessageDialog(gm.frame, label);
+			}
 		}
+	}
+	
+	public void rivalApply() {
+		JLabel label = new JLabel("相手の接続を受けました");
+	    JOptionPane.showMessageDialog(gm.frame, label);
+	    gm.setStatus(GameMain.Status.GAME_DUO);
 	}
 
     @Override
