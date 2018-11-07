@@ -21,7 +21,7 @@ public class Draw extends JPanel{
 		tk = Toolkit.getDefaultToolkit();
 		img = tk.getImage(getClass().getResource("BackGroundPattern.png"));  //フィールドの画像
 	}
-	public Draw(PuchuPair first, PuchuPair[] next) {	//プレイ用
+	public Draw(Field fd) {	//プレイ用
 		this.setPreferredSize(new Dimension(PanelW, PanelH));
 		
 		lb = new JLabel();
