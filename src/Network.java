@@ -122,7 +122,26 @@ public class Network extends Thread {
 			break;
 		case "MAKE":
 			break;
-		case "
+		case "LEFTPRESS":
+			break;
+		case "RIGHTPRESS:":
+			break;
+		case "DOWNPRESS":
+			break;
+		case "ZPRESS":
+			break;
+		case "XPRESS":
+			break;
+		case "LEFTRELEASE":
+			break;
+		case "RIGHTRELEASE":
+			break;
+		case "DOWNRELEASE":
+			break;
+		case "ZRELEASE":
+			break;
+		case "XRELEASE":
+			break;
 		}
 	}
 	
