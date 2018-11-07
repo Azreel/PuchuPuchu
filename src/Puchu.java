@@ -11,12 +11,10 @@ public class Puchu {
 	public int type;		// ぷちゅの種類
 	public int x;			// 座標
 	public int y;			//
-	public int id;			// 1次元配列管理上のID
 	
-	Puchu(int set_type, int set_x, int set_y, int set_id) {
+	Puchu(int set_type, int set_x, int set_y) {
 		this.type = set_type;
 		this.x = set_x;
 		this.y = set_y;
-		this.id = set_id;
 	}
 }
