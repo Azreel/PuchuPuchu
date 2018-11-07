@@ -19,7 +19,7 @@ public class Key extends KeyAdapter {
 	}
 
 	public void keyPressed(KeyEvent e) {// キーボードが押された時の処理
-
+		System.out.println(e.getKeyCode());
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:// ←キーが押されている間
 			Left = true;
@@ -37,7 +37,7 @@ public class Key extends KeyAdapter {
 			TurnRight = true;
 			break;
 		case KeyEvent.VK_Q:// Qキーが押されている間
-			gm.frame.dispose();
+			System.exit(0);
 			break;
 		}
 

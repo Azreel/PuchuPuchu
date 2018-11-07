@@ -50,7 +50,8 @@ public class GameMain extends Thread {
 					title = new Title(this, nw);
 					title.setPreferredSize(new Dimension(ScreenW, ScreenH));
 					frame.add(title);
-					frame.pack();
+					frame.revalidate();
+					frame.requestFocus();
 				}
 				break;
 			case GAME_SOLO: // 1Pプレイ
@@ -62,9 +63,14 @@ public class GameMain extends Thread {
 					PuchuPair[] next = new PuchuPair[2];
 					next[0] = new PuchuPair(1, Puchu.Type.Pat1, Puchu.Type.Pat2);
 					next[1] = new PuchuPair(2, Puchu.Type.Pat1, Puchu.Type.Pat2);
-					me = new Field();
+					me = new Field(first, next);
+					me.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
 					rival = new Field(); //空っぽ
-					//me.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
+					rival.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
+					frame.add(me);
+					frame.add(rival);
+					frame.revalidate();
+					frame.requestFocus();
 				} else {
 					// Fieldの画面描画関係
 				}
@@ -74,10 +80,18 @@ public class GameMain extends Thread {
 					System.out.println("2Pモード");
 					frame.remove(title);
 					title = null;
-					me = new Field();
-					rival = new Field();
-					//me.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
-					//rival.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
+					PuchuPair first = new PuchuPair(0, Puchu.Type.Pat1, Puchu.Type.Pat2);
+					PuchuPair[] next = new PuchuPair[2];
+					next[0] = new PuchuPair(1, Puchu.Type.Pat1, Puchu.Type.Pat2);
+					next[1] = new PuchuPair(2, Puchu.Type.Pat1, Puchu.Type.Pat2);
+					me = new Field(first, next);
+					me.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
+					rival = new Field(first, next);
+					rival.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
+					frame.add(me);
+					frame.add(rival);
+					frame.revalidate();
+					frame.requestFocus();
 				} else {
 					// Fieldの画面描画関係
 					nw.sentMyInput("Left");
