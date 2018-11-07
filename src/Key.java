@@ -8,11 +8,11 @@ public class Key extends KeyAdapter {
 	static public boolean Down;
 	static public boolean TurnRight;
 	static public boolean TurnLeft;
-	static public boolean Up;
-	static public int GameStage;
+	
+	GameMain gm;
 
-	Key() {
-		System.out.println("keyconst");
+	Key(GameMain parent) {
+		gm = parent;
 	}
 
 	public void keyTyped(KeyEvent e) {// キーボードが押された時の処理(文字)
@@ -31,28 +31,17 @@ public class Key extends KeyAdapter {
 			TurnLeft = true;
 			break;
 		case 40:// ↓キーが押されている間
-			TurnRight = true;
+			Down = true;
 			break;
 		case 32:// spaceキーが押されている間
 			Down = true;
 			break;
-		case 1:
-			Up = true;
-			break;
 		case KeyEvent.VK_ENTER:
-			if (GameStage == 0 || GameStage == 3)
-				GameStage = 1;
-			if (GameStage == 2)
-				System.exit(0);
 			break;
 		case 16:// shiftキーが押されている間
-			if (GameStage == 1)
-				GameStage = 3;
-			if (GameStage == 4)
-				GameStage = 1;
 			break;
 		case 81:// Qキーが押されている間
-			GameStage = 2;
+			gm.frame.dispose();
 			break;
 		}
 
@@ -75,10 +64,6 @@ public class Key extends KeyAdapter {
 			break;
 		case 32:// spaceキーが離されたとき
 			Down = false;
-			break;
-		case 16:
-			if (GameStage == 3)
-				GameStage = 4;
 			break;
 		}
 	}
