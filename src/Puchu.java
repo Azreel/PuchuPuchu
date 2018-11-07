@@ -3,8 +3,8 @@ import javax.swing.*;
 
 public class Puchu {
 	
-	public static final int Obs = -1;
-	public static final int Empty = 0;
+	public static final int Obs = -1;	// ‚¨×–‚‚Õ‚¿‚ã
+	public static final int Empty = 0;	// ‚Õ‚¿‚ã‚ª‘¶İ‚µ‚È‚¢
 	public static final int Pat1 = 1;
 	public static final int Pat2 = 2;
 	public static final int Pat3 = 3;
@@ -13,11 +13,11 @@ public class Puchu {
 	public static final int Pat6 = 6;
 	public static final int Pat7 = 7;
 	
-	public int type;
-	public Image face;
-	public int x;
-	public int y;
-	public int id;
+	public int type;	// ‚Õ‚¿‚ã‚Ìí—Ş -1 ~ 7
+	public Image face;	// ‚Õ‚¿‚ã‚ÌŠç‰æ‘œ
+	public int x;		// À•W
+	public int y;		//
+	public int id;		// ‚Õ‚¿‚ã‚Ì1ŸŒ³”z—ñŠÇ—ã‚ÌID
 	
 	public Puchu(int set_type, int set_x, int set_y, int set_id) {
 		this.type = set_type;
