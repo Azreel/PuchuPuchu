@@ -4,13 +4,14 @@ import javax.swing.*;
 public class GameMain extends Thread {
 	final int ScreenW = 960;
 	final int ScreenH = 640;
+	final long FPS = 1000 / 60;
 	
 	public static enum Status { GAME_TITLE, GAME_SOLO, GAME_DUO };
 	public JFrame frame = new JFrame();
 	
 	private Status gameStatus = Status.GAME_TITLE;
 	private Network nw;
-	private long loopDelay = 16;
+	private long loopDelay = FPS;
 	private Field me = null;
 	private Field rival = null;
 	private Title title = null;
@@ -57,11 +58,10 @@ public class GameMain extends Thread {
 					System.out.println("1Pモード");
 					frame.remove(title);
 					title = null;
-					PuchuPair first = new PuchuPair();
+					PuchuPair first = new PuchuPair(0);
 					PuchuPair[] next = new PuchuPair[2];
-					for(int i=0; i<2; i++) {
-						next[i] = new PuchuPair();
-					}
+					next[0] = new PuchuPair(1);
+					next[1] = new PuchuPair(2);
 					me = new Field();
 					rival = new Field(); //空っぽ
 					//me.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
@@ -93,7 +93,7 @@ public class GameMain extends Thread {
 				}
 				break;
 			}
-			loopDelay = 16 - (System.currentTimeMillis() - start);
+			loopDelay = FPS - (System.currentTimeMillis() - start);
 		}
 	}
 	
