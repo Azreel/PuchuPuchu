@@ -14,7 +14,7 @@ public class Puchu {
 	public int y;			//
 	public int id;			// 1次元配列管理上のID
 	
-	public Puchu(Type set_type, int set_x, int set_y, int set_id) {
+	Puchu(Type set_type, int set_x, int set_y, int set_id) {
 		this.puchu_type = set_type;
 		SetFace(set_type);
 		this.x = set_x;
