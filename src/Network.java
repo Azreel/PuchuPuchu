@@ -4,8 +4,9 @@ import java.net.*;
 public class Network extends Thread {
 	final int Port = 12345;
 	
+	public Mode programMode = Mode.SERVER;
+	
 	enum Mode { SERVER, CLIENT };
-	Mode programMode = Mode.SERVER;
 	GameMain gm;
 	Boolean isConnect = false;
 	ServerSocket ss;
@@ -36,11 +37,10 @@ public class Network extends Thread {
 			            //サーバがクライアントへ送るデータを一時保存するバッファ(送信バッファ)
 			            pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(sc.getOutputStream())));
 					} else {
-						if(br.readLine().equals("PING")) {
+						if(!isConnect && br.readLine().equals("PING")) {
 							pw.println("PONG");
 							pw.flush();
 							isConnect = true;
-							programMode = Mode.CLIENT;
 							gm.rivalApply();
 						}
 					}
@@ -48,6 +48,7 @@ public class Network extends Thread {
 				case CLIENT:
 					break;
 				}
+				if(isConnect) getRivalStatus();
 			}catch(Exception e) {
 				System.out.println("nw run: "+e);
 				if(isConnect) return;
@@ -106,19 +107,34 @@ public class Network extends Thread {
         }
 	}
 	
-	public String getRivalInput() {
+	private void getRivalStatus() {
+		String input;
 		try {
-			String input = br.readLine();
-			return input;
+			input = br.readLine();
 		}catch(Exception e) {
 			System.out.println("nw get: "+e);
-			if(e.getMessage().equals("Connection reset")) return "END";
-			else return null;
+			input = "END";
+		}
+		switch(input) {
+		case "START":
+			break;
+		case "END":
+			break;
+		case "MAKE":
+			break;
+		case "
 		}
 	}
 	
-	public void sentMyInput(String input) {
-		pw.println(input);
+	public void sentPuchu(int type1, int type2) {
+		pw.println("MAKE");
+		pw.println(type1);
+		pw.println(type2);
+		pw.flush();
+	}
+	
+	public void sentStatus(String status) {
+		pw.println(status);
 		pw.flush();
 	}
 }

@@ -7,7 +7,7 @@ public class GameMain extends Thread {
 	final long FPS = 1000 / 60;
 	
 	public static enum Status { GAME_TITLE, GAME_SOLO, GAME_DUO };
-	public JFrame frame = new JFrame();
+	public final JFrame frame = new JFrame();
 	
 	private Status gameStatus = Status.GAME_TITLE;
 	private Network nw;
@@ -32,7 +32,7 @@ public class GameMain extends Thread {
 		frame.setResizable(false);// サイズ変更不可
 		frame.setLayout(new GridLayout(1,2));
 		frame.setVisible(true);
-		meKey = new Key(this);
+		meKey = new Key(this); //キー取得用
 		frame.addKeyListener(meKey);
 	}
 	
@@ -69,8 +69,7 @@ public class GameMain extends Thread {
 					frame.remove(title);
 					title = null;
 					// プレイヤーフィールド
-					//me = new Field(meKey);
-					me = new Field();
+					me = new Field(meKey);
 					meDraw = new Draw(me);
 					meDraw.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
 					// nullプレイヤーフィールド
@@ -108,16 +107,6 @@ public class GameMain extends Thread {
 //					frame.requestFocus();
 				} else {
 					// Fieldの画面描画関係
-					nw.sentMyInput("Left");
-					String rival = nw.getRivalInput();
-					if(rival.equals("END")) {
-						JLabel label = new JLabel("勝ち");
-					    JOptionPane.showMessageDialog(frame, label);
-					    nw = null;
-					    setStatus(GameMain.Status.GAME_TITLE);
-					}else {
-						System.out.println(nw.getRivalInput());
-					}
 				}
 				break;
 			}
