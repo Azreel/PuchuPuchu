@@ -10,7 +10,7 @@ public class Field extends JPanel{
 	
 	Toolkit tk;
 	Image img;
-	JLabel lb;
+	JLabel lb;	//ラベル
 	private int i, j;
 	public int score = 0;
 	public ArrayList<Puchu> puchu_list;
