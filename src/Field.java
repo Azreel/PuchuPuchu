@@ -3,46 +3,36 @@ import java.util.*;
 
 import javax.swing.*;
 
-public class Field extends JPanel{
+public class Field {
 	
-	final int PanelW = 480;
-	final int PanelH = 640;
-	
-	Toolkit tk;
-	Image img;
-	JLabel lb;	//ラベル
-	private int i, j;
 	public int score = 0;
-	public ArrayList<Puchu> puchu_list;
 	public Puchu[][] cell = new Puchu[12][6];
+	public PuchuPair now, next1, next2;
 	
-	public Field() {	//1P用
-		this.setPreferredSize(new Dimension(PanelW, PanelH));
-		
-		lb = new JLabel();
-		lb.setPreferredSize(new Dimension(PanelW, PanelH));
-		
-		tk = Toolkit.getDefaultToolkit();
-		img = tk.getImage(getClass().getResource("BackGroundPattern.png"));  //フィールドの画像
-	}
-	public Field(PuchuPair first, PuchuPair[] next) {	//対戦用
-		this.setPreferredSize(new Dimension(PanelW, PanelH));
-		
-		lb = new JLabel();
-		lb.setPreferredSize(new Dimension(PanelW, PanelH));
-		
-		tk = Toolkit.getDefaultToolkit();
-		img = tk.getImage(getClass().getResource("BackGroundPattern.png"));
+	public Field() {	
+
 	}
 	
-	@Override
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		Graphics2D img_2d = (Graphics2D) g;
-		for ( i = 0; i < 6; i++ ) {
-			for ( j = 0; j < 3; j++ ) {
-				img_2d.drawImage(img, j*img.getWidth(this) + 60, i*img.getHeight(this) + 120, this);	//連続描画
-			}
-		}
+	public void create_puchu(){	//first create
+		
+		Random rnd = new Random();
+		
+		now = new PuchuPair(rnd.nextInt(6), rnd.nextInt(6));	//振ってくるぷちゅ
+		next1 = new PuchuPair(rnd.nextInt(6), rnd.nextInt(6));	//次のぷちゅ
+		next2 = new PuchuPair(rnd.nextInt(6), rnd.nextInt(6));	//次の次のぷちゅ
 	}
+	
+	public void update_puchu() {	//ぷちゅの更新
+		
+		Random rnd = new Random();
+		
+		now.puchu1.type = next1.puchu1.type;
+		now.puchu2.type = next1.puchu2.type;
+		
+		next1.puchu1.type = next2.puchu1.type;
+		next1.puchu2.type = next2.puchu2.type;
+		
+		next2 = new PuchuPair(rnd.nextInt(6), rnd.nextInt(6));
+	}
+	
 }
