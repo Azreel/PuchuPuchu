@@ -21,26 +21,22 @@ public class Key extends KeyAdapter {
 	public void keyPressed(KeyEvent e) {// キーボードが押された時の処理
 
 		switch (e.getKeyCode()) {
-		case 37:// ←キーが押されている間
+		case KeyEvent.VK_LEFT:// ←キーが押されている間
 			Left = true;
 			break;
-		case 39:// →キーが押されている間
+		case KeyEvent.VK_RIGHT:// →キーが押されている間
 			Right = true;
 			break;
-		case 38:// ↑キーが押されている間
+		case KeyEvent.VK_DOWN:// ↓キーが押されている間
+			Down = true;
+			break;
+		case KeyEvent.VK_Z:// Zキーが押されている間
 			TurnLeft = true;
 			break;
-		case 40:// ↓キーが押されている間
-			Down = true;
+		case KeyEvent.VK_X:// Xキーが押されている間
+			TurnRight = true;
 			break;
-		case 32:// spaceキーが押されている間
-			Down = true;
-			break;
-		case KeyEvent.VK_ENTER:
-			break;
-		case 16:// shiftキーが押されている間
-			break;
-		case 81:// Qキーが押されている間
+		case KeyEvent.VK_Q:// Qキーが押されている間
 			gm.frame.dispose();
 			break;
 		}
@@ -50,20 +46,20 @@ public class Key extends KeyAdapter {
 	public void keyReleased(KeyEvent e) {// キーボードから離された時の処理
 
 		switch (e.getKeyCode()) {
-		case 37:// ←キーが離されたとき
+		case KeyEvent.VK_LEFT:// ←キーが押されている間
 			Left = false;
 			break;
-		case 39:// →キーが離されたとき
+		case KeyEvent.VK_RIGHT:// →キーが押されている間
 			Right = false;
 			break;
-		case 38:// ↑キーが離されたとき
+		case KeyEvent.VK_DOWN:// ↓キーが押されている間
+			Down = false;
+			break;
+		case KeyEvent.VK_Z:// Zキーが押されている間
 			TurnLeft = false;
 			break;
-		case 40:// ↓キーが離されたとき
+		case KeyEvent.VK_X:// Xキーが押されている間
 			TurnRight = false;
-			break;
-		case 32:// spaceキーが離されたとき
-			Down = false;
 			break;
 		}
 	}

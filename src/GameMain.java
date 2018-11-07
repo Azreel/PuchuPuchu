@@ -57,6 +57,11 @@ public class GameMain extends Thread {
 					System.out.println("1Pモード");
 					frame.remove(title);
 					title = null;
+					PuchuPair first = new PuchuPair();
+					PuchuPair[] next = new PuchuPair[2];
+					for(int i=0; i<2; i++) {
+						next[i] = new PuchuPair();
+					}
 					me = new Field();
 					rival = new Field(); //空っぽ
 					//me.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
