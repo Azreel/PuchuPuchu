@@ -12,11 +12,13 @@ public class GameMain extends Thread {
 	private Status gameStatus = Status.GAME_TITLE;
 	private Network nw;
 	private long loopDelay = FPS;
+	private Key meKey = null;
+	private Key rivalKey = null;
+	private Title title = null;
 	private Field me = null;
 	private Field rival = null;
 	private Draw meDraw = null;
 	private Draw rivalDraw = null;
-	private Title title = null;
 	
 	GameMain(){
 		MakeWindow();
@@ -30,7 +32,8 @@ public class GameMain extends Thread {
 		frame.setResizable(false);// サイズ変更不可
 		frame.setLayout(new GridLayout(1,2));
 		frame.setVisible(true);
-		frame.addKeyListener(new Key(this));
+		meKey = new Key(this);
+		frame.addKeyListener(meKey);
 	}
 	
 	public void run() {
@@ -66,6 +69,7 @@ public class GameMain extends Thread {
 					frame.remove(title);
 					title = null;
 					// プレイヤーフィールド
+					//me = new Field(meKey);
 					me = new Field();
 					meDraw = new Draw(me);
 					meDraw.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
@@ -79,11 +83,29 @@ public class GameMain extends Thread {
 					frame.requestFocus();
 				} else {
 					// Fieldの画面描画関係
+					meDraw.repaint();
 				}
 				break;
 			case GAME_DUO: // 2Pプレイ
 				if(me == null && rival == null) {
 					System.out.println("2Pモード");
+//					// タイトル除去
+//					frame.remove(title);
+//					title = null;
+//					// プレイヤーフィールド
+//					me = new Field(meKey);
+//					meDraw = new Draw(me);
+//					meDraw.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
+//					// ライバルプレイヤーフィールド
+//					rivalKey = new Key(null);
+//					rival = new Field(rivalKey);
+//					rivalDraw = new Draw(rival);
+//					rivalDraw.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
+//					// フレームに追加
+//					frame.add(meDraw);
+//					frame.add(rivalDraw);
+//					frame.revalidate();
+//					frame.requestFocus();
 				} else {
 					// Fieldの画面描画関係
 					nw.sentMyInput("Left");

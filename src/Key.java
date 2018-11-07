@@ -3,11 +3,11 @@ import java.awt.event.KeyEvent;
 
 public class Key extends KeyAdapter {
 
-	static public boolean Left;
-	static public boolean Right;
-	static public boolean Down;
-	static public boolean TurnRight;
-	static public boolean TurnLeft;
+	public boolean Left;
+	public boolean Right;
+	public boolean Down;
+	public boolean TurnRight;
+	public boolean TurnLeft;
 	
 	GameMain gm;
 
@@ -19,7 +19,6 @@ public class Key extends KeyAdapter {
 	}
 
 	public void keyPressed(KeyEvent e) {// キーボードが押された時の処理
-		System.out.println(e.getKeyCode());
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:// ←キーが押されている間
 			Left = true;
@@ -44,7 +43,6 @@ public class Key extends KeyAdapter {
 	}
 
 	public void keyReleased(KeyEvent e) {// キーボードから離された時の処理
-
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:// ←キーが押されている間
 			Left = false;
