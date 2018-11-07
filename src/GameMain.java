@@ -4,21 +4,20 @@ import javax.swing.*;
 public class GameMain extends Thread {
 	final int ScreenW = 960;
 	final int ScreenH = 640;
+	final long FPS = 1000 / 60;
 	
 	public static enum Status { GAME_TITLE, GAME_SOLO, GAME_DUO };
 	public JFrame frame = new JFrame();
 	
 	private Status gameStatus = Status.GAME_TITLE;
 	private Network nw;
-	private long loopDelay = 16;
+	private long loopDelay = FPS;
 	private Field me = null;
 	private Field rival = null;
 	private Title title = null;
 	
 	GameMain(){
 		MakeWindow();
-		nw = new Network(this);
-		nw.start();
 	}
 	
 	private void MakeWindow() {
@@ -29,15 +28,14 @@ public class GameMain extends Thread {
 		frame.setResizable(false);// サイズ変更不可
 		frame.setLayout(new GridLayout(1,2));
 		frame.setVisible(true);
+		frame.addKeyListener(new Key(this));
 	}
 	
 	public void run() {
 		while(true) {
 			// 60fps保つ
 			try {
-				if(loopDelay > 0) {
-					sleep(loopDelay);
-				}
+				if(loopDelay > 0) sleep(loopDelay);
 			}catch(Exception e) {}
 			// ゲーム全体の管理
 			long start = System.currentTimeMillis();
@@ -47,6 +45,8 @@ public class GameMain extends Thread {
 					System.out.println("タイトル生成");
 					me = null;
 					rival = null;
+					nw = new Network(this);
+					nw.start();
 					title = new Title(this, nw);
 					title.setPreferredSize(new Dimension(ScreenW, ScreenH));
 					frame.add(title);
@@ -54,11 +54,16 @@ public class GameMain extends Thread {
 				}
 				break;
 			case GAME_SOLO: // 1Pプレイ
-				if(me == null) {
+				if(me == null && rival == null) {
 					System.out.println("1Pモード");
 					frame.remove(title);
 					title = null;
+					PuchuPair first = new PuchuPair(0, Puchu.Type.Pat1, Puchu.Type.Pat2);
+					PuchuPair[] next = new PuchuPair[2];
+					next[0] = new PuchuPair(1, Puchu.Type.Pat1, Puchu.Type.Pat2);
+					next[1] = new PuchuPair(2, Puchu.Type.Pat1, Puchu.Type.Pat2);
 					me = new Field();
+					rival = new Field(); //空っぽ
 					//me.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
 				} else {
 					// Fieldの画面描画関係
@@ -75,13 +80,20 @@ public class GameMain extends Thread {
 					//rival.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
 				} else {
 					// Fieldの画面描画関係
+					nw.sentMyInput("Left");
+					String rival = nw.getRivalInput();
+					if(rival.equals("END")) {
+						JLabel label = new JLabel("勝ち");
+					    JOptionPane.showMessageDialog(frame, label);
+					    nw = null;
+					    setStatus(GameMain.Status.GAME_TITLE);
+					}else {
+						System.out.println(nw.getRivalInput());
+					}
 				}
 				break;
-			default: // エラー
-				System.out.println("予期せぬゲームステータス");
-				break;
 			}
-			loopDelay = 16 - (System.currentTimeMillis() - start);
+			loopDelay = FPS - (System.currentTimeMillis() - start);
 		}
 	}
 	

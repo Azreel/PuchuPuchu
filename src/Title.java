@@ -2,8 +2,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 public class Title extends JPanel{
 	final Toolkit tk = Toolkit.getDefaultToolkit();
@@ -25,7 +23,7 @@ public class Title extends JPanel{
 		//背景画像
 		bg = tk.getImage(getClass().getResource("title.png"));
 		//自分のIPアドレス
-        myIP = new JLabel(getIPaddr());
+        myIP = new JLabel(nw.getIPaddr());
         myIP.setBounds(225, 470, 400, 30);
         myIP.setFont(labelFont);
 		//1Pプレイ
@@ -52,15 +50,6 @@ public class Title extends JPanel{
         this.add(rivalIP);
         this.add(myIP);
     }
-	
-	private String getIPaddr() {
-		try {
-			InetAddress addr = InetAddress.getLocalHost();
-			return "自分のIPアドレス: " + addr.getHostAddress();
-		} catch(UnknownHostException e) {
-			return "ネットワークに接続されていません";
-		}
-	}
 	
 	private class SoloPlayBtn implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
