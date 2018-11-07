@@ -13,7 +13,7 @@ public class PuchuPair {
 	int _y = 200; 		//
 	public int form;	// 姿勢状態(ぷちゅ1を中心にぷちゅ2がどこにいるか)
 	
-	PuchuPair(int set_id, Puchu.Type set_type1, Puchu.Type set_type2){
+	PuchuPair(int set_id, int set_type1, int set_type2){
 		this.form = PuchuPair.Up;
 		this.puchu1 = new Puchu(set_type1, _x, _y, set_id);
 		this.puchu2 = new Puchu(set_type2, _x, _y - 40, set_id + 1);		
