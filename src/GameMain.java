@@ -58,10 +58,10 @@ public class GameMain extends Thread {
 					System.out.println("1Pモード");
 					frame.remove(title);
 					title = null;
-					PuchuPair first = new PuchuPair(0);
+					PuchuPair first = new PuchuPair(0, Puchu.Type.Pat1, Puchu.Type.Pat2);
 					PuchuPair[] next = new PuchuPair[2];
-					next[0] = new PuchuPair(1);
-					next[1] = new PuchuPair(2);
+					next[0] = new PuchuPair(1, Puchu.Type.Pat1, Puchu.Type.Pat2);
+					next[1] = new PuchuPair(2, Puchu.Type.Pat1, Puchu.Type.Pat2);
 					me = new Field();
 					rival = new Field(); //空っぽ
 					//me.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
