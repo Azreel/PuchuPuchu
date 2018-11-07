@@ -8,9 +8,14 @@ public class Field {
 	public int score = 0;
 	public Puchu[][] cell = new Puchu[12][6];
 	public PuchuPair now, next1, next2;
+	public Draw draw;
 	
-	public Field() {	
+	public Field() {
+		draw = new Draw();
+	}
 
+	public Field(Key key) {
+		draw = new Draw(this);
 	}
 	
 	public void create_puchu(){	//first create
