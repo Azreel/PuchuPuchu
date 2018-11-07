@@ -14,6 +14,8 @@ public class GameMain extends Thread {
 	private long loopDelay = FPS;
 	private Field me = null;
 	private Field rival = null;
+	private Draw meDraw = null;
+	private Draw rivalDraw = null;
 	private Title title = null;
 	
 	GameMain(){
@@ -43,10 +45,13 @@ public class GameMain extends Thread {
 			case GAME_TITLE: // タイトル
 				if(title == null) {
 					System.out.println("タイトル生成");
+					// 前のプレイデータを消去
 					me = null;
 					rival = null;
+					// ネットワーク開始
 					nw = new Network(this);
 					nw.start();
+					// タイトルパネル追加
 					title = new Title(this, nw);
 					title.setPreferredSize(new Dimension(ScreenW, ScreenH));
 					frame.add(title);
@@ -57,18 +62,19 @@ public class GameMain extends Thread {
 			case GAME_SOLO: // 1Pプレイ
 				if(me == null && rival == null) {
 					System.out.println("1Pモード");
+					// タイトル除去
 					frame.remove(title);
 					title = null;
-					PuchuPair first = new PuchuPair(0, Puchu.Type.Pat1, Puchu.Type.Pat2);
-					PuchuPair[] next = new PuchuPair[2];
-					next[0] = new PuchuPair(1, Puchu.Type.Pat1, Puchu.Type.Pat2);
-					next[1] = new PuchuPair(2, Puchu.Type.Pat1, Puchu.Type.Pat2);
-					me = new Field(first, next);
-					me.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
-					rival = new Field(); //空っぽ
-					rival.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
-					frame.add(me);
-					frame.add(rival);
+					// プレイヤーフィールド
+					me = new Field();
+					meDraw = new Draw(me);
+					meDraw.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
+					// nullプレイヤーフィールド
+					rivalDraw = new Draw();
+					rivalDraw.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
+					// フレームに追加
+					frame.add(meDraw);
+					frame.add(rivalDraw);
 					frame.revalidate();
 					frame.requestFocus();
 				} else {
@@ -78,20 +84,6 @@ public class GameMain extends Thread {
 			case GAME_DUO: // 2Pプレイ
 				if(me == null && rival == null) {
 					System.out.println("2Pモード");
-					frame.remove(title);
-					title = null;
-					PuchuPair first = new PuchuPair(0, Puchu.Type.Pat1, Puchu.Type.Pat2);
-					PuchuPair[] next = new PuchuPair[2];
-					next[0] = new PuchuPair(1, Puchu.Type.Pat1, Puchu.Type.Pat2);
-					next[1] = new PuchuPair(2, Puchu.Type.Pat1, Puchu.Type.Pat2);
-					me = new Field(first, next);
-					me.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
-					rival = new Field(first, next);
-					rival.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
-					frame.add(me);
-					frame.add(rival);
-					frame.revalidate();
-					frame.requestFocus();
 				} else {
 					// Fieldの画面描画関係
 					nw.sentMyInput("Left");
