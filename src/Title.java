@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 
 public class Title extends JPanel{
 	final Toolkit tk = Toolkit.getDefaultToolkit();
+	final int fadeSpeed = 60;
 	
 	GameMain gm;
 	Network nw;
@@ -14,6 +15,9 @@ public class Title extends JPanel{
 	JLabel rival, myIP;
 	Font btnFont = new Font("MS ゴシック", Font.PLAIN, 24);
 	Font labelFont = new Font("MS ゴシック", Font.PLAIN, 20);
+	GameMain.Status next = null;
+	boolean isFade = false;
+	float fadeAlpha = 0.0f;
 	
 	Title(GameMain parent, Network client) {
 		gm = parent;
@@ -53,14 +57,14 @@ public class Title extends JPanel{
 	
 	private class SoloPlayBtn implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
-			gm.setStatus(GameMain.Status.GAME_SOLO);
+			setFade(GameMain.Status.GAME_SOLO);
 		}
 	}
 	
 	private class DuoPlayBtn implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
 			if(nw.Connect(rivalIP.getText())) {
-				gm.setStatus(GameMain.Status.GAME_DUO);
+				setFade(GameMain.Status.GAME_DUO);
 			} else {
 				JLabel label = new JLabel("接続に失敗しました");
 			    JOptionPane.showMessageDialog(gm.frame, label);
@@ -71,13 +75,30 @@ public class Title extends JPanel{
 	public void rivalApply() {
 		JLabel label = new JLabel("相手の接続を受けました");
 	    JOptionPane.showMessageDialog(gm.frame, label);
-	    gm.setStatus(GameMain.Status.GAME_DUO);
+	    setFade(GameMain.Status.GAME_DUO);
 	}
-
+	
+	private void setFade(GameMain.Status status) {
+		next = status;
+		isFade = true;
+		this.removeAll();
+	}
+	
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2D = (Graphics2D) g;
         g2D.drawImage(bg, null, this);
+        if(isFade) {
+        	int xx = this.getWidth();
+            int yy = this.getHeight();
+            g2D.setColor(new Color(0,0,0,(int)(fadeAlpha*255)));
+            g2D.fillRect(0, 0, xx, yy);
+            fadeAlpha += 1.0f / fadeSpeed;
+            if(fadeAlpha > 1.0f){
+            	isFade = false;
+            	gm.setStatus(next);
+            }
+        }
     }
 }
