@@ -8,7 +8,7 @@ public class Field {
 	public int score = 0;
 	public Puchu[][] cell = new Puchu[6][12];
 	public Puchu first_puchu;
-	public PuchuPair now, next1, next2;
+	public PuchuPair now, next1, next2, next3;
 	public Draw draw;
 	
 	public Key key;
@@ -40,6 +40,7 @@ public class Field {
 		now = new PuchuPair(rnd.nextInt(6)+1, rnd.nextInt(6)+1);	//振ってくるぷちゅ
 		next1 = new PuchuPair(rnd.nextInt(6)+1, rnd.nextInt(6)+1);	//次のぷちゅ
 		next2 = new PuchuPair(rnd.nextInt(6)+1, rnd.nextInt(6)+1);	//次の次のぷちゅ
+		next3 = new PuchuPair(rnd.nextInt(6)+1, rnd.nextInt(6)+1);
 	}
 	
 	public void update_puchu() {	//ぷちゅの更新
@@ -52,7 +53,11 @@ public class Field {
 		next1.puchu1.type = next2.puchu1.type;	//次のぷちゅの更新
 		next1.puchu2.type = next2.puchu2.type;
 		
-		next2 = new PuchuPair(rnd.nextInt(6), rnd.nextInt(6));	//次の次のぷちゅの更新
+		next2.puchu1.type = next3.puchu1.type;
+		next2.puchu2.type = next3.puchu2.type;
+		
+		next3 = new PuchuPair(rnd.nextInt(6), rnd.nextInt(6));	//次の次のぷちゅの更新
+		
 	}
 	
 	public void hit_puchu() {
