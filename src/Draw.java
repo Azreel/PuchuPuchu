@@ -40,8 +40,8 @@ public class Draw extends JPanel{
 		img_background = tk.getImage(getClass().getResource("fieldbackground.png"));
 		
 		fd = _fd;
-		fd.next[0].movePosition(290, 50);
-		fd.next[1].movePosition(265,  -40);
+//		fd.next[0].movePosition(290, 50);
+//		fd.next[1].movePosition(265,  -40);
 		
 		initImage();
 	}
