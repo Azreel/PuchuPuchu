@@ -3,46 +3,109 @@ import java.util.*;
 
 import javax.swing.*;
 
-public class Field extends JPanel{
+public class Field {
 	
-	final int PanelW = 480;
-	final int PanelH = 640;
-	
-	Toolkit tk;
-	Image img;
-	JLabel lb;	//ラベル
-	private int i, j;
 	public int score = 0;
-	public ArrayList<Puchu> puchu_list;
-	public Puchu[][] cell = new Puchu[12][6];
+	public Puchu[][] cell = new Puchu[6][12];
+	public PuchuPair now, next1, next2;
+	public Draw draw;
 	
-	public Field() {	//1P用
-		this.setPreferredSize(new Dimension(PanelW, PanelH));
-		
-		lb = new JLabel();
-		lb.setPreferredSize(new Dimension(PanelW, PanelH));
-		
-		tk = Toolkit.getDefaultToolkit();
-		img = tk.getImage(getClass().getResource("BackGroundPattern.png"));  //フィールドの画像
+	public Key rivalKey = null;
+	public Key meKey = null;
+	
+	public boolean bottom_flag = false; //当たり判定
+	public boolean left_flag = false;
+	public boolean right_flag = false;
+
+	private int now_x = 0;
+	private int now_y = 0;
+	
+	public Field() {			//nullプレイヤー用
+		draw = new Draw();
 	}
-	public Field(PuchuPair first, PuchuPair[] next) {	//対戦用
-		this.setPreferredSize(new Dimension(PanelW, PanelH));
-		
-		lb = new JLabel();
-		lb.setPreferredSize(new Dimension(PanelW, PanelH));
-		
-		tk = Toolkit.getDefaultToolkit();
-		img = tk.getImage(getClass().getResource("BackGroundPattern.png"));
+
+	public Field(Key key) {
+		draw = new Draw(this);
 	}
 	
-	@Override
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		Graphics2D img_2d = (Graphics2D) g;
-		for ( i = 0; i < 6; i++ ) {
-			for ( j = 0; j < 3; j++ ) {
-				img_2d.drawImage(img, j*img.getWidth(this) + 60, i*img.getHeight(this) + 120, this);	//連続描画
+	public void create_puchu(){	//first create
+		
+		Random rnd = new Random();
+		
+		now = new PuchuPair(rnd.nextInt(6), rnd.nextInt(6));	//振ってくるぷちゅ
+		next1 = new PuchuPair(rnd.nextInt(6), rnd.nextInt(6));	//次のぷちゅ
+		next2 = new PuchuPair(rnd.nextInt(6), rnd.nextInt(6));	//次の次のぷちゅ
+	}
+	
+	public void update_puchu() {	//ぷちゅの更新
+		
+		Random rnd = new Random();
+		
+		now.puchu1.type = next1.puchu1.type;	//振ってくるぷちゅの更新
+		now.puchu2.type = next1.puchu2.type;
+		
+		next1.puchu1.type = next2.puchu1.type;	//次のぷちゅの更新
+		next1.puchu2.type = next2.puchu2.type;
+		
+		next2 = new PuchuPair(rnd.nextInt(6), rnd.nextInt(6));	//次の次のぷちゅの更新
+	}
+	
+	public void hit_puchu() {
+		
+		if ( now.form == 0 ) {
+			now_x = ( now.puchu1.x - 60 ) / 40;
+			now_y = ( now.puchu1.y - 110 ) / 40;
+			
+			if ( cell[now_x+1][now_y].type != 0 ) {
+				right_flag = true;
+			}
+			if ( cell[now_x-1][now_y].type != 0 ) {
+				left_flag = true;
+			}
+			if ( cell[now_x][now_y+1].type != 0 ) {
+				bottom_flag = true;
+			}
+			
+		} else if ( now.form == 1 ) {
+			now_x = ( now.puchu1.x - 60 ) / 40;
+			now_y = ( now.puchu1.y - 110 ) / 40;
+			
+			if ( cell[now_x+2][now_y].type != 0 ) {
+				right_flag = true;
+			}
+			if ( cell[now_x-1][now_y].type != 0 ) {
+				left_flag = true;
+			}
+			if ( cell[now_x][now_y+1].type != 0 || cell[now_x+1][now_y+1].type != 0 ) {
+				bottom_flag = true;
+			}
+		} else if ( now.form == 2 ) {
+			now_x = ( now.puchu2.x - 60 ) / 40;
+			now_y = ( now.puchu2.y - 110 ) / 40;
+			
+			if ( cell[now_x+1][now_y].type != 0 ) {
+				right_flag = true;
+			}
+			if ( cell[now_x-1][now_y].type != 0 ) {
+				left_flag = true;
+			}
+			if ( cell[now_x][now_y+1].type != 0 ) {
+				bottom_flag = true;
+			}
+		} else {
+			now_x = ( now.puchu1.x - 60 ) / 40;
+			now_y = ( now.puchu1.y - 110 ) / 40;
+			
+			if ( cell[now_x+1][now_y].type != 0 ) {
+				right_flag = true;
+			}
+			if ( cell[now_x-2][now_y].type != 0 ) {
+				left_flag = true;
+			}
+			if ( cell[now_x][now_y+1].type != 0 || cell[now_x-2][now_y].type != 0 ) {
+				bottom_flag = true;
 			}
 		}
 	}
+	
 }
