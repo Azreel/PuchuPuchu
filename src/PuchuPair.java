@@ -8,8 +8,8 @@ public class PuchuPair {
 	public static final int Left = 3;
 	
 	Puchu puchu1, puchu2;
-	int _x = 60+80;		// 生成座標
-	int _y = 120+40; 	//
+	int _x = 80;		// 生成座標
+	int _y = 40; 	//
 	public int form;	// 姿勢状態(ぷちゅ1を中心にぷちゅ2がどこにいるか)
 	public boolean is_match_posture_right = true;	// 右回転に対して判定位置と描写位置がずれているか
 	public boolean is_match_posture_left = true;	// 左回転に対して判定位置と描写位置がずれているか

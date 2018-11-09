@@ -6,13 +6,14 @@ import javax.swing.*;
 public class Draw extends JPanel{
 	
 	public static final int Squares = 40;
+	private static final int margin_w = 60, margin_h = 110;
 	
 	final int PanelW = 480;
 	final int PanelH = 640;
 	
 	Toolkit tk;
 	Image img;
-	Image img_puchu[] = new Image[8];
+	Image img_puchu[] = new Image[9];
 	JLabel lb;	//ラベル
 	Field fd;
 	
@@ -60,6 +61,8 @@ public class Draw extends JPanel{
 		
 		fd = _fd;
 		
+		initImage();
+		
 		//--- テスト用仮処理 ---
 //		puchu_cell_init();
 //		cell[11][0].type = Puchu.Pat1;
@@ -72,6 +75,12 @@ public class Draw extends JPanel{
 //		cell[1][0].type = Puchu.Emp;
 //		now_puchu = new PuchuPair(Puchu.Pat1, Puchu.Pat1);
 		//-------------
+	}
+	
+	private void initImage() {
+		for ( int i = 1; i <= 8; i++ ) {
+			img_puchu[i] = tk.getImage(getClass().getResource("puchu"+i+".png"));			
+		}
 	}
 	
 	public void startDropAnim() {
@@ -126,10 +135,10 @@ public class Draw extends JPanel{
 		if ( !vanflg ) { time4++; }
 */		//-------------
 		
-//		if ( !fd.now.is_match_posture_right ) { fd.now.drawingTurnRight(); }
-//		if ( !fd.now.is_match_posture_left ) { fd.now.drawingTurnLeft(); }
-//		if ( !fd.now.is_match_position ) { fd.now.drawingMove(); }
-//		img_2d.drawImage(img_puchu[fd.now.puchu1.type], fd.now.puchu1.draw_x, fd.now.puchu1.draw_y, this);
-//		img_2d.drawImage(img_puchu[fd.now.puchu2.type], fd.now.puchu2.draw_x, fd.now.puchu2.draw_y, this);
+		if ( !fd.now.is_match_posture_right ) { fd.now.drawingTurnRight(); }
+		if ( !fd.now.is_match_posture_left ) { fd.now.drawingTurnLeft(); }
+		if ( !fd.now.is_match_position ) { fd.now.drawingMove(); }
+		img_2d.drawImage(img_puchu[fd.now.puchu1.type], fd.now.puchu1.draw_x + margin_w, fd.now.puchu1.draw_y + margin_h, this);
+		img_2d.drawImage(img_puchu[fd.now.puchu2.type], fd.now.puchu2.draw_x + margin_w, fd.now.puchu2.draw_y + margin_h, this);
 	}
 }
