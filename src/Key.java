@@ -9,12 +9,6 @@ public class Key extends KeyAdapter {
 	public boolean TurnRight;
 	public boolean TurnLeft;
 	public String KeyData;
-	
-	GameMain gm;
-
-	Key(GameMain parent) {
-		gm = parent;
-	}
 
 	public void keyTyped(KeyEvent e) {// キーボードが押された時の処理(文字)
 	}
