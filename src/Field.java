@@ -65,8 +65,8 @@ public class Field {
 	public void hit_puchu() {
 		
 		if ( now.form == 0 ) {
-			now_x = ( now.puchu1.x - 60 ) / 40;
-			now_y = ( now.puchu1.y - 110 ) / 40;
+			now_x = ( now.puchu1.x ) / 40;
+			now_y = ( now.puchu1.y ) / 40;
 			
 			if ( cell[now_x+1][now_y].type != 0 ) {
 				right_flag = true;
@@ -79,8 +79,8 @@ public class Field {
 			}
 			
 		} else if ( now.form == 1 ) {
-			now_x = ( now.puchu1.x - 60 ) / 40;
-			now_y = ( now.puchu1.y - 110 ) / 40;
+			now_x = ( now.puchu1.x ) / 40;
+			now_y = ( now.puchu1.y ) / 40;
 			
 			if ( cell[now_x+2][now_y].type != 0 ) {
 				right_flag = true;
@@ -92,8 +92,8 @@ public class Field {
 				bottom_flag = true;
 			}
 		} else if ( now.form == 2 ) {
-			now_x = ( now.puchu2.x - 60 ) / 40;
-			now_y = ( now.puchu2.y - 110 ) / 40;
+			now_x = ( now.puchu2.x ) / 40;
+			now_y = ( now.puchu2.y ) / 40;
 			
 			if ( cell[now_x+1][now_y].type != 0 ) {
 				right_flag = true;
@@ -105,8 +105,8 @@ public class Field {
 				bottom_flag = true;
 			}
 		} else {
-			now_x = ( now.puchu1.x - 60 ) / 40;
-			now_y = ( now.puchu1.y - 110 ) / 40;
+			now_x = ( now.puchu1.x ) / 40;
+			now_y = ( now.puchu1.y ) / 40;
 			
 			if ( cell[now_x+1][now_y].type != 0 ) {
 				right_flag = true;
@@ -130,7 +130,7 @@ public class Field {
 	
 	public void deside_pos() {		//落下先の場所決め
 		
-		if ( bottom_flag == true ) {
+		if ( bottom_flag == true && now_y != 11 ) {
 			
 		}
 		
