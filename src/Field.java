@@ -8,7 +8,8 @@ public class Field {
 	public int score = 0;
 	public Puchu[][] cell = new Puchu[6][12];
 	public Puchu first_puchu;
-	public PuchuPair now, next1, next2, next3;
+	public PuchuPair now;
+	public PuchuPair[] next = new PuchuPair[3];
 	public Draw draw;
 	
 	public Key key;
@@ -38,25 +39,24 @@ public class Field {
 		Random rnd = new Random();
 		
 		now = new PuchuPair(rnd.nextInt(6)+1, rnd.nextInt(6)+1);	//振ってくるぷちゅ
-		next1 = new PuchuPair(rnd.nextInt(6)+1, rnd.nextInt(6)+1);	//次のぷちゅ
-		next2 = new PuchuPair(rnd.nextInt(6)+1, rnd.nextInt(6)+1);	//次の次のぷちゅ
-		next3 = new PuchuPair(rnd.nextInt(6)+1, rnd.nextInt(6)+1);
+		for ( int i = 0; i < 3; i++ ) {
+			next[i] = new PuchuPair(rnd.nextInt(6)+1, rnd.nextInt(6)+1);	//次のぷちゅ
+		}
 	}
 	
 	public void update_puchu() {	//ぷちゅの更新
 		
 		Random rnd = new Random();
 		
-		now.puchu1.type = next1.puchu1.type;	//振ってくるぷちゅの更新
-		now.puchu2.type = next1.puchu2.type;
+		now.puchu1.type = next[0].puchu1.type;	//振ってくるぷちゅの更新
+		now.puchu2.type = next[0].puchu2.type;
 		
-		next1.puchu1.type = next2.puchu1.type;	//次のぷちゅの更新
-		next1.puchu2.type = next2.puchu2.type;
+		for ( int i = 0; i < 2; i++ ) {
+			next[i].puchu1.type = next[i+1].puchu1.type;	//次のぷちゅの更新
+			next[i].puchu2.type = next[i+1].puchu2.type;
+		}
 		
-		next2.puchu1.type = next3.puchu1.type;
-		next2.puchu2.type = next3.puchu2.type;
-		
-		next3 = new PuchuPair(rnd.nextInt(6), rnd.nextInt(6));	//次の次のぷちゅの更新
+		next[2] = new PuchuPair(rnd.nextInt(6), rnd.nextInt(6));	//次の次のぷちゅの更新
 		
 	}
 	
