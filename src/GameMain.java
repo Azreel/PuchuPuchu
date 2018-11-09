@@ -54,6 +54,8 @@ public class GameMain extends Thread {
 					frame.add(title);
 					frame.revalidate();
 					frame.requestFocus();
+				} else {
+					title.repaint();
 				}
 				break;
 			case GAME_SOLO: // 1Pプレイ
@@ -63,12 +65,9 @@ public class GameMain extends Thread {
 					frame.remove(title);
 					title = null;
 					// プレイヤーフィールド
-//					me = new Field(meKey);
-//					meDraw = new Draw(me);
-//					meDraw.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
+					me = new Field();
 //					// nullプレイヤーフィールド
-//					rivalDraw = new Draw();
-//					rivalDraw.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
+					rival = new Field();
 //					// フレームに追加
 //					frame.add(meDraw);
 //					frame.add(rivalDraw);
@@ -82,18 +81,13 @@ public class GameMain extends Thread {
 			case GAME_DUO: // 2Pプレイ
 				if(me == null && rival == null) {
 					System.out.println("2Pモード");
-//					// タイトル除去
-//					frame.remove(title);
-//					title = null;
-//					// プレイヤーフィールド
-//					me = new Field(meKey);
-//					meDraw = new Draw(me);
-//					meDraw.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
+					// タイトル除去
+					frame.remove(title);
+					title = null;
+					// プレイヤーフィールド
+					me = new Field();
 //					// ライバルプレイヤーフィールド
-//					rivalKey = new Key(null);
-//					rival = new Field(rivalKey);
-//					rivalDraw = new Draw(rival);
-//					rivalDraw.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
+					rival = new Field();
 //					// フレームに追加
 //					frame.add(meDraw);
 //					frame.add(rivalDraw);

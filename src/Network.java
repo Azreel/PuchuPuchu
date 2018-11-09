@@ -8,7 +8,7 @@ public class Network extends Thread {
 	
 	enum Mode { SERVER, CLIENT };
 	GameMain gm;
-	Boolean isConnect = false;
+	boolean isConnect = false;
 	ServerSocket ss;
 	Socket sc;
 	BufferedReader br;
@@ -32,11 +32,12 @@ public class Network extends Thread {
 				case SERVER:
 					if(sc == null) {
 						sc = ss.accept();
-						//クライアントから送られてきたデータを一時保存するバッファ(受信バッファ)
+						// 受信バッファ
 			            br = new BufferedReader(new InputStreamReader(sc.getInputStream()));
-			            //サーバがクライアントへ送るデータを一時保存するバッファ(送信バッファ)
+			            // 送信バッファ
 			            pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(sc.getOutputStream())));
 					} else {
+						// 接続確認
 						if(!isConnect && br.readLine().equals("PING")) {
 							pw.println("PONG");
 							pw.flush();
@@ -53,6 +54,7 @@ public class Network extends Thread {
 				System.out.println("nw run: "+e);
 				if(isConnect) return;
 			}
+			try { sleep(1); } catch(Exception e) {}
 		}
 	}
 	
@@ -66,7 +68,7 @@ public class Network extends Thread {
 		}
 	}
 	
-	public Boolean Connect(String addr) {
+	public boolean Connect(String addr) {
 		// PING送信
 		try {
 			// サーバーを閉じる
@@ -99,10 +101,12 @@ public class Network extends Thread {
         	try {
         		ss = new ServerSocket(Port);
         		programMode = Mode.SERVER;
+        		System.out.println("サーバー再生成");
         	} catch(Exception ex) {
         		System.out.println("サーバー作成失敗");
     			programMode = Mode.CLIENT;
         	}
+        	isConnect = false;
             return false;
         }
 	}
