@@ -6,7 +6,7 @@ import javax.swing.*;
 public class Field {
 	
 	public int score = 0;
-	public Puchu[][] cell = new Puchu[6][12];
+	public Puchu[][] cell = new Puchu[6][14];
 	public Puchu first_puchu;
 	public PuchuPair now;
 	public PuchuPair[] next = new PuchuPair[3];
@@ -122,8 +122,8 @@ public class Field {
 	private void init_cell() {
 		
 		for ( int i = 0; i < 6; i++ ) {
-			for ( int j = 0; j < 12; j++ ) {
-				cell[i][j] = new Puchu(Puchu.Emp, i*Draw.Squares, j*Draw.Squares);
+			for ( int j = 0; j < 14; j++ ) {
+				cell[i][j] = new Puchu(Puchu.Emp, i*Draw.Squares, (j-2)*Draw.Squares);
 			}
 		}
 	}
