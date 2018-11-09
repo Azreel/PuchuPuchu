@@ -7,14 +7,14 @@ public class GameMain extends Thread {
 	final long FPS = 1000 / 60;
 	
 	public static enum Status { GAME_TITLE, GAME_SOLO, GAME_DUO };
-	public JFrame frame = new JFrame();
+	public final JFrame frame = new JFrame();
 	
 	private Status gameStatus = Status.GAME_TITLE;
 	private Network nw;
 	private long loopDelay = FPS;
+	private Title title = null;
 	private Field me = null;
 	private Field rival = null;
-	private Title title = null;
 	
 	GameMain(){
 		MakeWindow();
@@ -28,7 +28,6 @@ public class GameMain extends Thread {
 		frame.setResizable(false);// サイズ変更不可
 		frame.setLayout(new GridLayout(1,2));
 		frame.setVisible(true);
-		frame.addKeyListener(new Key(this));
 	}
 	
 	public void run() {
@@ -43,53 +42,59 @@ public class GameMain extends Thread {
 			case GAME_TITLE: // タイトル
 				if(title == null) {
 					System.out.println("タイトル生成");
+					// 前のプレイデータを消去
 					me = null;
 					rival = null;
+					// ネットワーク開始
 					nw = new Network(this);
 					nw.start();
+					// タイトルパネル追加
 					title = new Title(this, nw);
 					title.setPreferredSize(new Dimension(ScreenW, ScreenH));
 					frame.add(title);
-					frame.pack();
+					frame.revalidate();
+					frame.requestFocus();
+				} else {
+					title.repaint();
 				}
 				break;
 			case GAME_SOLO: // 1Pプレイ
 				if(me == null && rival == null) {
 					System.out.println("1Pモード");
+					// タイトル除去
 					frame.remove(title);
 					title = null;
-					PuchuPair first = new PuchuPair(0, Puchu.Type.Pat1, Puchu.Type.Pat2);
-					PuchuPair[] next = new PuchuPair[2];
-					next[0] = new PuchuPair(1, Puchu.Type.Pat1, Puchu.Type.Pat2);
-					next[1] = new PuchuPair(2, Puchu.Type.Pat1, Puchu.Type.Pat2);
-					me = new Field();
-					rival = new Field(); //空っぽ
-					//me.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
+					// プレイヤーフィールド
+					me = new Field(true);
+					// nullプレイヤーフィールド
+					rival = new Field(false);
+//					// フレームに追加
+					frame.add(me.draw);
+					frame.add(rival.draw);
+					frame.revalidate();
+					frame.requestFocus();
 				} else {
 					// Fieldの画面描画関係
+					me.draw.repaint();
 				}
 				break;
 			case GAME_DUO: // 2Pプレイ
 				if(me == null && rival == null) {
 					System.out.println("2Pモード");
+					// タイトル除去
 					frame.remove(title);
 					title = null;
-					me = new Field();
-					rival = new Field();
-					//me.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
-					//rival.setPreferredSize(new Dimension(ScreenW/2, ScreenH));
+					// プレイヤーフィールド
+					me = new Field(true);
+//					// ライバルプレイヤーフィールド
+					rival = new Field(true);
+//					// フレームに追加
+					frame.add(me.draw);
+					frame.add(rival.draw);
+					frame.revalidate();
+					frame.requestFocus();
 				} else {
 					// Fieldの画面描画関係
-					nw.sentMyInput("Left");
-					String rival = nw.getRivalInput();
-					if(rival.equals("END")) {
-						JLabel label = new JLabel("勝ち");
-					    JOptionPane.showMessageDialog(frame, label);
-					    nw = null;
-					    setStatus(GameMain.Status.GAME_TITLE);
-					}else {
-						System.out.println(nw.getRivalInput());
-					}
 				}
 				break;
 			}

@@ -4,10 +4,11 @@ import java.net.*;
 public class Network extends Thread {
 	final int Port = 12345;
 	
+	public Mode programMode = Mode.SERVER;
+	
 	enum Mode { SERVER, CLIENT };
-	Mode programMode = Mode.SERVER;
 	GameMain gm;
-	Boolean isConnect = false;
+	boolean isConnect = false;
 	ServerSocket ss;
 	Socket sc;
 	BufferedReader br;
@@ -31,16 +32,16 @@ public class Network extends Thread {
 				case SERVER:
 					if(sc == null) {
 						sc = ss.accept();
-						//クライアントから送られてきたデータを一時保存するバッファ(受信バッファ)
+						// 受信バッファ
 			            br = new BufferedReader(new InputStreamReader(sc.getInputStream()));
-			            //サーバがクライアントへ送るデータを一時保存するバッファ(送信バッファ)
+			            // 送信バッファ
 			            pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(sc.getOutputStream())));
 					} else {
-						if(br.readLine().equals("PING")) {
+						// 接続確認
+						if(!isConnect && br.readLine().equals("PING")) {
 							pw.println("PONG");
 							pw.flush();
 							isConnect = true;
-							programMode = Mode.CLIENT;
 							gm.rivalApply();
 						}
 					}
@@ -48,10 +49,12 @@ public class Network extends Thread {
 				case CLIENT:
 					break;
 				}
+				if(isConnect) getRivalStatus();
 			}catch(Exception e) {
 				System.out.println("nw run: "+e);
 				if(isConnect) return;
 			}
+			try { sleep(1); } catch(Exception e) {}
 		}
 	}
 	
@@ -65,7 +68,7 @@ public class Network extends Thread {
 		}
 	}
 	
-	public Boolean Connect(String addr) {
+	public boolean Connect(String addr) {
 		// PING送信
 		try {
 			// サーバーを閉じる
@@ -98,27 +101,63 @@ public class Network extends Thread {
         	try {
         		ss = new ServerSocket(Port);
         		programMode = Mode.SERVER;
+        		System.out.println("サーバー再生成");
         	} catch(Exception ex) {
         		System.out.println("サーバー作成失敗");
     			programMode = Mode.CLIENT;
         	}
+        	isConnect = false;
             return false;
         }
 	}
 	
-	public String getRivalInput() {
+	private void getRivalStatus() {
+		String input;
 		try {
-			String input = br.readLine();
-			return input;
+			input = br.readLine();
 		}catch(Exception e) {
 			System.out.println("nw get: "+e);
-			if(e.getMessage().equals("Connection reset")) return "END";
-			else return null;
+			input = "END";
+		}
+		switch(input) {
+		case "START":
+			break;
+		case "END":
+			break;
+		case "MAKE":
+			break;
+		case "LEFTPRESS":
+			break;
+		case "RIGHTPRESS:":
+			break;
+		case "DOWNPRESS":
+			break;
+		case "ZPRESS":
+			break;
+		case "XPRESS":
+			break;
+		case "LEFTRELEASE":
+			break;
+		case "RIGHTRELEASE":
+			break;
+		case "DOWNRELEASE":
+			break;
+		case "ZRELEASE":
+			break;
+		case "XRELEASE":
+			break;
 		}
 	}
 	
-	public void sentMyInput(String input) {
-		pw.println(input);
+	public void sentPuchu(int type1, int type2) {
+		pw.println("MAKE");
+		pw.println(type1);
+		pw.println(type2);
+		pw.flush();
+	}
+	
+	public void sentStatus(String status) {
+		pw.println(status);
 		pw.flush();
 	}
 }
