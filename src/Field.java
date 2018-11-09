@@ -39,7 +39,7 @@ public class Field {
 		Random rnd = new Random();
 		
 		now = new PuchuPair(rnd.nextInt(6)+1, rnd.nextInt(6)+1);	//振ってくるぷちゅ
-		now.setPosition(80, -80);
+		now.setPosition(80, -40);
 		for ( int i = 0; i < 3; i++ ) {
 			next[i] = new PuchuPair(rnd.nextInt(6)+1, rnd.nextInt(6)+1);	//次のぷちゅ
 			next[i].setPosition(265+25*i, -40+90*i);
@@ -66,7 +66,7 @@ public class Field {
 		
 		if ( now.form == 0 ) {
 			now_x = ( now.puchu1.x ) / 40;
-			now_y = ( now.puchu1.y ) / 40;
+			now_y = ( now.puchu1.y ) / 40 + 2;
 			
 			if ( cell[now_x+1][now_y].type != 0 ) {
 				right_flag = true;
@@ -74,13 +74,13 @@ public class Field {
 			if ( cell[now_x-1][now_y].type != 0 ) {
 				left_flag = true;
 			}
-			if ( cell[now_x][now_y+1].type != 0 || now_y == 11 ) {
+			if ( now_y == 13 || cell[now_x][now_y+1].type != 0 ) {
 				bottom_flag = true;
 			}
 			
 		} else if ( now.form == 1 ) {
 			now_x = ( now.puchu1.x ) / 40;
-			now_y = ( now.puchu1.y ) / 40;
+			now_y = ( now.puchu1.y ) / 40 + 1;
 			
 			if ( cell[now_x+2][now_y].type != 0 ) {
 				right_flag = true;
@@ -88,12 +88,12 @@ public class Field {
 			if ( cell[now_x-1][now_y].type != 0 ) {
 				left_flag = true;
 			}
-			if ( cell[now_x][now_y+1].type != 0 || cell[now_x+1][now_y+1].type != 0 || now_y == 11 ) {
+			if ( now_y == 13 || cell[now_x][now_y+1].type != 0 || cell[now_x+1][now_y+1].type != 0 ) {
 				bottom_flag = true;
 			}
 		} else if ( now.form == 2 ) {
 			now_x = ( now.puchu2.x ) / 40;
-			now_y = ( now.puchu2.y ) / 40;
+			now_y = ( now.puchu2.y ) / 40 + 1;
 			
 			if ( cell[now_x+1][now_y].type != 0 ) {
 				right_flag = true;
@@ -101,12 +101,12 @@ public class Field {
 			if ( cell[now_x-1][now_y].type != 0 ) {
 				left_flag = true;
 			}
-			if ( cell[now_x][now_y+1].type != 0 || now_y == 11 ) {
+			if ( now_y == 13 || cell[now_x][now_y+1].type != 0 ) {
 				bottom_flag = true;
 			}
 		} else {
 			now_x = ( now.puchu1.x ) / 40;
-			now_y = ( now.puchu1.y ) / 40;
+			now_y = ( now.puchu1.y ) / 40 + 1;
 			
 			if ( cell[now_x+1][now_y].type != 0 ) {
 				right_flag = true;
@@ -114,7 +114,7 @@ public class Field {
 			if ( cell[now_x-2][now_y].type != 0 ) {
 				left_flag = true;
 			}
-			if ( cell[now_x][now_y+1].type != 0 || cell[now_x-2][now_y].type != 0 || now_y == 11 ) {
+			if ( now_y == 13 || cell[now_x][now_y+1].type != 0 || cell[now_x-2][now_y].type != 0 ) {
 				bottom_flag = true;
 			}
 		}
@@ -137,7 +137,9 @@ public class Field {
 	}
 	
 	public void update() {			//連続処理
-		now.fallDown();
 		hit_puchu();
+		if ( bottom_flag == false ) {
+			now.fallDown();
+		}
 	}
 }
