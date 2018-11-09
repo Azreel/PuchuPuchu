@@ -89,8 +89,8 @@ public class Draw extends JPanel{
 		}
 		if ( !is_alive ) { return; }
 		
-		for( int i = 0; i < 12; i++ ) {
-			for ( int j = 0; j < 6; j++ ) {
+		for( int i = 0; i < fd.cell.length; i++ ) {
+			for ( int j = 0; j < fd.cell[i].length; j++ ) {
 				if ( fd.cell[i][j].type != Puchu.Emp) {
 					if ( !fd.cell[i][j].is_match_position ) { fd.cell[i][j].drawingDropDown(); }
 					if ( fd.cell[i][j].type == Puchu.Van ) { fd.cell[i][j].vanishOutDelay(); }
@@ -126,10 +126,10 @@ public class Draw extends JPanel{
 		if ( !vanflg ) { time4++; }
 */		//-------------
 		
-		if ( !fd.now.is_match_posture_right ) { fd.now.drawingTurnRight(); }
-		if ( !fd.now.is_match_posture_left ) { fd.now.drawingTurnLeft(); }
-		if ( !fd.now.is_match_position ) { fd.now.drawingMove(); }
-		img_2d.drawImage(img_puchu[fd.now.puchu1.type], fd.now.puchu1.draw_x, fd.now.puchu1.draw_y, this);
-		img_2d.drawImage(img_puchu[fd.now.puchu2.type], fd.now.puchu2.draw_x, fd.now.puchu2.draw_y, this);
+//		if ( !fd.now.is_match_posture_right ) { fd.now.drawingTurnRight(); }
+//		if ( !fd.now.is_match_posture_left ) { fd.now.drawingTurnLeft(); }
+//		if ( !fd.now.is_match_position ) { fd.now.drawingMove(); }
+//		img_2d.drawImage(img_puchu[fd.now.puchu1.type], fd.now.puchu1.draw_x, fd.now.puchu1.draw_y, this);
+//		img_2d.drawImage(img_puchu[fd.now.puchu2.type], fd.now.puchu2.draw_x, fd.now.puchu2.draw_y, this);
 	}
 }
