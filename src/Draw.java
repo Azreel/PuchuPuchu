@@ -59,9 +59,10 @@ public class Draw extends JPanel{
 		
 	@Override
 	public void paintComponent(Graphics g) {
+		fd.update();
+		
 		super.paintComponent(g);
 		Graphics2D img_2d = (Graphics2D) g;
-
 
 		if ( is_alive ) {
 			for( int i = 0; i < fd.cell.length; i++ ) {
@@ -82,11 +83,8 @@ public class Draw extends JPanel{
 				if ( !fd.next[i].is_match_position_move ) { fd.next[i].drawingMovePosition(); }
 				img_2d.drawImage(img_puchu[fd.next[i].puchu1.type], fd.next[i].puchu1.draw_x + margin_w, fd.next[i].puchu1.draw_y + margin_h, this);
 				img_2d.drawImage(img_puchu[fd.next[i].puchu2.type], fd.next[i].puchu2.draw_x + margin_w, fd.next[i].puchu2.draw_y + margin_h, this);
-			}
-			
-			
+			}		
 		}
 		img_2d.drawImage(img_background, 0, 0, this);
 	}
-	
 }
