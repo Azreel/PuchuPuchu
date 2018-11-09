@@ -65,17 +65,17 @@ public class GameMain extends Thread {
 					frame.remove(title);
 					title = null;
 					// プレイヤーフィールド
-					me = new Field();
-//					// nullプレイヤーフィールド
-					rival = new Field();
+					me = new Field(true);
+					// nullプレイヤーフィールド
+					rival = new Field(false);
 //					// フレームに追加
-//					frame.add(meDraw);
-//					frame.add(rivalDraw);
-//					frame.revalidate();
-//					frame.requestFocus();
+					frame.add(me.draw);
+					frame.add(rival.draw);
+					frame.revalidate();
+					frame.requestFocus();
 				} else {
 					// Fieldの画面描画関係
-					//meDraw.repaint();
+					me.draw.repaint();
 				}
 				break;
 			case GAME_DUO: // 2Pプレイ
@@ -85,14 +85,14 @@ public class GameMain extends Thread {
 					frame.remove(title);
 					title = null;
 					// プレイヤーフィールド
-					me = new Field();
+					me = new Field(true);
 //					// ライバルプレイヤーフィールド
-					rival = new Field();
+					rival = new Field(true);
 //					// フレームに追加
-//					frame.add(meDraw);
-//					frame.add(rivalDraw);
-//					frame.revalidate();
-//					frame.requestFocus();
+					frame.add(me.draw);
+					frame.add(rival.draw);
+					frame.revalidate();
+					frame.requestFocus();
 				} else {
 					// Fieldの画面描画関係
 				}
