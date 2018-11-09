@@ -96,17 +96,16 @@ public class Title extends JPanel{
         if(isFade) {
         	int xx = this.getWidth();
             int yy = this.getHeight();
-            g2D.setColor(new Color(0,0,0,(int)(fadeAlpha*255)));
+            g2D.setColor(new Color(0,0,0,(int)((fadeAlpha <= 1.0f ? fadeAlpha : 1.0f)*255)));
             g2D.fillRect(0, 0, xx, yy);
             fadeAlpha += 1.0f / fadeSpeed;
             if(fadeAlpha >= 1.0f){
-            	isFade = false;
             	bgm.Stop();
             	bgm.Close();
             	gm.setStatus(next);
             	return;
             }
-            bgm.setVolume(1.0f - fadeAlpha);
+            //bgm.setVolume(1.0f - fadeAlpha);
         }
     }
 }

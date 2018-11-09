@@ -56,7 +56,9 @@ public class Sound {
 	
 	public void setVolume(float vol) {
 		if(control != null) {
-			try { control.setValue((float)Math.log10((double)vol) * 20); } catch(Exception e) {}
+			float range = control.getMaximum() - control.getMinimum();
+			float gain = (range * vol) + control.getMinimum();
+			try { control.setValue(gain); } catch(Exception e) {}
 		}
 	}
 }
