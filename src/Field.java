@@ -115,7 +115,7 @@ public class Field {
 		
 		for ( int i = 0; i < 6; i++ ) {
 			for ( int j = 0; j < 12; j++ ) {
-				cell[j][i] = new Puchu(Puchu.Emp, i*Draw.Squares, j*Draw.Squares);
+				cell[i][j] = new Puchu(Puchu.Emp, i*Draw.Squares, j*Draw.Squares);
 			}
 		}
 	}
