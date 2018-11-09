@@ -39,6 +39,7 @@ public class PuchuPair {
 		puchu2.x = puchu1.x + (int)(Draw.Squares * Math.cos((form - 1) * Math.PI/2));
 		puchu2.y = puchu1.y + (int)(Draw.Squares * Math.sin((form - 1) * Math.PI/2));
 		is_match_posture_right = false;
+		is_match_posture_left = true;
 		turn_anim_time = (int)max_turn_anim_time;
 	}
 	
@@ -47,6 +48,7 @@ public class PuchuPair {
 		puchu2.x = puchu1.x + (int)(Draw.Squares * Math.cos((form - 1) * Math.PI/2));
 		puchu2.y = puchu1.y + (int)(Draw.Squares * Math.sin((form - 1) * Math.PI/2));
 		is_match_posture_left = false;
+		is_match_posture_right = true;
 		turn_anim_time = (int)max_turn_anim_time;
 	}
 	
@@ -61,8 +63,8 @@ public class PuchuPair {
 	}
 	
 	public void drawingTurnLeft() {
-		puchu2.draw_x = puchu1.draw_x + (int)(Draw.Squares * Math.cos(form * Math.PI/2 - Math.PI/2*(1.0 - turn_anim_time/max_turn_anim_time)));
-		puchu2.draw_y = puchu1.draw_y + (int)(Draw.Squares * Math.sin(form * Math.PI/2 - Math.PI/2*(1.0 - turn_anim_time/max_turn_anim_time)));
+		puchu2.draw_x = puchu1.draw_x + (int)(Draw.Squares * Math.cos(form * Math.PI/2 - Math.PI/2*(1.0 - turn_anim_time/max_turn_anim_time)));			
+		puchu2.draw_y = puchu1.draw_y + (int)(Draw.Squares * Math.sin(form * Math.PI/2 - Math.PI/2*(1.0 - turn_anim_time/max_turn_anim_time)));			
 		turn_anim_time--;
 		if ( turn_anim_time < 0 ) {
 			is_match_posture_left = true;
