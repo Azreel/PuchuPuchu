@@ -50,13 +50,13 @@ public class Title extends JPanel{
 		duoBtn.addActionListener(new DuoPlayBtn());
 		//BGM
 		bgm = new Sound(getClass().getResource("Title.wav"));
+		bgm.Play();
         
         this.add(soloBtn);
         this.add(duoBtn);
         this.add(rival);
         this.add(rivalIP);
         this.add(myIP);
-        bgm.Play();
     }
 	
 	private class SoloPlayBtn implements ActionListener{

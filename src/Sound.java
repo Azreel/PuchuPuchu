@@ -6,6 +6,7 @@ public class Sound {
 	private Clip clip;
 	private FloatControl control = null;
 	private boolean isClosed = false;
+	private float range, gain = 1.0f;
 	
 	Sound(URL url) {
 		this(url,false);
@@ -26,6 +27,7 @@ public class Sound {
 			clip.loop(isLoop ? clip.LOOP_CONTINUOUSLY : 0);
 			clip.open(ais);
 			control = (FloatControl)clip.getControl(FloatControl.Type.MASTER_GAIN);
+			range = control.getMaximum() - control.getMinimum();
 		} catch (Exception e) {
 			System.out.println("サウンド生成失敗");
 		}
@@ -41,6 +43,7 @@ public class Sound {
 		while(clip.isActive()) {
 			try {
 				Thread.sleep(100);
+				try { control.setValue(gain); } catch(Exception e) {}
 			} catch(InterruptedException e) { }
 		}
 	}
@@ -55,10 +58,6 @@ public class Sound {
 	}
 	
 	public void setVolume(float vol) {
-		if(control != null) {
-			float range = control.getMaximum() - control.getMinimum();
-			float gain = (range * vol) + control.getMinimum();
-			try { control.setValue(gain); } catch(Exception e) {}
-		}
+		if(control != null) gain = (range * vol) + control.getMinimum();
 	}
 }
