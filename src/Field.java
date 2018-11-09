@@ -12,6 +12,7 @@ public class Field {
 	
 	public Key rivalKey = null;
 	public Key meKey = null;
+	public Key key;
 	
 	public boolean bottom_flag = false; //当たり判定
 	public boolean left_flag = false;
@@ -20,13 +21,13 @@ public class Field {
 	private int now_x = 0;
 	private int now_y = 0;
 	
-	public Field() {			//nullプレイヤー用
-		draw = new Draw();
+	public Field(boolean flag) {			//nullプレイヤー用
+		if ( flag == true ) {
+			draw = new Draw();
+			key = new Key();
+		}
 	}
 
-	public Field(Key key) {
-		draw = new Draw(this);
-	}
 	
 	public void create_puchu(){	//first create
 		
