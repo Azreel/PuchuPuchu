@@ -10,8 +10,6 @@ public class Field {
 	public PuchuPair now, next1, next2;
 	public Draw draw;
 	
-	public Key rivalKey = null;
-	public Key meKey = null;
 	public Key key;
 	
 	public boolean bottom_flag = false; //当たり判定
@@ -23,8 +21,10 @@ public class Field {
 	
 	public Field(boolean flag) {			//nullプレイヤー用
 		if ( flag == true ) {
-			draw = new Draw();
+			draw = new Draw(this);
 			key = new Key();
+		} else {
+			draw = new Draw();
 		}
 	}
 
