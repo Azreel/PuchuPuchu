@@ -64,7 +64,6 @@ public class Draw extends JPanel{
 		Graphics2D img_2d = (Graphics2D) g;
 
 		if ( is_alive ) {
-			fd.update();
 			for( int i = 0; i < fd.cell.length; i++ ) {
 				for ( int j = 0; j < fd.cell[i].length; j++ ) {
 					if ( fd.cell[i][j].type != Puchu.Emp) {
