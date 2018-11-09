@@ -1,12 +1,12 @@
 import java.net.URL;
 import javax.sound.sampled.*;
 
-public class Sound {
+public class Sound extends Thread{
 	private boolean isLoop;
 	private Clip clip;
 	private FloatControl control = null;
-	private boolean isClosed = false;
 	private float range, gain = 1.0f;
+	private boolean isActive;
 	
 	Sound(URL url) {
 		this(url,false);
@@ -24,40 +24,34 @@ public class Sound {
 			AudioFormat af = ais.getFormat();
 			DataLine.Info dataLine = new DataLine.Info(Clip.class,af);
 			clip = (Clip)AudioSystem.getLine(dataLine);
-			clip.loop(isLoop ? clip.LOOP_CONTINUOUSLY : 0);
 			clip.open(ais);
-			control = (FloatControl)clip.getControl(FloatControl.Type.MASTER_GAIN);
-			range = control.getMaximum() - control.getMinimum();
+			clip.loop(isLoop ? clip.LOOP_CONTINUOUSLY : 0);
 		} catch (Exception e) {
 			System.out.println("サウンド生成失敗");
 		}
 		
 	}
 
-	public void Play() {
-		if(isClosed) {
-			System.out.println("サウンドは閉じられています");
-			return;
-		}
+	public void run() {
+		isActive = true;
 		clip.start();
-		while(clip.isActive()) {
+		control = (FloatControl)clip.getControl(FloatControl.Type.MASTER_GAIN);
+		range = control.getMaximum() - control.getMinimum();
+		while(clip.isActive() && this.isActive) {
 			try {
 				Thread.sleep(100);
-				try { control.setValue(gain); } catch(Exception e) {}
+				control.setValue(gain);
 			} catch(InterruptedException e) { }
 		}
+		clip.stop();
 	}
 	
 	public void Stop() {
-		if(!isClosed) clip.stop();
+		this.isActive = false;
 	}
 	
-	public void Close() {
-		clip.close();
-		isClosed = true;
-	}
 	
 	public void setVolume(float vol) {
-		if(control != null) gain = (range * vol) + control.getMinimum();
+		if(isActive) gain = (range * vol) + control.getMinimum();
 	}
 }

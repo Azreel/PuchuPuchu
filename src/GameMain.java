@@ -75,7 +75,9 @@ public class GameMain extends Thread {
 					frame.requestFocus();
 				} else {
 					// Fieldの画面描画関係
+					me.update();
 					me.draw.repaint();
+					rival.draw.repaint();
 				}
 				break;
 			case GAME_DUO: // 2Pプレイ
@@ -95,6 +97,10 @@ public class GameMain extends Thread {
 					frame.requestFocus();
 				} else {
 					// Fieldの画面描画関係
+					me.update();
+					me.draw.repaint();
+					rival.update();
+					rival.draw.repaint();
 				}
 				break;
 			}

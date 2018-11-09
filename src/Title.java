@@ -13,7 +13,7 @@ public class Title extends JPanel{
 	JButton soloBtn, duoBtn;
 	JTextField rivalIP;
 	JLabel rival, myIP;
-	Sound bgm;
+	Sound bgm = null;
 	Font btnFont = new Font("MS ゴシック", Font.PLAIN, 24);
 	Font labelFont = new Font("MS ゴシック", Font.PLAIN, 20);
 	GameMain.Status next = null;
@@ -49,8 +49,8 @@ public class Title extends JPanel{
 		duoBtn.setFont(btnFont);
 		duoBtn.addActionListener(new DuoPlayBtn());
 		//BGM
-		bgm = new Sound(getClass().getResource("Title.wav"));
-		bgm.Play();
+		bgm = new Sound(getClass().getResource("Title.wav"), true);
+		bgm.start();
         
         this.add(soloBtn);
         this.add(duoBtn);
@@ -101,7 +101,6 @@ public class Title extends JPanel{
             fadeAlpha += 1.0f / fadeSpeed;
             if(fadeAlpha >= 1.0f){
             	bgm.Stop();
-            	bgm.Close();
             	gm.setStatus(next);
             	return;
             }

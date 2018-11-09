@@ -39,7 +39,7 @@ public class Key extends KeyAdapter {
 			System.exit(0);
 			break;
 		}
-
+		System.out.println(KeyData);
 	}
 
 	public void keyReleased(KeyEvent e) {// キーボードから離された時の処理
@@ -65,5 +65,6 @@ public class Key extends KeyAdapter {
 			KeyData = "XRELEASE";
 			break;
 		}
+		System.out.println(KeyData);
 	}
 }
