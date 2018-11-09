@@ -46,7 +46,7 @@ public class Field {
 		}
 	}
 	
-	public void update_puchu() {	//ぷちゅの更新
+	public void switch_next() {	//ぷちゅの更新
 		
 		Random rnd = new Random();
 		
@@ -128,11 +128,16 @@ public class Field {
 		}
 	}
 	
-	public void deside_pos() {
+	public void deside_pos() {		//落下先の場所決め
 		
 		if ( bottom_flag == true ) {
 			
 		}
 		
+	}
+	
+	public void update() {			//連続処理
+		now.fallDown();
+		hit_puchu();
 	}
 }
