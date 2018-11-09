@@ -39,8 +39,10 @@ public class Field {
 		Random rnd = new Random();
 		
 		now = new PuchuPair(rnd.nextInt(6)+1, rnd.nextInt(6)+1);	//振ってくるぷちゅ
+		now.setPosition(80, -80);
 		for ( int i = 0; i < 3; i++ ) {
 			next[i] = new PuchuPair(rnd.nextInt(6)+1, rnd.nextInt(6)+1);	//次のぷちゅ
+			next[i].setPosition(265+25*i, -40+90*i);
 		}
 	}
 	
@@ -72,7 +74,7 @@ public class Field {
 			if ( cell[now_x-1][now_y].type != 0 ) {
 				left_flag = true;
 			}
-			if ( cell[now_x][now_y+1].type != 0 ) {
+			if ( cell[now_x][now_y+1].type != 0 || now_y == 11 ) {
 				bottom_flag = true;
 			}
 			
@@ -86,7 +88,7 @@ public class Field {
 			if ( cell[now_x-1][now_y].type != 0 ) {
 				left_flag = true;
 			}
-			if ( cell[now_x][now_y+1].type != 0 || cell[now_x+1][now_y+1].type != 0 ) {
+			if ( cell[now_x][now_y+1].type != 0 || cell[now_x+1][now_y+1].type != 0 || now_y == 11 ) {
 				bottom_flag = true;
 			}
 		} else if ( now.form == 2 ) {
@@ -99,7 +101,7 @@ public class Field {
 			if ( cell[now_x-1][now_y].type != 0 ) {
 				left_flag = true;
 			}
-			if ( cell[now_x][now_y+1].type != 0 ) {
+			if ( cell[now_x][now_y+1].type != 0 || now_y == 11 ) {
 				bottom_flag = true;
 			}
 		} else {
@@ -112,7 +114,7 @@ public class Field {
 			if ( cell[now_x-2][now_y].type != 0 ) {
 				left_flag = true;
 			}
-			if ( cell[now_x][now_y+1].type != 0 || cell[now_x-2][now_y].type != 0 ) {
+			if ( cell[now_x][now_y+1].type != 0 || cell[now_x-2][now_y].type != 0 || now_y == 11 ) {
 				bottom_flag = true;
 			}
 		}
@@ -124,5 +126,13 @@ public class Field {
 				cell[i][j] = new Puchu(Puchu.Emp, i*Draw.Squares, j*Draw.Squares);
 			}
 		}
+	}
+	
+	public void deside_pos() {
+		
+		if ( bottom_flag == true ) {
+			
+		}
+		
 	}
 }
