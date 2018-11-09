@@ -34,7 +34,7 @@ public class PuchuPair {
 		puchu1.x = puchu1.draw_x = x;
 		puchu1.y = puchu1.draw_y = y;
 		puchu2.x = puchu2.draw_x = x;
-		puchu2.y = puchu2.draw_y = y + Draw.Squares;
+		puchu2.y = puchu2.draw_y = y - Draw.Squares;
 	}
 	
 	//-- ぷちゅペアのポジション変更
@@ -44,7 +44,7 @@ public class PuchuPair {
 		puchu1.x = x;
 		puchu1.y = y;
 		puchu2.x = x;
-		puchu2.y = y + Draw.Squares;
+		puchu2.y = y - Draw.Squares;
 		move_anim_time = 0;
 		is_match_position_move = false;
 	}

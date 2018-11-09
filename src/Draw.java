@@ -42,6 +42,7 @@ public class Draw extends JPanel{
 		fd = _fd;
 //		fd.next[0].movePosition(290, 50);
 //		fd.next[1].movePosition(265,  -40);
+//		fd.next[0].setPosition(290, 50);
 		
 		initImage();
 	}
