@@ -7,6 +7,7 @@ public class Field {
 	
 	public int score = 0;
 	public Puchu[][] cell = new Puchu[6][12];
+	public Puchu first_puchu;
 	public PuchuPair now, next1, next2;
 	public Draw draw;
 	
@@ -105,6 +106,14 @@ public class Field {
 			}
 			if ( cell[now_x][now_y+1].type != 0 || cell[now_x-2][now_y].type != 0 ) {
 				bottom_flag = true;
+			}
+		}
+	}
+	private void init_cell() {
+		
+		for ( int i = 0; i < 6; i++ ) {
+			for ( int j = 0; j < 12; j++ ) {
+				cell[j][i] = new Puchu(Puchu.Emp, i*Draw.Squares, j*Draw.Squares);
 			}
 		}
 	}
