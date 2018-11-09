@@ -21,6 +21,8 @@ public class Field {
 	private int now_y = 0;
 	
 	public Field(boolean flag) {			//nullプレイヤー用
+		
+		init_cell();
 		if ( flag == true ) {
 			draw = new Draw(this);
 			key = new Key();
