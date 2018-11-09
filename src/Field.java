@@ -23,6 +23,7 @@ public class Field {
 	public Field(boolean flag) {			//nullプレイヤー用
 		
 		init_cell();
+		create_puchu();
 		if ( flag == true ) {
 			draw = new Draw(this);
 			key = new Key();
@@ -32,7 +33,7 @@ public class Field {
 	}
 
 	
-	public void create_puchu(){	//first create
+	private void create_puchu(){	//first create
 		
 		Random rnd = new Random();
 		
@@ -119,5 +120,4 @@ public class Field {
 			}
 		}
 	}
-	
 }
