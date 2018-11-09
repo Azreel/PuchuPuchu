@@ -37,9 +37,9 @@ public class Field {
 		
 		Random rnd = new Random();
 		
-		now = new PuchuPair(rnd.nextInt(6), rnd.nextInt(6));	//振ってくるぷちゅ
-		next1 = new PuchuPair(rnd.nextInt(6), rnd.nextInt(6));	//次のぷちゅ
-		next2 = new PuchuPair(rnd.nextInt(6), rnd.nextInt(6));	//次の次のぷちゅ
+		now = new PuchuPair(rnd.nextInt(6)+1, rnd.nextInt(6)+1);	//振ってくるぷちゅ
+		next1 = new PuchuPair(rnd.nextInt(6)+1, rnd.nextInt(6)+1);	//次のぷちゅ
+		next2 = new PuchuPair(rnd.nextInt(6)+1, rnd.nextInt(6)+1);	//次の次のぷちゅ
 	}
 	
 	public void update_puchu() {	//ぷちゅの更新
