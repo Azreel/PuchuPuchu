@@ -12,28 +12,10 @@ public class Draw extends JPanel{
 	final int PanelH = 640;
 	
 	Toolkit tk;
-	Image img;
+	Image img_background;
 	Image img_puchu[] = new Image[9];
 	JLabel lb;	//ラベル
 	Field fd;
-	
-	//--- テスト用仮処理 ---
-//	Puchu[][] cell = new Puchu[12][6];
-//	PuchuPair now_puchu;
-//	private void puchu_cell_init() {
-//		for ( int i = 0; i < 12; i++ ) {
-//			for ( int j = 0; j < 6; j++ ) {
-//				cell[i][j] = new Puchu(Puchu.Emp, j*Draw.Squares, i*Draw.Squares);
-//			}
-//		}		
-//	}
-//	int time = 0;
-//	int time2 = 0;
-//	int time3 = 0;
-//	int time4 = 0;
-//	boolean moveflg = false;
-//	boolean vanflg = false;
-	//-------------
 	
 	boolean is_alive = true;
 	
@@ -44,7 +26,7 @@ public class Draw extends JPanel{
 		lb.setPreferredSize(new Dimension(PanelW, PanelH));
 		
 		tk = Toolkit.getDefaultToolkit();
-		img = tk.getImage(getClass().getResource("BackGroundPattern.png"));  //フィールドの画像
+		img_background = tk.getImage(getClass().getResource("fieldbackground.png"));
 		
 		is_alive = false;
 	}
@@ -55,26 +37,13 @@ public class Draw extends JPanel{
 		lb.setPreferredSize(new Dimension(PanelW, PanelH));
 		
 		tk = Toolkit.getDefaultToolkit();
-		img = tk.getImage(getClass().getResource("BackGroundPattern.png"));
-		img_puchu[Puchu.Pat1] = tk.getImage(getClass().getResource("puchumodoki.png"));
-		img_puchu[Puchu.Van] = tk.getImage(getClass().getResource("puchumodokivan.png")); 
+		img_background = tk.getImage(getClass().getResource("fieldbackground.png"));
 		
 		fd = _fd;
+		fd.next[0].movePosition(290, 50);
+		fd.next[1].movePosition(265,  -40);
 		
 		initImage();
-		
-		//--- テスト用仮処理 ---
-//		puchu_cell_init();
-//		cell[11][0].type = Puchu.Pat1;
-//		cell[11][1].type = Puchu.Pat1;
-//		cell[11][2].type = Puchu.Pat1;
-//		cell[11][4].type = Puchu.Pat1;
-//		cell[1][0].type = Puchu.Pat1;
-//		cell[10][0].copyPuchu(cell[1][0]);
-//		cell[10][0].dropDown(10);
-//		cell[1][0].type = Puchu.Emp;
-//		now_puchu = new PuchuPair(Puchu.Pat1, Puchu.Pat1);
-		//-------------
 	}
 	
 	private void initImage() {
@@ -91,54 +60,32 @@ public class Draw extends JPanel{
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D img_2d = (Graphics2D) g;
-		for (int i = 0; i < 6; i++ ) {
-			for (int j = 0; j < 3; j++ ) {
-				img_2d.drawImage(img, j*img.getWidth(this) + 60, i*img.getHeight(this) + 110, this);	//連続描画
-			}
-		}
-		if ( !is_alive ) { return; }
-		
-		for( int i = 0; i < fd.cell.length; i++ ) {
-			for ( int j = 0; j < fd.cell[i].length; j++ ) {
-				if ( fd.cell[i][j].type != Puchu.Emp) {
-					if ( !fd.cell[i][j].is_match_position ) { fd.cell[i][j].drawingDropDown(); }
-					if ( fd.cell[i][j].type == Puchu.Van ) { fd.cell[i][j].vanishOutDelay(); }
-					img_2d.drawImage(img_puchu[fd.cell[i][j].type], fd.cell[i][j].draw_x + 60, fd.cell[i][j].draw_y + 110, this);				
+
+
+		if ( is_alive ) {
+			for( int i = 0; i < fd.cell.length; i++ ) {
+				for ( int j = 0; j < fd.cell[i].length; j++ ) {
+					if ( fd.cell[i][j].type != Puchu.Emp) {
+						if ( !fd.cell[i][j].is_match_position ) { fd.cell[i][j].drawingDropDown(); }
+						if ( fd.cell[i][j].type == Puchu.Van ) { fd.cell[i][j].vanishOutDelay(); }
+						img_2d.drawImage(img_puchu[fd.cell[i][j].type], fd.cell[i][j].draw_x + 60, fd.cell[i][j].draw_y + 110, this);				
+					}
 				}
 			}
+			if ( !fd.now.is_match_posture_right ) { fd.now.drawingTurnRight(); }
+			if ( !fd.now.is_match_posture_left ) { fd.now.drawingTurnLeft(); }
+			if ( !fd.now.is_match_position_slide ) { fd.now.drawingSlide(); }
+			img_2d.drawImage(img_puchu[fd.now.puchu1.type], fd.now.puchu1.draw_x + margin_w, fd.now.puchu1.draw_y + margin_h, this);
+			img_2d.drawImage(img_puchu[fd.now.puchu2.type], fd.now.puchu2.draw_x + margin_w, fd.now.puchu2.draw_y + margin_h, this);
+			for ( int i = 0; i < fd.next.length; i++ ) {
+				if ( !fd.next[i].is_match_position_move ) { fd.next[i].drawingMovePosition(); }
+				img_2d.drawImage(img_puchu[fd.next[i].puchu1.type], fd.next[i].puchu1.draw_x + margin_w, fd.next[i].puchu1.draw_y + margin_h, this);
+				img_2d.drawImage(img_puchu[fd.next[i].puchu2.type], fd.next[i].puchu2.draw_x + margin_w, fd.next[i].puchu2.draw_y + margin_h, this);
+			}
+			
+			
 		}
-		
-/*		//--- テスト用仮処理 ---
-		if ( time > 110 ) {
-			time = 0;
-			now_puchu.turnLeft();
-		}
-		if ( time2 > 40 ) {
-			time2 = 0;
-			moveflg = !moveflg;
-//			if ( moveflg ) { now_puchu.moveRight(); }
-//			else { now_puchu.moveLeft(); }
-			now_puchu.turnRight();
-		}
-		if ( time3 > 6 ) {
-			time3 = 0;
-			now_puchu.fallDown();
-		}
-		if ( time4 > 200 ) {
-			cell[11][1].vanishOut();
-			vanflg = true;
-			time4 = 0;
-		}
-		time++;
-		time2++;
-		time3++;
-		if ( !vanflg ) { time4++; }
-*/		//-------------
-		
-		if ( !fd.now.is_match_posture_right ) { fd.now.drawingTurnRight(); }
-		if ( !fd.now.is_match_posture_left ) { fd.now.drawingTurnLeft(); }
-		if ( !fd.now.is_match_position ) { fd.now.drawingSlide(); }
-		img_2d.drawImage(img_puchu[fd.now.puchu1.type], fd.now.puchu1.draw_x + margin_w, fd.now.puchu1.draw_y + margin_h, this);
-		img_2d.drawImage(img_puchu[fd.now.puchu2.type], fd.now.puchu2.draw_x + margin_w, fd.now.puchu2.draw_y + margin_h, this);
+		img_2d.drawImage(img_background, 0, 0, this);
 	}
+	
 }

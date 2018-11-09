@@ -8,17 +8,21 @@ public class PuchuPair {
 	public static final int Left = 3;
 	
 	Puchu puchu1, puchu2;
-	int _x = 80;		// 生成座標
-	int _y = 40; 	//
+	int _x = 325 - 60 + 25 + 25;		// 生成座標
+	int _y = 30 - 110 + 40 + 100 + 100; 	//
 	public int form;	// 姿勢状態(ぷちゅ1を中心にぷちゅ2がどこにいるか)
 	public boolean is_match_posture_right = true;	// 右回転に対して判定位置と描写位置がずれているか
 	public boolean is_match_posture_left = true;	// 左回転に対して判定位置と描写位置がずれているか
-	public boolean is_match_position = true;		// 横移動に対して判定位置と描写位置がずれているか
+	public boolean is_match_position_slide = true;	// 横移動に対して判定位置と描写位置がずれているか
+	public boolean is_match_position_move = true;	// 
 	private int turn_anim_time = 0;
 	private int slide_anim_dir = 0;					// 位置ずれの方向
+	private int move_anim_time = 0;
 	private int move_range_x = 0;
+	private int move_range_y = 0;
 	private static final float max_turn_anim_time = 5.0f;	// 回転アニメーションの時間
-	private static final int move_anim_speed = 20;			// 横移動アニメーションの速度
+	private static final int slide_anim_speed = 20;			// 横移動アニメーションの速度
+	private static final int max_move_anim_time = 20;
 	
 	PuchuPair(int set_type1, int set_type2){
 		this.form = PuchuPair.Up;
@@ -26,16 +30,39 @@ public class PuchuPair {
 		this.puchu2 = new Puchu(set_type2, _x, _y - Draw.Squares);		
 	}
 	
+	public void setPosition(int x, int y) {
+		puchu1.x = puchu1.draw_x = x;
+		puchu1.y = puchu1.draw_y = y;
+		puchu2.x = puchu2.draw_x = x;
+		puchu2.y = puchu2.draw_y = y + Draw.Squares;
+	}
+	
 	//-- ぷちゅペアのポジション変更
 	public void movePosition(int x, int y) {
+		move_range_x = x - puchu1.x;
+		move_range_y = y - puchu1.y;
 		puchu1.x = x;
 		puchu1.y = y;
 		puchu2.x = x;
 		puchu2.y = y + Draw.Squares;
+		move_anim_time = 0;
+		is_match_position_move = false;
 	}
 	
 	public void drawingMovePosition() {
-		
+		if ( move_anim_time < max_move_anim_time ) {
+			puchu1.draw_x += move_range_x/max_move_anim_time;
+			puchu1.draw_y += move_range_y/max_move_anim_time;			
+			puchu2.draw_x += move_range_x/max_move_anim_time;
+			puchu2.draw_y += move_range_y/max_move_anim_time;
+		} else {
+			puchu1.draw_x += move_range_x%max_move_anim_time;
+			puchu1.draw_y += move_range_y%max_move_anim_time;
+			puchu2.draw_x += move_range_x%max_move_anim_time;
+			puchu2.draw_y += move_range_y%max_move_anim_time;
+			is_match_position_move = true;
+		}
+		move_anim_time++;
 	}
 	
 	//-- ぷちゅの回転処理
@@ -86,23 +113,23 @@ public class PuchuPair {
 	public void slideRight() {
 		puchu1.x += Draw.Squares;
 		puchu2.x += Draw.Squares;
-		is_match_position = false;
+		is_match_position_slide = false;
 		slide_anim_dir = 1;
 	}
 	
 	public void slideLeft() {
 		puchu1.x -= Draw.Squares;
 		puchu2.x -= Draw.Squares;
-		is_match_position = false;
+		is_match_position_slide = false;
 		slide_anim_dir = -1;
 	}
 	
 	//-- ぷちゅの横移動アニメーション処理
 	public void drawingSlide() {
-		puchu1.draw_x += move_anim_speed * slide_anim_dir;
-		puchu2.draw_x += move_anim_speed * slide_anim_dir;
+		puchu1.draw_x += slide_anim_speed * slide_anim_dir;
+		puchu2.draw_x += slide_anim_speed * slide_anim_dir;
 		if ( puchu1.draw_x == puchu1.x ) {
-			is_match_position = true;
+			is_match_position_slide = true;
 		}
 	}
 }
