@@ -12,7 +12,7 @@ public class Puchu {
 	public int type;			// ぷちゅの種類
 	public int x, y;			// 判定座標
 	public int draw_x, draw_y;	// 描画に使用する座標(アニメーションのため遅延して動作する)
-	public boolean is_match_position = true;			// 判定位置と描写位置が一致しているか
+	public boolean is_match_position_drop = true;			// 判定位置と描写位置が一致しているか
 	private int van_time = 0;
 	private static final int drop_anim_speed = 10;	// 落下アニメーションの落下速度
 	private static final int max_van_time = 50;
@@ -21,9 +21,10 @@ public class Puchu {
 		this.type = set_type;
 		this.x = this.draw_x = set_x;
 		this.y = this.draw_y = set_y;
-		is_match_position = true;
+		is_match_position_drop = true;
 	}
 	
+	//-- ぷちゅの要素コピー(配列内容すり替え用)
 	public void copyPuchu(Puchu _puchu) {
 		this.type = _puchu.type;
 		this.x = this.draw_x = _puchu.x;
@@ -32,14 +33,14 @@ public class Puchu {
 	
 	//-- ぷちゅの落下処理
 	public void dropDown(int arr_i) {
-		y = arr_i * Draw.Squares;
-		if ( draw_y < y ) { is_match_position = false; }
+		y = (arr_i - 2) * Draw.Squares;
+		if ( draw_y < y ) { is_match_position_drop = false; }
 	}
 	
 	//-- ぷちゅの落下アニメーション処理
 	public void drawingDropDown() {
 		draw_y += drop_anim_speed;
-		if ( draw_y >= y ) { is_match_position = true; }
+		if ( draw_y >= y ) { is_match_position_drop = true; }
 	}
 	
 	//-- 消滅開始
