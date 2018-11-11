@@ -19,6 +19,7 @@ public class GameMain extends Thread {
 	private int[][] ppInit = new int[200][2];
 	private Field me = null;
 	private Field rival = null;
+	private String oldKey = "NULL";
 	
 	// コンストラクタ
 	GameMain(){
@@ -75,9 +76,9 @@ public class GameMain extends Thread {
 					// ぷちゅ生成
 					makePuchu();
 					// プレイヤーフィールド
-					me = new Field(true);
+					me = new Field(ppInit);
 					// nullプレイヤーフィールド
-					rival = new Field(false);
+					rival = new Field(null);
 					// フレームに追加
 					frame.add(me.draw);
 					frame.add(rival.draw);
@@ -100,9 +101,9 @@ public class GameMain extends Thread {
 					if(nw.programMode == Network.Mode.SERVER) nw.sentPuchu(makePuchu());
 					else while(!canStart) { try { sleep(1); } catch(Exception e) {} }
 					// プレイヤーフィールド
-					me = new Field(true);
+					me = new Field(ppInit);
 					// ライバルプレイヤーフィールド
-					rival = new Field(true);
+					rival = new Field(ppInit);
 					// フレームに追加
 					frame.add(me.draw);
 					frame.add(rival.draw);
@@ -115,7 +116,10 @@ public class GameMain extends Thread {
 						// Fieldの画面描画関係
 						me.update();
 						me.draw.repaint();
-						nw.sentStatus(me.key.KeyData);
+						if(!oldKey.equals(me.key.KeyData)) {
+							nw.sentStatus(me.key.KeyData);
+							oldKey = me.key.KeyData;
+						}
 						rival.update();
 						rival.draw.repaint();
 					}

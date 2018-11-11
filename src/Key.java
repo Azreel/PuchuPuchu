@@ -17,57 +17,61 @@ public class Key extends KeyAdapter {
 	// キーボードが押された時の処理
 	public void keyPressed(KeyEvent e) {
 		switch (e.getKeyCode()) {
-		case KeyEvent.VK_LEFT:// ←キーが押されている
+		case KeyEvent.VK_LEFT:// ←キー
 			Left = true;
-			KeyData = "LEFTPRESS";
+			setKeyData("LEFTPRESS");
 			break;
-		case KeyEvent.VK_RIGHT:// →キーが押されている
+		case KeyEvent.VK_RIGHT:// →キー
 			Right = true;
-			KeyData = "RIGHTPRESS";
+			setKeyData("RIGHTPRESS");
 			break;
-		case KeyEvent.VK_DOWN:// ↓キーが押されている
+		case KeyEvent.VK_DOWN:// ↓キー
 			Down = true;
-			KeyData = "DOWNPRESS";
+			setKeyData("DOWNPRESS");
 			break;
-		case KeyEvent.VK_Z:// Zキーが押されている
+		case KeyEvent.VK_Z:// Zキー
 			TurnLeft = true;
-			KeyData = "ZPRESS";
+			setKeyData("ZPRESS");
 			break;
-		case KeyEvent.VK_X:// Xキーが押されている
+		case KeyEvent.VK_X:// Xキー
 			TurnRight = true;
-			KeyData = "XPRESS";
+			setKeyData("XPRESS");
 			break;
-		case KeyEvent.VK_Q:// Qキーが押されている
+		case KeyEvent.VK_Q:// Qキー
 			System.exit(0);
 			break;
 		}
-		System.out.println(KeyData);
 	}
 
 	// キーボードから離された時の処理
 	public void keyReleased(KeyEvent e) {
 		switch (e.getKeyCode()) {
-		case KeyEvent.VK_LEFT:// ←キーが押されている
+		case KeyEvent.VK_LEFT:// ←キー
 			Left = false;
-			KeyData = "LEFTRELEASE";
+			setKeyData("LEFTRELEASE");
 			break;
-		case KeyEvent.VK_RIGHT:// →キーが押されている
+		case KeyEvent.VK_RIGHT:// →キー
 			Right = false;
-			KeyData = "RIGHTRELEASE";
+			setKeyData("RIGHTRELEASE");
 			break;
-		case KeyEvent.VK_DOWN:// ↓キーが押されている
+		case KeyEvent.VK_DOWN:// ↓キー
 			Down = false;
-			KeyData = "DOWNRELEASE";
+			setKeyData("DOWNRELEASE");
 			break;
-		case KeyEvent.VK_Z:// Zキーが押されている
+		case KeyEvent.VK_Z:// Zキー
 			TurnLeft = true;
-			KeyData = "ZRELEASE";
+			setKeyData("ZRELEASE");
 			break;
-		case KeyEvent.VK_X:// Xキーが押されている
+		case KeyEvent.VK_X:// Xキー
 			TurnRight = true;
-			KeyData = "XRELEASE";
+			setKeyData("XRELEASE");
 			break;
 		}
+	}
+	
+	// 送信用キー情報のセット
+	private void setKeyData(String key) {
+		if(!KeyData.equals(key)) KeyData = key;
 		System.out.println(KeyData);
 	}
 }
