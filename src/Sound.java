@@ -8,15 +8,18 @@ public class Sound extends Thread{
 	private float range, gain = 1.0f;
 	private boolean isActive;
 	
+	// コンストラクタ(ループなし)
 	Sound(URL url) {
 		this(url,false);
 	}
 	
+	// コンストラクタ(ループ指定あり)
 	Sound(URL url,boolean isLoop) {
 		this.isLoop = isLoop;
 		load(url);
 	}
 	
+	// ファイル読み込み
 	private void load(URL url) {
 		AudioInputStream ais;
 		try {
@@ -31,7 +34,8 @@ public class Sound extends Thread{
 		}
 		
 	}
-
+	
+	// 再生(スレッドのメイン)
 	public void run() {
 		isActive = true;
 		clip.start();
@@ -46,11 +50,12 @@ public class Sound extends Thread{
 		clip.stop();
 	}
 	
+	// 停止
 	public void Stop() {
 		this.isActive = false;
 	}
 	
-	
+	// ボリューム調整(うまく動かない)
 	public void setVolume(float vol) {
 		if(isActive) gain = (range * vol) + control.getMinimum();
 	}

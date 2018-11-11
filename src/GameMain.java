@@ -19,10 +19,12 @@ public class GameMain extends Thread {
 	private Field me = null;
 	private Field rival = null;
 	
+	// コンストラクタ
 	GameMain(){
 		MakeWindow();
 	}
-	
+
+	// ウィンドウ生成
 	private void MakeWindow() {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);// 終了処理
 		frame.setSize(ScreenW, ScreenH);
@@ -33,6 +35,7 @@ public class GameMain extends Thread {
 		frame.setVisible(true);
 	}
 	
+	// スレッドのメイン
 	public void run() {
 		while(true) {
 			// 60fps保つ
@@ -117,14 +120,12 @@ public class GameMain extends Thread {
 		}
 	}
 	
+	// ゲーム画面の状態変更
 	public void setStatus(Status next) {
 		gameStatus = next;
 	}
 	
-	public void rivalApply() {
-		title.rivalApply();
-	}
-	
+	//初期ぷちゅペア生成
 	private String[] makePuchu() {
 		String[] ppList = new String[200];
 		Random rnd = new Random();
@@ -136,8 +137,16 @@ public class GameMain extends Thread {
 		return ppList;
 	}
 	
+	// クライアントの接続受け入れ
+	public void rivalApply() {
+		title.rivalApply();
+	}
+	
+	// ライバルのキー入力を反映
 	public void setRivalInput(String key) {
 		switch(key) {
+		case "":
+			break;
 		case "LEFTPRESS":
 			rival.key.Left = true;
 			break;
@@ -174,6 +183,7 @@ public class GameMain extends Thread {
 		}
 	}
 	
+	// プログラム実行本体
 	public static void main(String[] args) {
 		GameMain gm = new GameMain();
 		gm.start();

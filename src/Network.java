@@ -15,6 +15,7 @@ public class Network extends Thread {
 	BufferedReader br;
 	PrintWriter pw;
 	
+	// コンストラクタ
 	Network(GameMain parent){
 		gm = parent;
 		try {
@@ -26,6 +27,7 @@ public class Network extends Thread {
 		}
 	}
 	
+	// スレッドのメイン
 	public void run() {
 		while(true) {
 			if(!isAlive) break;
@@ -60,10 +62,12 @@ public class Network extends Thread {
 		}
 	}
 	
+	// サーバーを閉じる
 	public void Close() {
 		isAlive = false;
 	}
 	
+	// 自分のIPアドレスを取得
 	public String getIPaddr() {
 		try {
 			String addr = InetAddress.getLocalHost().getHostAddress();
@@ -74,6 +78,7 @@ public class Network extends Thread {
 		}
 	}
 	
+	// サーバーに接続
 	public boolean Connect(String addr) {
 		// PING送信
 		try {
@@ -117,6 +122,7 @@ public class Network extends Thread {
         }
 	}
 	
+	// 相手のステータス取得
 	private void getRivalStatus() {
 		String input;
 		try {
@@ -138,6 +144,7 @@ public class Network extends Thread {
 		}
 	}
 	
+	// 初期ぷちゅペアリスト送信
 	public void sentPuchu(String[] list) {
 		pw.println("MAKESTART");
 		for(String data : list) {
@@ -147,6 +154,7 @@ public class Network extends Thread {
 		pw.flush();
 	}
 	
+	// 自分のステータスを送信
 	public void sentStatus(String status) {
 		pw.println(status);
 		pw.flush();

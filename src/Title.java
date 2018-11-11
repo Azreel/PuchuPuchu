@@ -14,12 +14,13 @@ public class Title extends JPanel{
 	JTextField rivalIP;
 	JLabel rival, myIP;
 	Sound bgm = null;
-	Font btnFont = new Font("MS ゴシック", Font.PLAIN, 24);
-	Font labelFont = new Font("MS ゴシック", Font.PLAIN, 20);
+	Font btnFont = new Font(Font.DIALOG, Font.PLAIN, 24);
+	Font labelFont = new Font(Font.DIALOG, Font.PLAIN, 20);
 	GameMain.Status next = null;
 	boolean isFade = false;
 	float fadeAlpha = 0.0f;
 	
+	// コンストラクタ
 	Title(GameMain parent, Network client) {
 		gm = parent;
 		nw = client;
@@ -59,12 +60,14 @@ public class Title extends JPanel{
         this.add(myIP);
     }
 	
+	// 1Pプレイボタン用イベントリスナー
 	private class SoloPlayBtn implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
 			setFade(GameMain.Status.GAME_SOLO);
 		}
 	}
 	
+	// 2Pプレイボタン用イベントリスナー
 	private class DuoPlayBtn implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
 			if(nw.Connect(rivalIP.getText())) {
@@ -76,18 +79,21 @@ public class Title extends JPanel{
 		}
 	}
 	
+	// クライアントの接続確認
 	public void rivalApply() {
 		JLabel label = new JLabel("相手の接続を受けました");
 	    JOptionPane.showMessageDialog(gm.frame, label);
 	    setFade(GameMain.Status.GAME_DUO);
 	}
 	
+	// フェード開始用
 	private void setFade(GameMain.Status status) {
 		next = status;
 		isFade = true;
 		this.removeAll();
 	}
 	
+	// 描画
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
