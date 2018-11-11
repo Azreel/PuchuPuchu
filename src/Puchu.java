@@ -5,6 +5,7 @@ public class Puchu {
 	
 	public static final int Emp = 0, Pat1 = 1, Pat2 = 2, Pat3 = 3, Pat4 = 4, Pat5 = 5, Pat6 = 6, Van = 7, Obs = 8, Vanishing = 9;
 	// Van : 消えるときの顔
+	// Vanishing : 消えるときのアニメーション
 	// Obs : お邪魔
 	// Emp : ぷちゅなし
 	// Pat1 ~ Pat6

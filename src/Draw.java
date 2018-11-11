@@ -47,7 +47,7 @@ public class Draw extends JPanel{
 		
 		is_alive = false;
 	}
-	Draw(Field _fd) {	//プレイ用
+	Draw(Field _fd) { //プレイ用
 		this.setPreferredSize(new Dimension(PanelW, PanelH));
 		
 		lb = new JLabel();
