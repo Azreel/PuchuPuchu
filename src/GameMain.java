@@ -10,6 +10,7 @@ public class GameMain extends Thread {
 	
 	public static enum Status { GAME_TITLE, GAME_SOLO, GAME_DUO };
 	public final JFrame frame = new JFrame();
+	public boolean canStart = false;
 	
 	private Status gameStatus = Status.GAME_TITLE;
 	private Network nw;
@@ -96,7 +97,8 @@ public class GameMain extends Thread {
 					frame.remove(title);
 					title = null;
 					// ぷちゅ生成
-					nw.sentPuchu(makePuchu());
+					if(nw.programMode == Network.Mode.SERVER) nw.sentPuchu(makePuchu());
+					else while(!canStart) { try { sleep(1); } catch(Exception e) {} }
 					// プレイヤーフィールド
 					me = new Field(true);
 					// ライバルプレイヤーフィールド
@@ -106,13 +108,17 @@ public class GameMain extends Thread {
 					frame.add(rival.draw);
 					frame.revalidate();
 					me.draw.requestFocus();
+					// 準備完了
+					nw.sentStatus("START");
 				} else {
-					// Fieldの画面描画関係
-					me.update();
-					me.draw.repaint();
-					nw.sentStatus(me.key.KeyData);
-					rival.update();
-					rival.draw.repaint();
+					if(canStart) {
+						// Fieldの画面描画関係
+						me.update();
+						me.draw.repaint();
+						nw.sentStatus(me.key.KeyData);
+						rival.update();
+						rival.draw.repaint();
+					}
 				}
 				break;
 			}
@@ -135,6 +141,16 @@ public class GameMain extends Thread {
 			ppList[i] = Integer.toString(ppInit[i][0]) + "," + Integer.toString(ppInit[i][1]);
  		}
 		return ppList;
+	}
+	
+	// 初期ぷちゅペア生成(外部受信)
+	public void makePuchuByServer(int[][] list) {
+		if(list == null) {
+			System.out.println("ぷちゅ生成エラー");
+			System.exit(0);
+		} else {
+			ppInit = list;
+		}
 	}
 	
 	// クライアントの接続受け入れ

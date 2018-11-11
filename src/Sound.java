@@ -3,6 +3,7 @@ import javax.sound.sampled.*;
 
 public class Sound extends Thread{
 	private boolean isLoop;
+	private AudioInputStream ais;
 	private Clip clip;
 	private FloatControl control = null;
 	private float range, gain = 1.0f;
@@ -21,13 +22,11 @@ public class Sound extends Thread{
 	
 	// ファイル読み込み
 	private void load(URL url) {
-		AudioInputStream ais;
 		try {
 			ais = AudioSystem.getAudioInputStream(url);
 			AudioFormat af = ais.getFormat();
 			DataLine.Info dataLine = new DataLine.Info(Clip.class,af);
 			clip = (Clip)AudioSystem.getLine(dataLine);
-			clip.open(ais);
 			clip.loop(isLoop ? clip.LOOP_CONTINUOUSLY : 0);
 		} catch (Exception e) {
 			System.out.println("サウンド生成失敗");
@@ -38,6 +37,12 @@ public class Sound extends Thread{
 	// 再生(スレッドのメイン)
 	public void run() {
 		isActive = true;
+		try {
+			clip.open(ais);
+		} catch (Exception e) {
+			System.out.println("サウンド再生失敗");
+			return;
+		}
 		clip.start();
 		control = (FloatControl)clip.getControl(FloatControl.Type.MASTER_GAIN);
 		range = control.getMaximum() - control.getMinimum();

@@ -132,11 +132,16 @@ public class Network extends Thread {
 			input = "END";
 		}
 		switch(input) {
+		case "null":
+			break;
 		case "START":
+			gm.canStart = true;
 			break;
 		case "END":
 			break;
 		case "MAKESTART":
+			gm.makePuchuByServer(getPuchuList());
+			gm.canStart = true;
 			break;
 		default:
 			gm.setRivalInput(input);
@@ -158,5 +163,31 @@ public class Network extends Thread {
 	public void sentStatus(String status) {
 		pw.println(status);
 		pw.flush();
+	}
+	
+	// 初期ぷちゅペアリスト受信
+	private int[][] getPuchuList(){
+		String pair;
+		int[][] pairList = new int[200][2];
+		int index = 0;
+		try {
+			pair = br.readLine();
+		} catch (Exception e) {
+			System.out.println("nw get: " + e);
+			return null;
+		}
+		while(!pair.equals("MAKEEND")) {
+			String[] set = pair.split(",");
+			pairList[index][0] = Integer.parseInt(set[0]);
+			pairList[index][1] = Integer.parseInt(set[1]);
+			index++;
+			try {
+				pair = br.readLine();
+			} catch (Exception e) {
+				System.out.println("nw get: " + e);
+				return null;
+			}
+		}
+		return pairList;
 	}
 }
