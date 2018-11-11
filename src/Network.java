@@ -3,11 +3,12 @@ import java.net.*;
 
 public class Network extends Thread {
 	final int Port = 12345;
+	public static enum Mode { SERVER, CLIENT };
 	
 	public Mode programMode = Mode.SERVER;
 	
-	enum Mode { SERVER, CLIENT };
 	GameMain gm;
+	boolean isAlive = true;
 	boolean isConnect = false;
 	ServerSocket ss;
 	Socket sc;
@@ -27,6 +28,7 @@ public class Network extends Thread {
 	
 	public void run() {
 		while(true) {
+			if(!isAlive) break;
 			try {
 				switch(programMode){
 				case SERVER:
@@ -52,10 +54,14 @@ public class Network extends Thread {
 				if(isConnect) getRivalStatus();
 			}catch(Exception e) {
 				System.out.println("nw run: "+e);
-				if(isConnect) return;
+				if(isConnect) break;
 			}
 			try { sleep(1); } catch(Exception e) {}
 		}
+	}
+	
+	public void Close() {
+		isAlive = false;
 	}
 	
 	public String getIPaddr() {
@@ -124,35 +130,20 @@ public class Network extends Thread {
 			break;
 		case "END":
 			break;
-		case "MAKE":
+		case "MAKESTART":
 			break;
-		case "LEFTPRESS":
-			break;
-		case "RIGHTPRESS:":
-			break;
-		case "DOWNPRESS":
-			break;
-		case "ZPRESS":
-			break;
-		case "XPRESS":
-			break;
-		case "LEFTRELEASE":
-			break;
-		case "RIGHTRELEASE":
-			break;
-		case "DOWNRELEASE":
-			break;
-		case "ZRELEASE":
-			break;
-		case "XRELEASE":
+		default:
+			gm.setRivalInput(input);
 			break;
 		}
 	}
 	
-	public void sentPuchu(int type1, int type2) {
-		pw.println("MAKE");
-		pw.println(type1);
-		pw.println(type2);
+	public void sentPuchu(String[] list) {
+		pw.println("MAKESTART");
+		for(String data : list) {
+			pw.println(data);
+		}
+		pw.println("MAKEEND");
 		pw.flush();
 	}
 	
