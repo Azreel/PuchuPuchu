@@ -51,7 +51,7 @@ public class Title extends JPanel{
 		duoBtn.addActionListener(new DuoPlayBtn());
 		//BGM
 		bgm = new Sound(getClass().getResource("Title.wav"), true);
-		//bgm.start();
+		bgm.start();
         
         this.add(soloBtn);
         this.add(duoBtn);

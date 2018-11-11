@@ -132,17 +132,22 @@ public class Network extends Thread {
 			input = "END";
 		}
 		switch(input) {
+		// 受信データなし
 		case "null":
 			break;
+		// 相手が初期ぷちゅペアリストを受信完了すると送られてくる
 		case "START":
-			gm.canStart = true;
+			if(programMode == Mode.SERVER) gm.canStart = true;
 			break;
+		// 相手が負けた場合に送られてくる
 		case "END":
 			break;
+		// 初期ぷちゅペア受信開始
 		case "MAKESTART":
 			gm.makePuchuByServer(getPuchuList());
 			gm.canStart = true;
 			break;
+		// キー入力
 		default:
 			gm.setRivalInput(input);
 			break;
