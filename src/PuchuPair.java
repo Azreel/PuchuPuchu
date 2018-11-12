@@ -107,7 +107,6 @@ public class PuchuPair {
 	
 	//-- ぷちゅの自由落下処理(操作中のぷちゅ)
 	public void fallDown(int _speed) {
-		_speed *= 10;
 		if ( Draw.Squares%_speed == 0 ) {
 			puchu1.y += _speed; puchu1.draw_y += _speed;
 			puchu2.y += _speed; puchu2.draw_y += _speed;
@@ -115,10 +114,6 @@ public class PuchuPair {
 			puchu1.y += 1;	puchu1.draw_y += 1;
 			puchu2.y += 1;	puchu2.draw_y += 1;			
 		}
-	}
-	public void fallDown() {
-		puchu1.y += 1;	puchu1.draw_y += 1;
-		puchu2.y += 1;	puchu2.draw_y += 1;					
 	}
 	
 	//-- ぷちゅの横移動処理
