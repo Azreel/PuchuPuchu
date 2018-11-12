@@ -13,15 +13,14 @@ public class Field {
 	public Draw draw;
 	public Key key;
 	
-	public boolean bottom_flag = false; //当たり判定
-	public boolean left_flag = false;
-	public boolean right_flag = false;
-	public boolean moving_flag = false;
-
-	private boolean turn_left_flag = true;
-	private boolean turn_right_flag = true;
-	private boolean slide_left_flag = true;
-	private boolean slide_right_flag = true;
+	public boolean bottom_flag = false; 	//当たり判定
+	public boolean moving_flag = false;		//移動できるかどうか
+	private boolean bottom_p1_flag = false;	//どのぷちゅが底にあるか
+	private boolean bottom_p2_flag = false;	
+	private boolean turn_left_flag = true;	//左回転できるか
+	private boolean turn_right_flag = true;	//右回転できるか
+	private boolean slide_left_flag = true;	//左に移動できるか
+	private boolean slide_right_flag = true;//右に移動できるか
 	private int now_x = 0;
 	private int now_y = 0;
 	private int switch_figure;
@@ -96,8 +95,12 @@ public class Field {
 			now_x = ( now.puchu1.x ) / 40;
 			now_y = ( now.puchu1.y ) / 40 + 2;
 			
-			if ( now_y == 13 || cell[now_x][now_y+1].type != 0 || cell[now_x+1][now_y+1].type != 0 ) {
+			if ( now_y == 13 ) {
 				bottom_flag = true;
+			} else if ( cell[now_x][now_y+1].type != 0 ) {
+				bottom_p1_flag = true;
+			} else if ( cell[now_x+1][now_y+1].type != 0 ) {
+				bottom_p2_flag = true;
 			}
 			if ( now_x >= 4 ) {
 				slide_right_flag = false;
@@ -122,18 +125,22 @@ public class Field {
 				slide_left_flag = false;
 				turn_right_flag = false;
 			} else if ( cell[now_x+1][now_y].type != 0 ) {
-				slide_left_flag = false;
+				slide_right_flag = false;
 				turn_right_flag = false;
 			} else if ( cell[now_x-1][now_y].type != 0 ) {
-				slide_right_flag = false;
+				slide_left_flag = false;
 				turn_left_flag = false;
 			}
 		} else {
 			now_x = ( now.puchu1.x ) / 40;
 			now_y = ( now.puchu1.y ) / 40 + 2;
 			
-			if ( now_y == 13 || cell[now_x][now_y+1].type != 0 || cell[now_x-1][now_y+1].type != 0 ) {
+			if ( now_y == 13 ) {
 				bottom_flag = true;
+			} else if ( cell[now_x][now_y+1].type != 0 ) {
+				bottom_p1_flag = true;
+			} else if ( cell[now_x-1][now_y+1].type != 0 ) {
+				bottom_p2_flag = true;
 			}
 			if ( now_x >= 5 ) {
 				slide_right_flag = false;
@@ -167,7 +174,7 @@ public class Field {
 		if ( moving_flag == true ) {
 			judge_key();
 			hit_puchu();
-			if ( bottom_flag != true ) {
+			if ( bottom_flag != true || bottom_p1_flag != true || bottom_p2_flag != true ) {
 				now.fallDown(speed);
 			} else {
 				cell[now.puchu1.x/40][now.puchu1.y/40+2].copyPuchu(now.puchu1);
