@@ -21,6 +21,7 @@ public class Field {
 	private int now_x = 0;
 	private int now_y = 0;
 	private int switch_figure;
+	private int speed = 1;
 	private int[][] cp_player = new int[GameMain.PPSIZE][2];
 	
 	public Field(GameMain gm, int[][] player) {			//nullプレイヤー用
@@ -36,6 +37,7 @@ public class Field {
 		} else {
 			draw = new Draw();
 		}
+		gm.fadeOut();
 	}
 
 	
@@ -68,8 +70,6 @@ public class Field {
 		if ( now.form == 0 ) {
 			now_x = ( now.puchu1.x ) / 40;
 			now_y = ( now.puchu1.y ) / 40 + 2;
-			System.out.println("now_x:" + now_x);
-			System.out.println("now_y:" + now_y);
 			if ( cell[now_x+1][now_y].type != 0 ) {
 				right_flag = true;
 			}
@@ -140,9 +140,10 @@ public class Field {
 	
 	public void update() {			//連続処理
 		if ( moving_flag == true ) {
+			judge_key();
 			hit_puchu();
 			if ( bottom_flag != true ) {
-				now.fallDown(1);
+				now.fallDown(speed);
 			} else {
 				cell[2][13].copyPuchu(now.puchu1);
 				cell[2][12].copyPuchu(now.puchu2);
@@ -177,5 +178,23 @@ public class Field {
 	
 	public void vanish_finish() {
 		
+	}
+	
+	public void judge_key() {
+		if ( key.Left == true ) {
+			now.slideLeft();
+		}
+		if ( key.Right == true ) {
+			now.slideRight();
+		}
+		if ( key.Down == true ) {
+			speed *= 5;
+		}
+		if ( key.TurnLeft == true ) {
+			now.turnLeft();
+		}
+		if ( key.TurnRight == true ) {
+			now.turnRight();
+		}
 	}
 }
