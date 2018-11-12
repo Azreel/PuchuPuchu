@@ -71,6 +71,7 @@ public class Draw extends JPanel{
 	//-- 落下アニメーション終了
 	private void finishDropAnim() {
 		is_drop_anim = false;
+		is_drop_all = false;
 		fd.drop_finish();
 	}
 	
@@ -82,6 +83,7 @@ public class Draw extends JPanel{
 	//-- ぷちゅペアの移動アニメーション終了
 	private void finishMoveAnim() {
 		is_move_anim = false;
+		is_move_all = false;
 		fd.switch_next();
 	}
 	
@@ -96,6 +98,7 @@ public class Draw extends JPanel{
 	//-- ぷちゅの消滅準備完了
 	private void nextVanishAnim() {
 		is_vanish_delay = false;
+		is_vanish_all = false;
 		is_vanish_anim = true;
 		is_chain_display = true;
 		chain_display_time = 0;
@@ -104,7 +107,16 @@ public class Draw extends JPanel{
 	//-- ぷちゅの消滅アニメーション終了
 	private void finishVanishAnim() {
 		is_vanish_anim = false;
+		is_vanish_all = false;
 		fd.vanish_finish();
+	}
+	
+	public void startGameOverAnim() {
+		
+	}
+	
+	private void finishGameOverAnim() {
+		
 	}
 	
 	//-- 盤面のアニメーション状況更新
