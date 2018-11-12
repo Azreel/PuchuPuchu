@@ -50,8 +50,7 @@ public class Title extends JPanel{
 		duoBtn.setFont(btnFont);
 		duoBtn.addActionListener(new DuoPlayBtn());
 		//BGM
-		bgm = new Sound(getClass().getResource("Title.wav"), true);
-		bgm.start();
+		gm.setBGM(getClass().getResource("Title.wav"));
         
         this.add(soloBtn);
         this.add(duoBtn);
@@ -97,18 +96,5 @@ public class Title extends JPanel{
         super.paintComponent(g);
         Graphics2D g2D = (Graphics2D) g;
         g2D.drawImage(bg, null, this);
-//        if(isFade) {
-//        	int w = this.getWidth();
-//            int h = this.getHeight();
-//            g2D.setColor(new Color(0,0,0,(int)((fadeAlpha <= 1.0f ? fadeAlpha : 1.0f)*255)));
-//            g2D.fillRect(0, 0, w, h);
-//            fadeAlpha += 1.0f / fadeSpeed;
-//            if(fadeAlpha >= 1.0f){
-//            	bgm.Stop();
-//            	gm.setStatus(next);
-//            	return;
-//            }
-//            //bgm.setVolume(1.0f - fadeAlpha);
-//        }
     }
 }

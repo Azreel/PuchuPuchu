@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.net.URL;
 import java.util.Random;
 
 import javax.swing.*;
@@ -83,7 +84,7 @@ public class GameMain extends Thread {
 					nw.Close();
 					// タイトル除去
 					frame.remove(title);
-					frame.remove(overlay);
+					//frame.remove(overlay);
 					title = null;
 					// ぷちゅ生成
 					makePuchu();
@@ -94,12 +95,12 @@ public class GameMain extends Thread {
 					rival = new Field(this, null);
 					rival.draw.setBounds(ScreenW/2, 0, ScreenW/2, ScreenH);
 					// フレームに追加
-					frame.add(overlay);
+					//frame.add(overlay);
 					frame.add(me.draw);
 					frame.add(rival.draw);
 					frame.revalidate();
 					me.draw.requestFocus();
-					isPaint = false; //フェードアウトのチラツキ防止
+					isPaint = false;
 				} else {
 					// Fieldの画面描画関係
 					me.update();
@@ -134,7 +135,6 @@ public class GameMain extends Thread {
 					me.draw.requestFocus();
 					// ぷちゅ受信完了
 					if(nw.programMode == Network.Mode.CLIENT) nw.sentStatus("START");
-					isPaint = false; //フェードアウトのチラツキ防止
 				} else {
 					if(canStart) {
 						// Fieldの画面描画関係
@@ -160,21 +160,29 @@ public class GameMain extends Thread {
 		gameStatus = next;
 	}
 	
+	// フェードイン
 	public void fadeIn(Status next) {
 		nextStatus = next;
 		overlay.FadeIn();
 		isPaint = false;
 	}
 	
+	// フェードアウト
 	public void fadeOut() {
 		nextStatus = gameStatus;
 		overlay.FadeOut();
 		isPaint = false;
 	}
 	
+	// フェード系終了
 	public void fadeEnd() {
 		gameStatus = nextStatus;
 		isPaint = true;
+	}
+	
+	// BGM設定
+	public void setBGM(URL path){
+		overlay.setBGM(path);
 	}
 	
 	// ゲーム終了の検知
@@ -221,7 +229,7 @@ public class GameMain extends Thread {
 		case "LEFTPRESS":
 			rival.key.Left = true;
 			break;
-		case "RIGHTPRESS:":
+		case "RIGHTPRESS":
 			rival.key.Right = true;
 			break;
 		case "DOWNPRESS":

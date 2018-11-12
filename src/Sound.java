@@ -1,6 +1,7 @@
 import java.net.URL;
 import javax.sound.sampled.*;
 
+@Deprecated
 public class Sound extends Thread{
 	private boolean isLoop;
 	private AudioInputStream ais;

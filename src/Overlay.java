@@ -1,5 +1,9 @@
 import javax.swing.*;
+
+import java.applet.Applet;
+import java.applet.AudioClip;
 import java.awt.*;
+import java.net.URL;
 
 public class Overlay extends JPanel{
 	final int fadeSpeed = 60;
@@ -7,6 +11,7 @@ public class Overlay extends JPanel{
 	Mode paintMode = Mode.STOP;
 	float fadeAlpha;
 	GameMain gm;
+	AudioClip bgm;
 	
 	Overlay(GameMain parent){
 		gm = parent;
@@ -21,6 +26,11 @@ public class Overlay extends JPanel{
 	public void FadeOut() {
 		paintMode = Mode.FADEOUT;
 		fadeAlpha = 1.0f;
+	}
+	
+	public void setBGM(URL path) {
+		bgm = Applet.newAudioClip(path);
+		bgm.loop();
 	}
 	
 	// 描画
@@ -40,6 +50,7 @@ public class Overlay extends JPanel{
             if(fadeAlpha >= 1.0f) {
             	paintMode = Mode.STOP;
             	gm.fadeEnd();
+            	bgm.stop();
             }
         	break;
         case FADEOUT:
