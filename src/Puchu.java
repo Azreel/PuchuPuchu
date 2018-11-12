@@ -39,7 +39,7 @@ public class Puchu {
 	//-- ぷちゅの落下処理
 	public void dropDown(int arr_i) {
 		y = (arr_i - 2) * Draw.Squares;
-		if ( draw_y < y ) { is_match_position_drop = false; }
+		is_match_position_drop = false;
 		drop_bound_time = 0;
 	}
 	

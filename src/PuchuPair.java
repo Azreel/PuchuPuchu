@@ -115,10 +115,6 @@ public class PuchuPair {
 			puchu2.y += 1;	puchu2.draw_y += 1;			
 		}
 	}
-	public void fallDown() {
-		puchu1.y += 1;	puchu1.draw_y += 1;
-		puchu2.y += 1;	puchu2.draw_y += 1;					
-	}
 	
 	//-- ぷちゅの横移動処理
 	public void slideRight() {

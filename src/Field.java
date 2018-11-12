@@ -20,6 +20,8 @@ public class Field {
 
 	private boolean turn_left_flag = true;
 	private boolean turn_right_flag = true;
+	private boolean slide_left_flag = true;
+	private boolean slide_right_flag = true;
 	private int now_x = 0;
 	private int now_y = 0;
 	private int switch_figure;
@@ -72,12 +74,7 @@ public class Field {
 		if ( now.form == 0 ) {
 			now_x = ( now.puchu1.x ) / 40;
 			now_y = ( now.puchu1.y ) / 40 + 2;
-			if ( cell[now_x+1][now_y].type != 0 ) {
-				right_flag = true;
-			}
-			if ( cell[now_x-1][now_y].type != 0 ) {
-				left_flag = true;
-			}
+			
 			if ( now_y == 13 || cell[now_x][now_y+1].type != 0 ) {
 				bottom_flag = true;
 			}
@@ -86,12 +83,6 @@ public class Field {
 			now_x = ( now.puchu1.x ) / 40;
 			now_y = ( now.puchu1.y ) / 40 + 1;
 			
-			if ( cell[now_x+2][now_y].type != 0 ) {
-				right_flag = true;
-			}
-			if ( cell[now_x-1][now_y].type != 0 ) {
-				left_flag = true;
-			}
 			if ( now_y == 13 || cell[now_x][now_y+1].type != 0 || cell[now_x+1][now_y+1].type != 0 ) {
 				bottom_flag = true;
 			}
@@ -99,12 +90,6 @@ public class Field {
 			now_x = ( now.puchu2.x ) / 40;
 			now_y = ( now.puchu2.y ) / 40 + 1;
 			
-			if ( cell[now_x+1][now_y].type != 0 ) {
-				right_flag = true;
-			}
-			if ( cell[now_x-1][now_y].type != 0 ) {
-				left_flag = true;
-			}
 			if ( now_y == 13 || cell[now_x][now_y+1].type != 0 ) {
 				bottom_flag = true;
 			}
@@ -112,13 +97,7 @@ public class Field {
 			now_x = ( now.puchu1.x ) / 40;
 			now_y = ( now.puchu1.y ) / 40 + 1;
 			
-			if ( cell[now_x+1][now_y].type != 0 ) {
-				right_flag = true;
-			}
-			if ( cell[now_x-2][now_y].type != 0 ) {
-				left_flag = true;
-			}
-			if ( now_y == 13 || cell[now_x][now_y+1].type != 0 || cell[now_x-2][now_y].type != 0 ) {
+			if ( now_y == 13 || cell[now_x][now_y+1].type != 0 || cell[now_x-1][now_y+1].type != 0 ) {
 				bottom_flag = true;
 			}
 		}
@@ -147,10 +126,10 @@ public class Field {
 			if ( bottom_flag != true ) {
 				now.fallDown(speed);
 			} else {
-				cell[2][13].copyPuchu(now.puchu1);
-				cell[2][12].copyPuchu(now.puchu2);
-				cell[2][13].dropDown(13);
-				cell[2][12].dropDown(12);
+				cell[now.puchu1.x/40][now.puchu1.y/40+2].copyPuchu(now.puchu1);
+				cell[now.puchu2.x/40][now.puchu2.y/40+2].copyPuchu(now.puchu2);
+				cell[now.puchu1.x/40][now.puchu1.y/40+2].dropDown(now.puchu1.y/40+2);
+				cell[now.puchu2.x/40][now.puchu2.y/40+2].dropDown(now.puchu2.y/40+2);
 				now = null;
 				draw.startDropAnim();
 				moving_flag = false;
@@ -183,11 +162,17 @@ public class Field {
 	}
 	
 	public void judge_key() {
-		if ( key.Left == true ) {
+		if ( key.Left == true && slide_left_flag ) {
 			now.slideLeft();
+			slide_left_flag = false;
+		} else if ( key.Left == false ) {
+			slide_left_flag = true;
 		}
-		if ( key.Right == true ) {
+		if ( key.Right == true && slide_right_flag ) {
 			now.slideRight();
+			slide_right_flag = false;
+		} else if ( key.Right == false ) {
+			slide_right_flag = true;
 		}
 		if ( key.Down == true ) {
 			speed *= 5;
