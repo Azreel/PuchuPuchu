@@ -100,10 +100,10 @@ public class Title extends JPanel{
         Graphics2D g2D = (Graphics2D) g;
         g2D.drawImage(bg, null, this);
         if(isFade) {
-        	int xx = this.getWidth();
-            int yy = this.getHeight();
+        	int w = this.getWidth();
+            int h = this.getHeight();
             g2D.setColor(new Color(0,0,0,(int)((fadeAlpha <= 1.0f ? fadeAlpha : 1.0f)*255)));
-            g2D.fillRect(0, 0, xx, yy);
+            g2D.fillRect(0, 0, w, h);
             fadeAlpha += 1.0f / fadeSpeed;
             if(fadeAlpha >= 1.0f){
             	bgm.Stop();

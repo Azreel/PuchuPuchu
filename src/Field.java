@@ -154,4 +154,12 @@ public class Field {
 		next[2].movePosition(290, 60);
 		draw.startMoveAnim();
 	}
+	
+	public void drop_finish() {
+		
+	}
+	
+	public void vanish_finish() {
+		
+	}
 }
