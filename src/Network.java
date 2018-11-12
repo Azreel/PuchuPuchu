@@ -190,7 +190,7 @@ public class Network extends Thread {
 	}
 	
 	// 初期ぷちゅペアリスト送信
-	public void sentPuchu(String[] list) {
+	public void sendPuchu(String[] list) {
 		pw.println("MAKESTART");
 		for(String data : list) {
 			pw.println(data);
@@ -200,7 +200,7 @@ public class Network extends Thread {
 	}
 	
 	// 自分のステータスを送信
-	public void sentStatus(String status) {
+	public void sendStatus(String status) {
 		pw.println(status);
 		pw.flush();
 	}

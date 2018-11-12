@@ -9,8 +9,15 @@ public class Key extends KeyAdapter {
 	public boolean TurnRight;
 	public boolean TurnLeft;
 	public boolean Enter;
-	public int KeyData = 0; //送信用
+	
+	private int KeyData = 0; //送信用
+	private int oldKey = 0;
+	private Network nw;
 
+	Key(Network parent){
+		nw = parent;
+	}
+	
 	// キーボードが押された時の処理(文字)
 	public void keyTyped(KeyEvent e) {
 	}
@@ -20,23 +27,23 @@ public class Key extends KeyAdapter {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:// ←キー
 			Left = true;
-			KeyData = 1;
+			sendKeyData(1);
 			break;
 		case KeyEvent.VK_RIGHT:// →キー
 			Right = true;
-			KeyData = 2;
+			sendKeyData(2);
 			break;
 		case KeyEvent.VK_DOWN:// ↓キー
 			Down = true;
-			KeyData = 3;
+			sendKeyData(3);
 			break;
 		case KeyEvent.VK_Z:// Zキー
 			TurnLeft = true;
-			KeyData = 4;
+			sendKeyData(4);
 			break;
 		case KeyEvent.VK_X:// Xキー
 			TurnRight = true;
-			KeyData = 5;
+			sendKeyData(5);
 			break;
 		case KeyEvent.VK_Q:// Qキー
 			System.exit(0);
@@ -52,27 +59,34 @@ public class Key extends KeyAdapter {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:// ←キー
 			Left = false;
-			KeyData = -1;
+			sendKeyData(-1);
 			break;
 		case KeyEvent.VK_RIGHT:// →キー
 			Right = false;
-			KeyData = -2;
+			sendKeyData(-2);
 			break;
 		case KeyEvent.VK_DOWN:// ↓キー
 			Down = false;
-			KeyData = -3;
+			sendKeyData(-3);
 			break;
 		case KeyEvent.VK_Z:// Zキー
 			TurnLeft = false;
-			KeyData = -4;
+			sendKeyData(-4);
 			break;
 		case KeyEvent.VK_X:// Xキー
 			TurnRight = false;
-			KeyData = -5;
+			sendKeyData(-5);
 			break;
 		case KeyEvent.VK_ENTER:// Enterキー
 			Enter = false;
 			break;
+		}
+	}
+	
+	private void sendKeyData(int key) {
+		if(key != oldKey) {
+			nw.sendStatus(Integer.toString(key));
+			oldKey = key;
 		}
 	}
 }

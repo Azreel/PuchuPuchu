@@ -10,13 +10,13 @@ public class GameMain extends Thread {
 	final long MSPF = 1000 / 60; //MilliSecond Per Frame
 	
 	public static enum Status { GAME_TITLE, GAME_SOLO, GAME_DUO };
+	public Network nw;
 	public static final int PPSIZE = 200;
 	public final JFrame frame = new JFrame();
 	public boolean canStart = false;
 	
 	private Status gameStatus = Status.GAME_TITLE;
 	private Status nextStatus;
-	private Network nw;
 	private long loopDelay = MSPF;
 	private Overlay overlay;
 	private boolean isOverlay = false;
@@ -122,7 +122,7 @@ public class GameMain extends Thread {
 					frame.remove(overlay);
 					title = null;
 					// ぷちゅ生成
-					if(nw.programMode == Network.Mode.SERVER) nw.sentPuchu(makePuchu());
+					if(nw.programMode == Network.Mode.SERVER) nw.sendPuchu(makePuchu());
 					else while(!canStart) { try { sleep(1); } catch(Exception e) {} }
 					// プレイヤーフィールド
 					me = new Field(this, ppInit);
@@ -137,16 +137,16 @@ public class GameMain extends Thread {
 					frame.revalidate();
 					me.draw.requestFocus();
 					// ぷちゅ受信完了
-					if(nw.programMode == Network.Mode.CLIENT) nw.sentStatus("START");
+					if(nw.programMode == Network.Mode.CLIENT) nw.sendStatus("START");
 				} else {
 					if(canStart) {
 						// Fieldの画面描画関係
 						me.update();
 						if(isPaint) me.draw.repaint();
-						if(oldKey != me.key.KeyData && !isFinish) { //ゲームが終了したら送信しない
-							nw.sentStatus(Integer.toString(me.key.KeyData));
-							oldKey = me.key.KeyData;
-						}
+//						if(oldKey != me.key.KeyData && !isFinish) { //ゲームが終了したら送信しない
+//							nw.sentStatus(Integer.toString(me.key.KeyData));
+//							oldKey = me.key.KeyData;
+//						}
 						rival.update();
 						if(isPaint) rival.draw.repaint();
 						overlay.repaint();
@@ -192,7 +192,7 @@ public class GameMain extends Thread {
 	public void finishGame() {
 		isFinish = true;
 		if(gameStatus == Status.GAME_DUO) {
-			nw.sentStatus("END");
+			nw.sendStatus("END");
 			nw.Close();
 		}
 	}
