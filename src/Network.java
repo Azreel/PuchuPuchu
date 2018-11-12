@@ -58,7 +58,7 @@ public class Network extends Thread {
 				System.out.println("nw run: "+e);
 				if(isConnect) break;
 			}
-			try { sleep(1); } catch(Exception e) {}
+			try { sleep(16); } catch(Exception e) {}
 		}
 	}
 	

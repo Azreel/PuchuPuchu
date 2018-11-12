@@ -9,7 +9,7 @@ public class Key extends KeyAdapter {
 	public boolean TurnRight;
 	public boolean TurnLeft;
 	public boolean Enter;
-	public String KeyData = "NULL"; //送信用
+	public int KeyData = 0; //送信用
 
 	// キーボードが押された時の処理(文字)
 	public void keyTyped(KeyEvent e) {
@@ -20,23 +20,23 @@ public class Key extends KeyAdapter {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:// ←キー
 			Left = true;
-			setKeyData("LEFTPRESS");
+			KeyData = 1;
 			break;
 		case KeyEvent.VK_RIGHT:// →キー
 			Right = true;
-			setKeyData("RIGHTPRESS");
+			KeyData = 2;
 			break;
 		case KeyEvent.VK_DOWN:// ↓キー
 			Down = true;
-			setKeyData("DOWNPRESS");
+			KeyData = 3;
 			break;
 		case KeyEvent.VK_Z:// Zキー
 			TurnLeft = true;
-			setKeyData("ZPRESS");
+			KeyData = 4;
 			break;
 		case KeyEvent.VK_X:// Xキー
 			TurnRight = true;
-			setKeyData("XPRESS");
+			KeyData = 5;
 			break;
 		case KeyEvent.VK_Q:// Qキー
 			System.exit(0);
@@ -52,32 +52,27 @@ public class Key extends KeyAdapter {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:// ←キー
 			Left = false;
-			setKeyData("LEFTRELEASE");
+			KeyData = -1;
 			break;
 		case KeyEvent.VK_RIGHT:// →キー
 			Right = false;
-			setKeyData("RIGHTRELEASE");
+			KeyData = -2;
 			break;
 		case KeyEvent.VK_DOWN:// ↓キー
 			Down = false;
-			setKeyData("DOWNRELEASE");
+			KeyData = -3;
 			break;
 		case KeyEvent.VK_Z:// Zキー
 			TurnLeft = false;
-			setKeyData("ZRELEASE");
+			KeyData = -4;
 			break;
 		case KeyEvent.VK_X:// Xキー
 			TurnRight = false;
-			setKeyData("XRELEASE");
+			KeyData = -5;
 			break;
 		case KeyEvent.VK_ENTER:// Enterキー
 			Enter = false;
 			break;
 		}
-	}
-	
-	// 送信用キー情報のセット
-	private void setKeyData(String key) {
-		KeyData = key;
 	}
 }
