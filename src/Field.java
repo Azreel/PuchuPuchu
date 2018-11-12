@@ -18,6 +18,8 @@ public class Field {
 	public boolean right_flag = false;
 	public boolean moving_flag = false;
 
+	private boolean turn_left_flag = true;
+	private boolean turn_right_flag = true;
 	private int now_x = 0;
 	private int now_y = 0;
 	private int switch_figure;
@@ -190,11 +192,17 @@ public class Field {
 		if ( key.Down == true ) {
 			speed *= 5;
 		}
-		if ( key.TurnLeft == true ) {
+		if ( key.TurnLeft == true && turn_left_flag ) {
 			now.turnLeft();
+			turn_left_flag = false;
+		} else if ( key.TurnLeft == false ){
+			turn_left_flag = true;
 		}
-		if ( key.TurnRight == true ) {
+		if ( key.TurnRight == true && turn_right_flag ) {
 			now.turnRight();
+			turn_right_flag = false;
+		} else if ( key.TurnRight == false ) {
+			turn_right_flag = true;
 		}
 	}
 }

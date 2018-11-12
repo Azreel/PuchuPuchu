@@ -99,6 +99,7 @@ public class GameMain extends Thread {
 					frame.add(rival.draw);
 					frame.revalidate();
 					me.draw.requestFocus();
+					isPaint = false; //フェードアウトのチラツキ防止
 				} else {
 					// Fieldの画面描画関係
 					me.update();
@@ -133,6 +134,7 @@ public class GameMain extends Thread {
 					me.draw.requestFocus();
 					// ぷちゅ受信完了
 					if(nw.programMode == Network.Mode.CLIENT) nw.sentStatus("START");
+					isPaint = false; //フェードアウトのチラツキ防止
 				} else {
 					if(canStart) {
 						// Fieldの画面描画関係

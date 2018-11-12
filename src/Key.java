@@ -63,11 +63,11 @@ public class Key extends KeyAdapter {
 			setKeyData("DOWNRELEASE");
 			break;
 		case KeyEvent.VK_Z:// Zキー
-			TurnLeft = true;
+			TurnLeft = false;
 			setKeyData("ZRELEASE");
 			break;
 		case KeyEvent.VK_X:// Xキー
-			TurnRight = true;
+			TurnRight = false;
 			setKeyData("XRELEASE");
 			break;
 		case KeyEvent.VK_ENTER:// Enterキー
