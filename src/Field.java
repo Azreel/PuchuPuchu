@@ -31,6 +31,7 @@ public class Field {
 			key = new Key();
 			init_player(player);
 			create_puchu(player);
+			switch_start();
 			draw.addKeyListener(key);
 		} else {
 			draw = new Draw();
@@ -57,6 +58,10 @@ public class Field {
 		
 		next[2] = new PuchuPair(cp_player[switch_figure][0], cp_player[switch_figure][1]);	//次の次のぷちゅの更新
 		switch_figure++;
+		
+		next[0].setPosition(265, -40);
+		next[1].setPosition(290, 50);
+		next[2].setPosition(315, 140);
 	}
 	
 	public void hit_puchu() {
@@ -136,7 +141,18 @@ public class Field {
 	public void update() {			//連続処理
 		if ( moving_flag == true ) {
 			hit_puchu();
-			now.fallDown(1);
+			if ( bottom_flag != true ) {
+				now.fallDown(1);
+			} else {
+				cell[2][13].copyPuchu(now.puchu1);
+				cell[2][12].copyPuchu(now.puchu2);
+				cell[2][13].dropDown(13);
+				cell[2][12].dropDown(12);
+				now = null;
+				draw.startDropAnim();
+				moving_flag = false;
+				bottom_flag = false;
+			}
 		}
 	}
 	private void init_player(int[][] player) {
@@ -151,12 +167,12 @@ public class Field {
 	private void switch_start() {
 		next[0].movePosition(80, -40);
 		next[1].movePosition(265, -40);
-		next[2].movePosition(290, 60);
+		next[2].movePosition(290, 50);
 		draw.startMoveAnim();
 	}
 	
 	public void drop_finish() {
-		
+		switch_start();
 	}
 	
 	public void vanish_finish() {
