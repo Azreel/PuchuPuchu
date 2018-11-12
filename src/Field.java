@@ -41,10 +41,10 @@ public class Field {
 	private void create_puchu(int[][] rnd_list){	//first create
 		
 		for ( int i = 0; i < next.length; i++ ) {
-			next[i] = new PuchuPair(rnd_list[i+1][0], rnd_list[i+1][1]);	//次のぷちゅ
+			next[i] = new PuchuPair(rnd_list[i][0], rnd_list[i][1]);	//次のぷちゅ
 			next[i].setPosition(265+25*i, -40+90*i);
 		}
-		switch_figure = 4;
+		switch_figure = 3;
 	}
 	
 	public void switch_next() {	//ぷちゅの更新
