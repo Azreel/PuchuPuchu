@@ -150,7 +150,7 @@ public class GameMain extends Thread {
 	private String[] makePuchu() {
 		String[] ppList = new String[PPSIZE];
 		Random rnd = new Random();
-		for(int i = 0; i < ppInit.length; i++) {
+		for(int i = 0; i < PPSIZE; i++) {
 			ppInit[i][0] = rnd.nextInt(6)+1;
 			ppInit[i][1] = rnd.nextInt(6)+1;
 			ppList[i] = Integer.toString(ppInit[i][0]) + "," + Integer.toString(ppInit[i][1]);

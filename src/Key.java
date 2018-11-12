@@ -8,7 +8,8 @@ public class Key extends KeyAdapter {
 	public boolean Down;
 	public boolean TurnRight;
 	public boolean TurnLeft;
-	public String KeyData = "NULL";
+	public boolean Enter;
+	public String KeyData = "NULL"; //送信用
 
 	// キーボードが押された時の処理(文字)
 	public void keyTyped(KeyEvent e) {
@@ -40,6 +41,9 @@ public class Key extends KeyAdapter {
 		case KeyEvent.VK_Q:// Qキー
 			System.exit(0);
 			break;
+		case KeyEvent.VK_ENTER:// Enterキー
+			Enter = true;
+			break;
 		}
 	}
 
@@ -65,6 +69,9 @@ public class Key extends KeyAdapter {
 		case KeyEvent.VK_X:// Xキー
 			TurnRight = true;
 			setKeyData("XRELEASE");
+			break;
+		case KeyEvent.VK_ENTER:// Enterキー
+			Enter = false;
 			break;
 		}
 	}
