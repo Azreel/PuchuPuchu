@@ -1,6 +1,6 @@
 import java.awt.*;
 import java.util.*;
-
+import java.awt.event.*;
 import javax.swing.*;
 
 public class Field {
@@ -21,11 +21,11 @@ public class Field {
 	private int now_x = 0;
 	private int now_y = 0;
 	
-	public Field(boolean flag) {			//nullプレイヤー用
+	public Field(int[][] player) {			//nullプレイヤー用
 		
 		init_cell();
 		create_puchu();
-		if ( flag == true ) {
+		if ( player == null ) {
 			draw = new Draw(this);
 			key = new Key();
 		} else {
