@@ -18,6 +18,7 @@ public class GameMain extends Thread {
 	private Network nw;
 	private long loopDelay = MSPF;
 	private Overlay overlay;
+	private boolean isPaint = true;
 	private Title title = null;
 	private int[][] ppInit = new int[PPSIZE][2];
 	private Field me = null;
@@ -37,10 +38,11 @@ public class GameMain extends Thread {
 	    frame.setLocationRelativeTo(null);
 		frame.setTitle("ぷちゅぷちゅ");
 		frame.setResizable(false);// サイズ変更不可
-		frame.setLayout(new GridLayout(1,2));
+		frame.setLayout(null);
 		frame.setVisible(true);
 		overlay = new Overlay(this);
 		overlay.setPreferredSize(new Dimension(ScreenW, ScreenH));
+		overlay.setBounds(0, 0, ScreenW, ScreenH);
 	}
 	
 	// スレッドのメイン
@@ -65,11 +67,13 @@ public class GameMain extends Thread {
 					// タイトルパネル追加
 					title = new Title(this, nw);
 					title.setPreferredSize(new Dimension(ScreenW, ScreenH));
-					frame.add(title);
+					title.setBounds(0, 0, ScreenW, ScreenH);
 					frame.add(overlay);
+					frame.add(title);
 					frame.revalidate();
 				} else {
-					title.repaint();
+					if(isPaint) title.repaint();
+					overlay.repaint();
 				}
 				break;
 			case GAME_SOLO: // 1Pプレイ
@@ -85,19 +89,24 @@ public class GameMain extends Thread {
 					makePuchu();
 					// プレイヤーフィールド
 					me = new Field(this, ppInit);
+					me.draw.setBounds(0, 0, ScreenW/2, ScreenH);
 					// nullプレイヤーフィールド
 					rival = new Field(this, null);
+					rival.draw.setBounds(ScreenW/2, 0, ScreenW/2, ScreenH);
 					// フレームに追加
+					frame.add(overlay);
 					frame.add(me.draw);
 					frame.add(rival.draw);
-					frame.add(overlay);
 					frame.revalidate();
 					me.draw.requestFocus();
 				} else {
 					// Fieldの画面描画関係
 					me.update();
-					me.draw.repaint();
-					rival.draw.repaint();
+					if(isPaint) {
+						me.draw.repaint();
+						rival.draw.repaint();
+					}
+					overlay.repaint();
 				}
 				break;
 			case GAME_DUO: // 2Pプレイ
@@ -112,12 +121,14 @@ public class GameMain extends Thread {
 					else while(!canStart) { try { sleep(1); } catch(Exception e) {} }
 					// プレイヤーフィールド
 					me = new Field(this, ppInit);
+					me.draw.setBounds(0, 0, ScreenW/2, ScreenH);
 					// ライバルプレイヤーフィールド
 					rival = new Field(this, ppInit);
+					rival.draw.setBounds(ScreenW/2, 0, ScreenW/2, ScreenH);
 					// フレームに追加
+					frame.add(overlay);
 					frame.add(me.draw);
 					frame.add(rival.draw);
-					frame.add(overlay);
 					frame.revalidate();
 					me.draw.requestFocus();
 					// ぷちゅ受信完了
@@ -126,13 +137,14 @@ public class GameMain extends Thread {
 					if(canStart) {
 						// Fieldの画面描画関係
 						me.update();
-						me.draw.repaint();
+						if(isPaint) me.draw.repaint();
 						if(!oldKey.equals(me.key.KeyData) && !isFinish) { //ゲームが終了したら送信しない
 							nw.sentStatus(me.key.KeyData);
 							oldKey = me.key.KeyData;
 						}
 						rival.update();
-						rival.draw.repaint();
+						if(isPaint) rival.draw.repaint();
+						overlay.repaint();
 					}
 				}
 				break;
@@ -149,15 +161,18 @@ public class GameMain extends Thread {
 	public void fadeIn(Status next) {
 		nextStatus = next;
 		overlay.FadeIn();
+		isPaint = false;
 	}
 	
-	public void fadeOut(Status next) {
-		nextStatus = next;
+	public void fadeOut() {
+		nextStatus = gameStatus;
 		overlay.FadeOut();
+		isPaint = false;
 	}
 	
 	public void fadeEnd() {
 		gameStatus = nextStatus;
+		isPaint = true;
 	}
 	
 	// ゲーム終了の検知
