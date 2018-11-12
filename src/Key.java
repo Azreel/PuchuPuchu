@@ -8,7 +8,7 @@ public class Key extends KeyAdapter {
 	public boolean Down;
 	public boolean TurnRight;
 	public boolean TurnLeft;
-	public String KeyData;
+	public String KeyData = "NULL";
 
 	// キーボードが押された時の処理(文字)
 	public void keyTyped(KeyEvent e) {
@@ -71,7 +71,9 @@ public class Key extends KeyAdapter {
 	
 	// 送信用キー情報のセット
 	private void setKeyData(String key) {
-		if(!KeyData.equals(key)) KeyData = key;
-		System.out.println(KeyData);
+		if(!KeyData.equals(key)) {
+			KeyData = key;
+			System.out.println(KeyData);
+		}
 	}
 }

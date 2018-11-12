@@ -141,11 +141,15 @@ public class Network extends Thread {
 			break;
 		// 相手が負けた場合に送られてくる
 		case "END":
+			gm.finishRival();
+			Close();
 			break;
 		// 初期ぷちゅペア受信開始
 		case "MAKESTART":
-			gm.makePuchuByServer(getPuchuList());
-			gm.canStart = true;
+			if(programMode == Mode.CLIENT) {
+				gm.makePuchuByServer(getPuchuList());
+				gm.canStart = true;
+			}
 			break;
 		// キー入力
 		default:
@@ -173,7 +177,7 @@ public class Network extends Thread {
 	// 初期ぷちゅペアリスト受信
 	private int[][] getPuchuList(){
 		String pair;
-		int[][] pairList = new int[200][2];
+		int[][] pairList = new int[GameMain.PPSIZE][2];
 		int index = 0;
 		try {
 			pair = br.readLine();
@@ -193,6 +197,7 @@ public class Network extends Thread {
 				return null;
 			}
 		}
-		return pairList;
+		if(index != GameMain.PPSIZE) return null;
+		else return pairList;
 	}
 }

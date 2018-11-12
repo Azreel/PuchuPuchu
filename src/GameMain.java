@@ -9,6 +9,7 @@ public class GameMain extends Thread {
 	final long MSPF = 1000 / 60; //MilliSecond Per Frame
 	
 	public static enum Status { GAME_TITLE, GAME_SOLO, GAME_DUO };
+	public static final int PPSIZE = 200;
 	public final JFrame frame = new JFrame();
 	public boolean canStart = false;
 	
@@ -16,10 +17,11 @@ public class GameMain extends Thread {
 	private Network nw;
 	private long loopDelay = MSPF;
 	private Title title = null;
-	private int[][] ppInit = new int[200][2];
+	private int[][] ppInit = new int[PPSIZE][2];
 	private Field me = null;
 	private Field rival = null;
 	private String oldKey = "NULL";
+	private boolean isFinish = false;
 	
 	// コンストラクタ
 	GameMain(){
@@ -76,9 +78,9 @@ public class GameMain extends Thread {
 					// ぷちゅ生成
 					makePuchu();
 					// プレイヤーフィールド
-					me = new Field(ppInit);
+					me = new Field(this, ppInit);
 					// nullプレイヤーフィールド
-					rival = new Field(null);
+					rival = new Field(this, null);
 					// フレームに追加
 					frame.add(me.draw);
 					frame.add(rival.draw);
@@ -101,22 +103,22 @@ public class GameMain extends Thread {
 					if(nw.programMode == Network.Mode.SERVER) nw.sentPuchu(makePuchu());
 					else while(!canStart) { try { sleep(1); } catch(Exception e) {} }
 					// プレイヤーフィールド
-					me = new Field(ppInit);
+					me = new Field(this, ppInit);
 					// ライバルプレイヤーフィールド
-					rival = new Field(ppInit);
+					rival = new Field(this, ppInit);
 					// フレームに追加
 					frame.add(me.draw);
 					frame.add(rival.draw);
 					frame.revalidate();
 					me.draw.requestFocus();
-					// 準備完了
-					nw.sentStatus("START");
+					// ぷちゅ受信完了
+					if(nw.programMode == Network.Mode.CLIENT) nw.sentStatus("START");
 				} else {
 					if(canStart) {
 						// Fieldの画面描画関係
 						me.update();
 						me.draw.repaint();
-						if(!oldKey.equals(me.key.KeyData)) {
+						if(!oldKey.equals(me.key.KeyData) && !isFinish) { //ゲームが終了したら送信しない
 							nw.sentStatus(me.key.KeyData);
 							oldKey = me.key.KeyData;
 						}
@@ -135,9 +137,18 @@ public class GameMain extends Thread {
 		gameStatus = next;
 	}
 	
+	// ゲーム終了の検知
+	public void finishGame() {
+		isFinish = true;
+		if(gameStatus == Status.GAME_DUO) {
+			nw.sentStatus("END");
+			nw.Close();
+		}
+	}
+	
 	//初期ぷちゅペア生成
 	private String[] makePuchu() {
-		String[] ppList = new String[200];
+		String[] ppList = new String[PPSIZE];
 		Random rnd = new Random();
 		for(int i = 0; i < ppInit.length; i++) {
 			ppInit[i][0] = rnd.nextInt(6)+1;
@@ -201,6 +212,11 @@ public class GameMain extends Thread {
 			System.out.println("不正なキーデータ: "+key);
 			break;
 		}
+	}
+	
+	// ライバルの負けを検知
+	public void finishRival() {
+		isFinish = true;
 	}
 	
 	// プログラム実行本体
