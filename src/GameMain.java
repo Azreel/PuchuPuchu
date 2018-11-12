@@ -14,8 +14,10 @@ public class GameMain extends Thread {
 	public boolean canStart = false;
 	
 	private Status gameStatus = Status.GAME_TITLE;
+	private Status nextStatus;
 	private Network nw;
 	private long loopDelay = MSPF;
+	private Overlay overlay;
 	private Title title = null;
 	private int[][] ppInit = new int[PPSIZE][2];
 	private Field me = null;
@@ -37,6 +39,8 @@ public class GameMain extends Thread {
 		frame.setResizable(false);// サイズ変更不可
 		frame.setLayout(new GridLayout(1,2));
 		frame.setVisible(true);
+		overlay = new Overlay(this);
+		overlay.setPreferredSize(new Dimension(ScreenW, ScreenH));
 	}
 	
 	// スレッドのメイン
@@ -62,6 +66,7 @@ public class GameMain extends Thread {
 					title = new Title(this, nw);
 					title.setPreferredSize(new Dimension(ScreenW, ScreenH));
 					frame.add(title);
+					frame.add(overlay);
 					frame.revalidate();
 				} else {
 					title.repaint();
@@ -74,6 +79,7 @@ public class GameMain extends Thread {
 					nw.Close();
 					// タイトル除去
 					frame.remove(title);
+					frame.remove(overlay);
 					title = null;
 					// ぷちゅ生成
 					makePuchu();
@@ -84,6 +90,7 @@ public class GameMain extends Thread {
 					// フレームに追加
 					frame.add(me.draw);
 					frame.add(rival.draw);
+					frame.add(overlay);
 					frame.revalidate();
 					me.draw.requestFocus();
 				} else {
@@ -98,6 +105,7 @@ public class GameMain extends Thread {
 					System.out.println("2Pモード");
 					// タイトル除去
 					frame.remove(title);
+					frame.remove(overlay);
 					title = null;
 					// ぷちゅ生成
 					if(nw.programMode == Network.Mode.SERVER) nw.sentPuchu(makePuchu());
@@ -109,6 +117,7 @@ public class GameMain extends Thread {
 					// フレームに追加
 					frame.add(me.draw);
 					frame.add(rival.draw);
+					frame.add(overlay);
 					frame.revalidate();
 					me.draw.requestFocus();
 					// ぷちゅ受信完了
@@ -135,6 +144,20 @@ public class GameMain extends Thread {
 	// ゲーム画面の状態変更
 	public void setStatus(Status next) {
 		gameStatus = next;
+	}
+	
+	public void fadeIn(Status next) {
+		nextStatus = next;
+		overlay.FadeIn();
+	}
+	
+	public void fadeOut(Status next) {
+		nextStatus = next;
+		overlay.FadeOut();
+	}
+	
+	public void fadeEnd() {
+		gameStatus = nextStatus;
 	}
 	
 	// ゲーム終了の検知

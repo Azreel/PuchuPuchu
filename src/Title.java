@@ -81,16 +81,14 @@ public class Title extends JPanel{
 	
 	// クライアントの接続確認
 	public void rivalApply() {
-		JLabel label = new JLabel("相手の接続を受けました");
-	    JOptionPane.showMessageDialog(gm.frame, label);
+	    JOptionPane.showMessageDialog(gm.frame, new JLabel("相手の接続を受けました"));
 	    setFade(GameMain.Status.GAME_DUO);
 	}
 	
 	// フェード開始用
 	private void setFade(GameMain.Status status) {
-		next = status;
-		isFade = true;
 		this.removeAll();
+		gm.fadeIn(status);
 	}
 	
 	// 描画
@@ -99,18 +97,18 @@ public class Title extends JPanel{
         super.paintComponent(g);
         Graphics2D g2D = (Graphics2D) g;
         g2D.drawImage(bg, null, this);
-        if(isFade) {
-        	int w = this.getWidth();
-            int h = this.getHeight();
-            g2D.setColor(new Color(0,0,0,(int)((fadeAlpha <= 1.0f ? fadeAlpha : 1.0f)*255)));
-            g2D.fillRect(0, 0, w, h);
-            fadeAlpha += 1.0f / fadeSpeed;
-            if(fadeAlpha >= 1.0f){
-            	bgm.Stop();
-            	gm.setStatus(next);
-            	return;
-            }
-            //bgm.setVolume(1.0f - fadeAlpha);
-        }
+//        if(isFade) {
+//        	int w = this.getWidth();
+//            int h = this.getHeight();
+//            g2D.setColor(new Color(0,0,0,(int)((fadeAlpha <= 1.0f ? fadeAlpha : 1.0f)*255)));
+//            g2D.fillRect(0, 0, w, h);
+//            fadeAlpha += 1.0f / fadeSpeed;
+//            if(fadeAlpha >= 1.0f){
+//            	bgm.Stop();
+//            	gm.setStatus(next);
+//            	return;
+//            }
+//            //bgm.setVolume(1.0f - fadeAlpha);
+//        }
     }
 }
