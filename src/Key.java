@@ -78,9 +78,6 @@ public class Key extends KeyAdapter {
 	
 	// 送信用キー情報のセット
 	private void setKeyData(String key) {
-		if(!KeyData.equals(key)) {
-			KeyData = key;
-			System.out.println(KeyData);
-		}
+		KeyData = key;
 	}
 }

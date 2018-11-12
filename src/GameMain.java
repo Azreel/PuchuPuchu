@@ -7,7 +7,7 @@ import javax.swing.*;
 public class GameMain extends Thread {
 	final int ScreenW = 960;
 	final int ScreenH = 640;
-	final long MSPF = 1000 / 60; //MilliSecond Per Frame
+	final long MSPF = 1000 / 50; //MilliSecond Per Frame
 	
 	public static enum Status { GAME_TITLE, GAME_SOLO, GAME_DUO };
 	public static final int PPSIZE = 200;
