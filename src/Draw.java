@@ -53,7 +53,6 @@ public class Draw extends JPanel{
 		is_alive = true;
 		fd = _fd;
 		initImages();
-
 	}
 	
 	//-- Image変数の初期化
@@ -72,6 +71,7 @@ public class Draw extends JPanel{
 	//-- 落下アニメーション終了
 	private void finishDropAnim() {
 		is_drop_anim = false;
+		fd.drop_finish();
 	}
 	
 	//-- ぷちゅペアの移動アニメーション開始
@@ -82,6 +82,7 @@ public class Draw extends JPanel{
 	//-- ぷちゅペアの移動アニメーション終了
 	private void finishMoveAnim() {
 		is_move_anim = false;
+		fd.switch_next();
 	}
 	
 	//-- ぷちゅの消滅アニメーション開始
@@ -103,6 +104,7 @@ public class Draw extends JPanel{
 	//-- ぷちゅの消滅アニメーション終了
 	private void finishVanishAnim() {
 		is_vanish_anim = false;
+		fd.vanish_finish();
 	}
 	
 	//-- 盤面のアニメーション状況更新
@@ -170,9 +172,11 @@ public class Draw extends JPanel{
 				}
 			}
 			// 操作中のぷちゅペア描写
-			updatePuchuPairAnim(fd.now);
-			img_2d.drawImage(img_puchu[fd.now.puchu1.type], fd.now.puchu1.draw_x + margin_w, fd.now.puchu1.draw_y + margin_h, this);
-			img_2d.drawImage(img_puchu[fd.now.puchu2.type], fd.now.puchu2.draw_x + margin_w, fd.now.puchu2.draw_y + margin_h, this);
+			if ( fd.now != null ) {
+				updatePuchuPairAnim(fd.now);
+				img_2d.drawImage(img_puchu[fd.now.puchu1.type], fd.now.puchu1.draw_x + margin_w, fd.now.puchu1.draw_y + margin_h, this);
+				img_2d.drawImage(img_puchu[fd.now.puchu2.type], fd.now.puchu2.draw_x + margin_w, fd.now.puchu2.draw_y + margin_h, this);				
+			}
 			// nextぷちゅ描写
 			for ( int i = 0; i < fd.next.length; i++ ) {
 				updatePuchuPairAnim(fd.next[i]);
