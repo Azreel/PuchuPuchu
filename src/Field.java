@@ -35,7 +35,7 @@ public class Field {
 			key = new Key(gm.nw);
 			init_player(player);
 			create_puchu(player);
-			switch_start();
+			
 			draw.addKeyListener(key);
 		} else {
 			draw = new Draw();
@@ -207,19 +207,7 @@ public class Field {
 		}
 	}
 	
-	public void deside_pos() {		//落下先の場所決め
-		
-		if ( bottom_flag == true && now_y != 11 ) {
-			
-		}
-		
-	}
-	
-	private void deside_vanish() {
-		
-	}
-	
-	private void vanish_puchu() {
+	private void puchu_comb() {
 		
 	}
 	
@@ -341,5 +329,13 @@ public class Field {
 			}
 		}
 		return pos_y-1;
+	}
+	
+	public void game_end() {
+		
+	}
+	
+	public void game_start() {
+		switch_start();
 	}
 }
