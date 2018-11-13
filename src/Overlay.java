@@ -72,7 +72,7 @@ public class Overlay extends JPanel{
             fadeAlpha -= 1.0f / fadeSpeed;
             if(fadeAlpha <= 0.0f) {
             	paintMode = Mode.STOP;
-            	if(isPlay) gm.fadeEnd();
+            	gm.fadeEnd();
             }
         	break;
         case RESULT:
