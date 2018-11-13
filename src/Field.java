@@ -21,14 +21,18 @@ public class Field {
 	private boolean turn_right_flag = true;	//右回転できるか
 	private boolean slide_left_flag = true;	//左に移動できるか
 	private boolean slide_right_flag = true;//右に移動できるか
+	private boolean game_end_flag = false;
+	
 	private int now_x = 0;
 	private int now_y = 0;
 	private int switch_figure;
 	private int speed = 1;
 	private int[][] cp_player = new int[GameMain.PPSIZE][2];
+	private GameMain gm;
 	
-	public Field(GameMain gm, int[][] player) {			//nullプレイヤー用
+	public Field(GameMain game, int[][] player) {			//nullプレイヤー用
 		
+		gm = game;
 		init_cell();
 		if ( player != null ) {
 			draw = new Draw(this);
@@ -143,7 +147,7 @@ public class Field {
 				bottom_p1_flag = true;
 				bottom_p2_flag = true;
 			}
-			if ( now_x >= 5 && cell[now_x-2][now_y].type != 0 ) {
+			if ( now_x >= 5 && cell[now_x-1][now_y].type != 0 ) {
 				slide_right_flag = false;
 				slide_left_flag = false;
 				turn_right_flag = false;
@@ -214,6 +218,10 @@ public class Field {
 	public int update() {			//連続処理
 		
 		int drop_pos = 0;
+		
+		if ( game_end_flag && key.Enter ) {
+			gm.fadeIn(GameMain.Status.GAME_TITLE);
+		}
 		
 		if ( moving_flag == true ) {
 			judge_key();
@@ -332,7 +340,7 @@ public class Field {
 	}
 	
 	public void game_end() {
-		
+		game_end_flag = true;
 	}
 	
 	public void p1_defeat() {
