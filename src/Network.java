@@ -58,7 +58,7 @@ public class Network extends Thread {
 				System.out.println("nw run: "+e);
 				if(isConnect) break;
 			}
-			try { sleep(1); } catch(Exception e) {}
+			try { sleep(16); } catch(Exception e) {}
 		}
 	}
 	
@@ -125,37 +125,39 @@ public class Network extends Thread {
 	
 	// 相手のステータス取得
 	private void getRivalStatus() {
-		String input;
-		try {
-			input = br.readLine();
-		}catch(Exception e) {
-			System.out.println("nw get: "+e);
-			input = "END";
-		}
-		switch(input) {
-		// 受信データなし
-		case "null":
-			break;
-		// 相手が初期ぷちゅペアリストを受信完了すると送られてくる
-		case "START":
-			if(programMode == Mode.SERVER) gm.canStart = true;
-			break;
-		// 相手が負けた場合に送られてくる
-		case "END":
-			gm.finishRival();
-			Close();
-			break;
-		// 初期ぷちゅペア受信開始
-		case "MAKESTART":
-			if(programMode == Mode.CLIENT) {
-				gm.makePuchuByServer(getPuchuList());
-				gm.canStart = true;
+		String input = "";
+		while(!input.equals("null") && !input.equals("END")) {
+			try {
+				input = br.readLine();
+			}catch(Exception e) {
+				System.out.println("nw get: "+e);
+				input = "END";
 			}
-			break;
-		// キー入力
-		default:
-			gm.setRivalInput(input);
-			break;
+			switch(input) {
+			// 受信データなし
+			case "null":
+				break;
+			// 相手が初期ぷちゅペアリストを受信完了すると送られてくる
+			case "START":
+				if(programMode == Mode.SERVER) gm.canStart = true;
+				break;
+			// 相手が負けた場合に送られてくる
+			case "END":
+				gm.finishRival();
+				Close();
+				break;
+			// 初期ぷちゅペア受信開始
+			case "MAKESTART":
+				if(programMode == Mode.CLIENT) {
+					gm.makePuchuByServer(getPuchuList());
+					gm.canStart = true;
+				}
+				break;
+			// キー入力
+			default:
+				gm.setRivalInput(input);
+				break;
+			}
 		}
 	}
 	
@@ -171,6 +173,7 @@ public class Network extends Thread {
 			return null;
 		}
 		while(!pair.equals("MAKEEND")) {
+			if(pair.equals("null")) return null;
 			String[] set = pair.split(",");
 			pairList[index][0] = Integer.parseInt(set[0]);
 			pairList[index][1] = Integer.parseInt(set[1]);
@@ -187,7 +190,7 @@ public class Network extends Thread {
 	}
 	
 	// 初期ぷちゅペアリスト送信
-	public void sentPuchu(String[] list) {
+	public void sendPuchu(String[] list) {
 		pw.println("MAKESTART");
 		for(String data : list) {
 			pw.println(data);
@@ -197,7 +200,7 @@ public class Network extends Thread {
 	}
 	
 	// 自分のステータスを送信
-	public void sentStatus(String status) {
+	public void sendStatus(String status) {
 		pw.println(status);
 		pw.flush();
 	}

@@ -50,7 +50,7 @@ public class Title extends JPanel{
 		duoBtn.setFont(btnFont);
 		duoBtn.addActionListener(new DuoPlayBtn());
 		//BGM
-		gm.setBGM(getClass().getResource("Title.wav"));
+		//gm.setBGM(getClass().getResource("Title.wav"));
         
         this.add(soloBtn);
         this.add(duoBtn);

@@ -9,8 +9,15 @@ public class Key extends KeyAdapter {
 	public boolean TurnRight;
 	public boolean TurnLeft;
 	public boolean Enter;
-	public String KeyData = "NULL"; //送信用
+	
+	private int KeyData = 0; //送信用
+	private int oldKey = 0;
+	private Network nw;
 
+	Key(Network parent){
+		nw = parent;
+	}
+	
 	// キーボードが押された時の処理(文字)
 	public void keyTyped(KeyEvent e) {
 	}
@@ -20,23 +27,23 @@ public class Key extends KeyAdapter {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:// ←キー
 			Left = true;
-			setKeyData("LEFTPRESS");
+			sendKeyData(1);
 			break;
 		case KeyEvent.VK_RIGHT:// →キー
 			Right = true;
-			setKeyData("RIGHTPRESS");
+			sendKeyData(2);
 			break;
 		case KeyEvent.VK_DOWN:// ↓キー
 			Down = true;
-			setKeyData("DOWNPRESS");
+			sendKeyData(3);
 			break;
 		case KeyEvent.VK_Z:// Zキー
 			TurnLeft = true;
-			setKeyData("ZPRESS");
+			sendKeyData(4);
 			break;
 		case KeyEvent.VK_X:// Xキー
 			TurnRight = true;
-			setKeyData("XPRESS");
+			sendKeyData(5);
 			break;
 		case KeyEvent.VK_Q:// Qキー
 			System.exit(0);
@@ -52,23 +59,23 @@ public class Key extends KeyAdapter {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:// ←キー
 			Left = false;
-			setKeyData("LEFTRELEASE");
+			sendKeyData(-1);
 			break;
 		case KeyEvent.VK_RIGHT:// →キー
 			Right = false;
-			setKeyData("RIGHTRELEASE");
+			sendKeyData(-2);
 			break;
 		case KeyEvent.VK_DOWN:// ↓キー
 			Down = false;
-			setKeyData("DOWNRELEASE");
+			sendKeyData(-3);
 			break;
 		case KeyEvent.VK_Z:// Zキー
 			TurnLeft = false;
-			setKeyData("ZRELEASE");
+			sendKeyData(-4);
 			break;
 		case KeyEvent.VK_X:// Xキー
 			TurnRight = false;
-			setKeyData("XRELEASE");
+			sendKeyData(-5);
 			break;
 		case KeyEvent.VK_ENTER:// Enterキー
 			Enter = false;
@@ -76,11 +83,10 @@ public class Key extends KeyAdapter {
 		}
 	}
 	
-	// 送信用キー情報のセット
-	private void setKeyData(String key) {
-		if(!KeyData.equals(key)) {
-			KeyData = key;
-			System.out.println(KeyData);
+	private void sendKeyData(int key) {
+		if(key != oldKey) {
+			nw.sendStatus(Integer.toString(key));
+			oldKey = key;
 		}
 	}
 }

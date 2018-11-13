@@ -32,7 +32,7 @@ public class Field {
 		init_cell();
 		if ( player != null ) {
 			draw = new Draw(this);
-			key = new Key();
+			key = new Key(gm.nw);
 			init_player(player);
 			create_puchu(player);
 			switch_start();
@@ -63,7 +63,9 @@ public class Field {
 		
 		next[2] = new PuchuPair(cp_player[switch_figure][0], cp_player[switch_figure][1]);	//次の次のぷちゅの更新
 		switch_figure++;
-		
+		if ( switch_figure == GameMain.PPSIZE ) {
+			switch_figure = 0;
+		}
 		next[0].setPosition(265, -40);
 		next[1].setPosition(290, 50);
 		next[2].setPosition(315, 140);
@@ -74,10 +76,22 @@ public class Field {
 			now_x = ( now.puchu1.x ) / 40;
 			now_y = ( now.puchu1.y ) / 40 + 2;
 			
+			System.out.println("now_x:" + now_x);
+			System.out.println("now_y:" + now_y);
 			if ( now_y == 13 || cell[now_x][now_y+1].type != 0 ) {
 				bottom_flag = true;
 			}
-			if ( now_x >= 5 ) {
+			if ( now_x >= 5 && cell[now_x-1][now_y].type != 0 ) {
+				slide_right_flag = false;
+				slide_left_flag = false;
+				turn_right_flag = false;
+				turn_left_flag = false;
+			} else if ( now_x <= 0 && cell[now_x+1][now_y].type != 0 ) {
+				slide_left_flag = false;
+				slide_right_flag = false;
+				turn_left_flag = false;
+				turn_right_flag = false;
+			} else if ( now_x >= 5 ) {
 				slide_right_flag = false;
 				turn_right_flag = false;
 			} else if ( now_x <= 0 ) {
@@ -90,7 +104,6 @@ public class Field {
 				slide_right_flag = false;
 				turn_right_flag = false;
 			}
-			
 		} else if ( now.form == 1 ) {
 			now_x = ( now.puchu1.x ) / 40;
 			now_y = ( now.puchu1.y ) / 40 + 2;
@@ -99,10 +112,18 @@ public class Field {
 				bottom_flag = true;
 			} else if ( cell[now_x][now_y+1].type != 0 ) {
 				bottom_p1_flag = true;
+				bottom_flag = true;
 			} else if ( cell[now_x+1][now_y+1].type != 0 ) {
 				bottom_p2_flag = true;
+				bottom_flag = true;
 			}
-			if ( now_x >= 4 ) {
+			if ( now_x >= 4 && cell[now_x-1][now_y].type != 0 ) {
+				slide_right_flag = false;
+				slide_left_flag = false;
+			} else if ( now_x <= 0 && cell[now_x+2][now_y].type != 0 ) {
+				slide_left_flag = false;
+				slide_right_flag = false;
+			} else if ( now_x >= 4 ) {
 				slide_right_flag = false;
 			} else if ( now_x <= 0 ) {
 				slide_left_flag = false;
@@ -118,7 +139,17 @@ public class Field {
 			if ( now_y == 13 || cell[now_x][now_y+1].type != 0 ) {
 				bottom_flag = true;
 			}
-			if ( now_x >= 5 ) {
+			if ( now_x >= 5 && cell[now_x-2][now_y].type != 0 ) {
+				slide_right_flag = false;
+				slide_left_flag = false;
+				turn_right_flag = false;
+				turn_left_flag = false;
+			} else if ( now_x <= 0 && cell[now_x+1][now_y].type != 0 ) {
+				slide_right_flag = false;
+				slide_left_flag = false;
+				turn_right_flag = false;
+				turn_left_flag =false;
+			} else if ( now_x >= 5 ) {
 				slide_right_flag = false;
 				turn_left_flag = false;
 			} else if ( now_x <= 0 ) {
@@ -126,10 +157,10 @@ public class Field {
 				turn_right_flag = false;
 			} else if ( cell[now_x+1][now_y].type != 0 ) {
 				slide_right_flag = false;
-				turn_right_flag = false;
+				turn_left_flag = false;
 			} else if ( cell[now_x-1][now_y].type != 0 ) {
 				slide_left_flag = false;
-				turn_left_flag = false;
+				turn_right_flag = false;
 			}
 		} else {
 			now_x = ( now.puchu1.x ) / 40;
@@ -139,10 +170,18 @@ public class Field {
 				bottom_flag = true;
 			} else if ( cell[now_x][now_y+1].type != 0 ) {
 				bottom_p1_flag = true;
+				bottom_flag = true;
 			} else if ( cell[now_x-1][now_y+1].type != 0 ) {
 				bottom_p2_flag = true;
+				bottom_flag = true;
 			}
-			if ( now_x >= 5 ) {
+			if ( now_x >= 5 && cell[now_x-2][now_y].type != 0 ) {
+				slide_right_flag = false;
+				slide_left_flag = false;
+			} else if ( now_x <= 1 && cell[now_x+1][now_y].type != 0 ) {
+				slide_right_flag = false;
+				slide_left_flag = false;
+			} else if ( now_x >= 5 ) {
 				slide_right_flag = false;
 			} else if ( now_x <= 1 ) {
 				slide_left_flag = false;
@@ -170,11 +209,20 @@ public class Field {
 		
 	}
 	
-	public void update() {			//連続処理
+	private void deside_vanish() {
+		
+	}
+	
+	private void vanish_puchu() {
+		
+	}
+	
+	public int update() {			//連続処理
+		
 		if ( moving_flag == true ) {
 			judge_key();
 			hit_puchu();
-			if ( bottom_flag != true || bottom_p1_flag != true || bottom_p2_flag != true ) {
+			if ( bottom_flag != true ) {
 				now.fallDown(speed);
 			} else {
 				cell[now.puchu1.x/40][now.puchu1.y/40+2].copyPuchu(now.puchu1);
@@ -186,6 +234,11 @@ public class Field {
 				moving_flag = false;
 				bottom_flag = false;
 			}
+		}
+		if ( now != null ) {
+			return -1;
+		} else {
+			return switch_figure;
 		}
 	}
 	private void init_player(int[][] player) {

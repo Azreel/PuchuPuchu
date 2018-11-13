@@ -10,21 +10,21 @@ public class GameMain extends Thread {
 	final long MSPF = 1000 / 60; //MilliSecond Per Frame
 	
 	public static enum Status { GAME_TITLE, GAME_SOLO, GAME_DUO };
+	public Network nw;
 	public static final int PPSIZE = 200;
 	public final JFrame frame = new JFrame();
 	public boolean canStart = false;
 	
 	private Status gameStatus = Status.GAME_TITLE;
 	private Status nextStatus;
-	private Network nw;
 	private long loopDelay = MSPF;
 	private Overlay overlay;
-	private boolean isPaint = true;
+	private boolean isOverlay = false;
 	private Title title = null;
 	private int[][] ppInit = new int[PPSIZE][2];
 	private Field me = null;
 	private Field rival = null;
-	private String oldKey = "NULL";
+	private int oldKey = 0;
 	private boolean isFinish = false;
 	
 	// コンストラクタ
@@ -48,11 +48,14 @@ public class GameMain extends Thread {
 	
 	// スレッドのメイン
 	public void run() {
+		boolean isPaint = true;
+		
 		while(true) {
 			// 60fps保つ
 			try {
 				if(loopDelay > 0) sleep(loopDelay);
 			}catch(Exception e) {}
+			isPaint = !isOverlay;
 			// ゲーム全体の管理
 			long start = System.currentTimeMillis();
 			switch(gameStatus) {
@@ -119,7 +122,7 @@ public class GameMain extends Thread {
 					frame.remove(overlay);
 					title = null;
 					// ぷちゅ生成
-					if(nw.programMode == Network.Mode.SERVER) nw.sentPuchu(makePuchu());
+					if(nw.programMode == Network.Mode.SERVER) nw.sendPuchu(makePuchu());
 					else while(!canStart) { try { sleep(1); } catch(Exception e) {} }
 					// プレイヤーフィールド
 					me = new Field(this, ppInit);
@@ -134,16 +137,16 @@ public class GameMain extends Thread {
 					frame.revalidate();
 					me.draw.requestFocus();
 					// ぷちゅ受信完了
-					if(nw.programMode == Network.Mode.CLIENT) nw.sentStatus("START");
+					if(nw.programMode == Network.Mode.CLIENT) nw.sendStatus("START");
 				} else {
 					if(canStart) {
 						// Fieldの画面描画関係
 						me.update();
 						if(isPaint) me.draw.repaint();
-						if(!oldKey.equals(me.key.KeyData) && !isFinish) { //ゲームが終了したら送信しない
-							nw.sentStatus(me.key.KeyData);
-							oldKey = me.key.KeyData;
-						}
+//						if(oldKey != me.key.KeyData && !isFinish) { //ゲームが終了したら送信しない
+//							nw.sentStatus(Integer.toString(me.key.KeyData));
+//							oldKey = me.key.KeyData;
+//						}
 						rival.update();
 						if(isPaint) rival.draw.repaint();
 						overlay.repaint();
@@ -164,20 +167,20 @@ public class GameMain extends Thread {
 	public void fadeIn(Status next) {
 		nextStatus = next;
 		overlay.FadeIn();
-		isPaint = false;
+		isOverlay = true;
 	}
 	
 	// フェードアウト
 	public void fadeOut() {
 		nextStatus = gameStatus;
 		overlay.FadeOut();
-		isPaint = false;
+		isOverlay = true;
 	}
 	
 	// フェード系終了
 	public void fadeEnd() {
 		gameStatus = nextStatus;
-		isPaint = true;
+		isOverlay = false;
 	}
 	
 	// BGM設定
@@ -189,7 +192,7 @@ public class GameMain extends Thread {
 	public void finishGame() {
 		isFinish = true;
 		if(gameStatus == Status.GAME_DUO) {
-			nw.sentStatus("END");
+			nw.sendStatus("END");
 			nw.Close();
 		}
 	}
@@ -223,38 +226,37 @@ public class GameMain extends Thread {
 	
 	// ライバルのキー入力を反映
 	public void setRivalInput(String key) {
-		switch(key) {
-		case "":
+		int keyCode;
+		boolean isPress;
+		try {
+			keyCode = Integer.parseInt(key);
+		} catch(Exception e) {
+			System.out.println("不正なキーデータ: "+key);
+			return;
+		}
+		
+		if(keyCode > 0) {
+			isPress = true;
+		} else {
+			isPress = false;
+			keyCode *= -1;
+		}
+		
+		switch(keyCode) {
+		case 1:
+			rival.key.Left = isPress;
 			break;
-		case "LEFTPRESS":
-			rival.key.Left = true;
+		case 2:
+			rival.key.Right = isPress;
 			break;
-		case "RIGHTPRESS":
-			rival.key.Right = true;
+		case 3:
+			rival.key.Down = isPress;
 			break;
-		case "DOWNPRESS":
-			rival.key.Down = true;
+		case 4:
+			rival.key.TurnLeft = isPress;
 			break;
-		case "ZPRESS":
-			rival.key.TurnLeft = true;
-			break;
-		case "XPRESS":
-			rival.key.TurnRight = true;
-			break;
-		case "LEFTRELEASE":
-			rival.key.Left = false;
-			break;
-		case "RIGHTRELEASE":
-			rival.key.Right = false;
-			break;
-		case "DOWNRELEASE":
-			rival.key.Down = false;
-			break;
-		case "ZRELEASE":
-			rival.key.TurnLeft = false;
-			break;
-		case "XRELEASE":
-			rival.key.TurnRight = false;
+		case 5:
+			rival.key.TurnRight = isPress;
 			break;
 		default:
 			System.out.println("不正なキーデータ: "+key);
