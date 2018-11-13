@@ -11,7 +11,7 @@ public class Overlay extends JPanel{
 	Mode paintMode = Mode.STOP;
 	float fadeAlpha;
 	GameMain gm;
-	AudioClip bgm;
+	Sound bgm;
 	boolean isPlay = false;
 	
 	Overlay(GameMain parent){
@@ -34,14 +34,16 @@ public class Overlay extends JPanel{
 	}
 	
 	public void setBGM(URL path) {
-		bgm = Applet.newAudioClip(path);
-		bgm.loop();
+//		bgm = Applet.newAudioClip(path);
+//		bgm.loop();
+		bgm = new Sound(path, true);
+		bgm.start();
 		isPlay = true;
 	}
 	
 	public void stopBGM() {
 		if(isPlay) {
-			bgm.stop();
+			bgm.Stop();
 			isPlay = false;
 		}
 	}
