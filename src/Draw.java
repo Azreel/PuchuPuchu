@@ -3,6 +3,8 @@ import java.awt.image.ImageObserver;
 import java.util.*;
 
 import javax.swing.*;
+import java.applet.Applet;
+import java.applet.AudioClip;
 
 public class Draw extends JPanel{
 	
@@ -10,6 +12,8 @@ public class Draw extends JPanel{
 	private static final int margin_w = 60, margin_h = 110;
 	private static final int PanelW = 480;
 	private static final int PanelH = 640;
+	public static enum GameInfo { GAME_READY, GAME_PLAYNOW, GAME_WIN, GAME_LOSE };
+	private GameInfo game = GameInfo.GAME_PLAYNOW;
 	
 	private Toolkit tk;
 	private Image img_background;
@@ -34,6 +38,27 @@ public class Draw extends JPanel{
 	private boolean is_vanish_delay = false, is_vanish_delay_all = false;
 	private boolean is_vanish_anim = false, is_vanish_all = false;
 	
+	private static enum AnimState {state1, state2, state3, state4, state5, end };
+	
+	private Image img_ready, img_start;
+	private AnimState ready_state = AnimState.end;
+	private int ready_anim_time = 0;
+	private int ready_image_height = -350, ready_image_speed = 100;
+	private int start_image_height = -350, start_image_speed = 0, start_image_accel = 4;
+	private static final int ready_anim_timing = 100;
+	private static final int start_anim_timing = 150;
+	private static final int start_delay = 200;
+	
+	private Image img_end;
+	private AnimState end_state = AnimState.state1;
+	private int end_anim_time = 0;
+	private int end_image_height = -350, end_image_speed = 0, end_image_accel = 4;
+	private static final int end_anim_delay = 10;
+	private static final int end_image_timing = 100;
+	private static final int end_time = 400;
+	
+	private AudioClip se_del, se_lose, se_drop;
+	
 	Draw() {	//nullプレイヤー用
 		this.setPreferredSize(new Dimension(PanelW, PanelH));
 		lb = new JLabel();
@@ -53,6 +78,9 @@ public class Draw extends JPanel{
 		is_alive = true;
 		fd = _fd;
 		initImages();
+		initSounds();
+		
+		startReadyAnim();
 	}
 	
 	//-- Image変数の初期化
@@ -63,16 +91,46 @@ public class Draw extends JPanel{
 		img_van_anim = tk.getImage(getClass().getResource("VanishAnimation.gif"));
 	}
 	
+	private void initSounds() {
+		se_del = Applet.newAudioClip(getClass().getResource("delpuchu.wav"));
+		se_lose = Applet.newAudioClip(getClass().getResource("lose.wav"));
+		se_drop = Applet.newAudioClip(getClass().getResource("rakka.wav"));
+	}
+	
+	public void startReadyAnim() {
+		game = GameInfo.GAME_READY;
+		ready_state = AnimState.state1;
+		img_ready = tk.getImage(getClass().getResource("ready.png"));
+		img_start = tk.getImage(getClass().getResource("start.png"));
+	}
+	
+	private void nextReadyAnim() {
+		ready_state = AnimState.state4;
+	}
+	
+	private void finishReadyAnim() {
+		game = GameInfo.GAME_PLAYNOW;
+		ready_state = AnimState.state5;
+		System.out.println("ゲーム開始");
+		fd.game_start();
+	}
+	
 	//-- 落下アニメーション開始
 	public void startDropAnim() {
 		is_drop_anim = true;
+		se_drop.play();
 	}
 	
 	//-- 落下アニメーション終了
 	private void finishDropAnim() {
 		is_drop_anim = false;
 		is_drop_all = false;
-		fd.drop_finish();
+//		fd.drop_finish();
+		
+		//テスト
+		if ( fd.cell[2][2].type != Puchu.Emp ) { startEndAnim(GameInfo.GAME_LOSE);}
+		else if ( fd.cell[0][2].type!= Puchu.Emp ) { startEndAnim(GameInfo.GAME_WIN);}
+		else { fd.drop_finish();}
 	}
 	
 	//-- ぷちゅペアの移動アニメーション開始
@@ -85,6 +143,8 @@ public class Draw extends JPanel{
 		is_move_anim = false;
 		is_move_all = false;
 		fd.switch_next();
+		
+//		if ( game == GameInfo.GAME_PLAYNOW ) { fd.switch_next(); }
 	}
 	
 	//-- ぷちゅの消滅アニメーション開始
@@ -97,6 +157,7 @@ public class Draw extends JPanel{
 	
 	//-- ぷちゅの消滅準備完了
 	private void nextVanishAnim() {
+		se_del.play();
 		is_vanish_delay = false;
 		is_vanish_all = false;
 		is_vanish_anim = true;
@@ -111,12 +172,75 @@ public class Draw extends JPanel{
 		fd.vanish_finish();
 	}
 	
-	public void startGameOverAnim() {
-		
+	//-- 決着時のアニメーション開始
+	public void startEndAnim(GameInfo _game) {
+		game = _game;
+		if ( _game == GameInfo.GAME_WIN ) { img_end = tk.getImage(getClass().getResource("yatta.png")); }
+		if ( _game == GameInfo.GAME_LOSE ) { img_end = tk.getImage(getClass().getResource("patankyu.png")); se_lose.play(); }
+		end_state = AnimState.state1;
+		end_anim_time = 0;
 	}
 	
-	private void finishGameOverAnim() {
-		
+	//-- イメージ落下開始
+	private void startEndImgDrop() {
+		end_state = AnimState.state2;
+	}
+	
+	//-- 決着時のアニメーション終了
+	private void finishEndAnim() {
+		System.out.println("おわり");
+		end_state = AnimState.end;
+		fd.game_end();
+	}
+	
+	private void updateReadyAnim() {
+		switch(ready_state) {
+		case state1:
+			ready_anim_time++;
+			ready_image_height = -(int)(Math.pow((ready_anim_timing - ready_anim_time),2)/10);
+			if ( ready_anim_time > ready_anim_timing ) { ready_state = AnimState.state2; }
+			break;
+		case state2:
+			ready_anim_time++;
+			if ( ready_anim_time > start_anim_timing ) { ready_state = AnimState.state3; }
+			break;
+		case state3:
+			ready_anim_time++;
+			start_image_speed += start_image_accel;
+			start_image_height += start_image_speed/5;
+			if ( start_image_height > -80 && start_image_speed >0 ) { start_image_speed = (int)(start_image_speed * -0.7); nextReadyAnim(); }
+			break;
+		case state4:
+			ready_anim_time++;
+			start_image_speed += start_image_accel;
+			start_image_height += start_image_speed/10;
+			ready_image_height += ready_image_speed;
+			if ( ready_anim_time > start_delay ) { finishReadyAnim(); }
+			break;
+		case state5:
+			ready_anim_time++;
+			start_image_speed += start_image_accel;
+			start_image_height += start_image_speed/10;
+			if ( ready_anim_time > 300 ) { ready_state = AnimState.end; }
+			break;
+		}
+	}
+	
+	//-- 決着時のアニメーション状況更新
+	private void updateEndImgDrop() {
+		switch(end_state) {
+		case state1:
+			end_anim_time++;
+			if ( end_anim_time > end_image_timing ) { startEndImgDrop(); }
+			break;
+		case state2 :
+			end_anim_time++;
+			end_image_speed += end_image_accel; 
+			end_image_height += end_image_speed/5;
+			if ( end_image_height > 0 && end_image_speed > 0) { end_image_speed = (int)(end_image_speed * -0.7); }
+			if ( end_anim_time > end_time ) { finishEndAnim(); }
+			break;
+		}
 	}
 	
 	//-- 盤面のアニメーション状況更新
@@ -161,8 +285,10 @@ public class Draw extends JPanel{
 		Graphics2D img_2d = (Graphics2D) g;
 //		buffer = createImage(PanelW, PanelH);
 //		Graphics img_2d = buffer.getGraphics();
-		img_2d.setFont(new Font("Dialog",Font.BOLD,30));
-		img_2d.setColor(Color.BLUE);
+		img_2d.setColor(new Color(60,60,60));
+		img_2d.fillRect(0, 0, PanelW, PanelH);
+		img_2d.setFont(chain_font);
+		img_2d.setColor(chain_color);
 
 		if ( is_alive ) {
 			// 初期処理
@@ -175,7 +301,17 @@ public class Draw extends JPanel{
 			for( int i = 0; i < fd.cell.length; i++ ) {
 				for ( int j = 0; j < fd.cell[i].length; j++ ) {
 					if ( fd.cell[i][j].type == Puchu.Emp) { continue; }
-					updateCellAnim(fd.cell[i][j]);
+					switch( game ) {
+					case GAME_PLAYNOW: // プレイ中の盤面更新
+						updateCellAnim(fd.cell[i][j]);
+						break;
+					case GAME_WIN: // 勝利時の盤面更新
+						fd.cell[i][j].endGameAnim(true, end_anim_time - j*end_anim_delay/3);
+						break;
+					case GAME_LOSE: // 敗北時の盤面更新
+						fd.cell[i][j].endGameAnim(false, end_anim_time - i*end_anim_delay);
+						break;
+					}
 					if ( fd.cell[i][j].type == Puchu.Vanishing ) {
 						img_2d.drawImage(img_van_anim, fd.cell[i][j].draw_x + margin_w - Draw.Squares/2, fd.cell[i][j].draw_y + margin_h - Draw.Squares/2, this);
 					} else {
@@ -210,6 +346,22 @@ public class Draw extends JPanel{
 			chain_display_time++;
 			img_2d.drawString(chain_text, chain_x, chain_y - chain_display_time);
 			if ( chain_display_time > max_chain_display_time ) { is_chain_display = false; }
+		}
+		
+		switch(game) {
+		case GAME_PLAYNOW:
+		case GAME_READY :
+			if ( ready_state != AnimState.end ) {			
+				updateReadyAnim();
+				img_2d.drawImage(img_ready, margin_w, ready_image_height+ margin_h, this);
+				img_2d.drawImage(img_start, margin_w, start_image_height + margin_h, this);
+			}
+			break;
+		case GAME_WIN :
+		case GAME_LOSE :
+			updateEndImgDrop();
+			img_2d.drawImage(img_end, margin_w, end_image_height + margin_h, this);
+			break;
 		}
 //		g.drawImage(buffer, 0, 0, this);
 	}

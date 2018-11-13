@@ -7,7 +7,7 @@ import java.net.URL;
 
 public class Overlay extends JPanel{
 	final int fadeSpeed = 60;
-	static enum Mode {STOP, FADEIN, FADEOUT};
+	static enum Mode {STOP, FADEIN, FADEOUT, PAUSE, RESULT};
 	Mode paintMode = Mode.STOP;
 	float fadeAlpha;
 	GameMain gm;
@@ -27,6 +27,10 @@ public class Overlay extends JPanel{
 	public void FadeOut() {
 		paintMode = Mode.FADEOUT;
 		fadeAlpha = 1.0f;
+	}
+	
+	public void Result(int score) {
+		paintMode = Mode.RESULT;
 	}
 	
 	public void setBGM(URL path) {
@@ -70,6 +74,8 @@ public class Overlay extends JPanel{
             	paintMode = Mode.STOP;
             	if(isPlay) gm.fadeEnd();
             }
+        	break;
+        case RESULT:
         	break;
         }
     }

@@ -1,5 +1,7 @@
 import java.awt.*;
 import javax.swing.*;
+import java.applet.Applet;
+import java.applet.AudioClip;
 
 public class Puchu {
 	
@@ -14,13 +16,18 @@ public class Puchu {
 	public int x, y;			// 判定座標
 	public int draw_x, draw_y;	// 描画に使用する座標(アニメーションのため遅延して動作する)
 	public boolean is_match_position_drop = true;			// 判定位置と描写位置が一致しているか
+	public boolean is_check = false;
 	private int drop_bound_time = 0;
 	private int van_time = 0;
+	private int bound_anim_count = 1; // バウンドアニメーションの回数
+	private boolean is_drop_se = false;
 	private static final int drop_anim_speed = 20;	// 落下アニメーションの落下速度
 	private static final int bound_anim_speed = 6; // バウンドアニメーションの速度(小さいほど早い)
-	private static final int bound_anim_count = 1; // バウンドアニメーションの回数
 	private static final int max_van_time = 50; // 死に際ぷちゅの顔が表示される時間
 	private static final int max_van_time_after = 40; // 消滅アニメーション再生から終了判定をとるまでの時間
+	private static final int max_end_flame = 200;
+	private AudioClip se_drop = Applet.newAudioClip(getClass().getResource("rakka.wav"));
+	
 	
 	Puchu(int set_type, int set_x, int set_y) {
 		this.type = set_type;
@@ -41,12 +48,15 @@ public class Puchu {
 		y = (arr_i - 2) * Draw.Squares;
 		is_match_position_drop = false;
 		drop_bound_time = 0;
+		bound_anim_count = 1;
+		is_drop_se = false;
 	}
 	
 	//-- ぷちゅの落下アニメーション
 	public void drawingDropDown() {
 		draw_y += drop_anim_speed;
 		if ( draw_y >= y ) {
+//			if ( !is_drop_se ) { is_drop_se = true; se_drop.play();}
 			draw_y = y;
 			drawingDropBound();
 		}
@@ -59,6 +69,15 @@ public class Puchu {
 		if ( drop_bound_time/(bound_anim_speed*2) >= bound_anim_count ) {
 			is_match_position_drop = true;
 		}
+	}
+	
+	public void dropDownObs(int _line) {
+		draw_y = -(_line + 2)*Draw.Squares;
+		type = Puchu.Obs;
+		is_match_position_drop = false;
+		drop_bound_time = 0;
+		bound_anim_count = 3;
+		is_drop_se = false;
 	}
 	
 	//-- 消滅開始
@@ -81,5 +100,12 @@ public class Puchu {
 		if ( van_time > max_van_time + max_van_time_after ) {
 			type = Puchu.Emp;
 		}
+	}
+	
+	//-- 勝利及び敗北時のアニメーション用
+	public void endGameAnim(boolean _is_winner, int _flame) {
+		if ( _flame > max_end_flame  || _flame < 0 ) { return; }
+		int dir = (_is_winner)?1:-1;
+		draw_y -= dir * (int)(Math.pow(_flame , 2)/(max_end_flame*1.0));
 	}
 }

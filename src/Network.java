@@ -15,6 +15,8 @@ public class Network extends Thread {
 	BufferedReader br;
 	PrintWriter pw;
 	int index = 0; //操作中のぷちゅ
+	int sendCount = 0;
+	int recvCount = 0;
 	
 	// コンストラクタ
 	Network(GameMain parent){
@@ -59,7 +61,7 @@ public class Network extends Thread {
 				System.out.println("nw run: "+e);
 				if(isConnect) break;
 			}
-			try { sleep(16); } catch(Exception e) {}
+			try { sleep(1); } catch(Exception e) {}
 		}
 	}
 	
@@ -126,21 +128,22 @@ public class Network extends Thread {
 	
 	// 相手のステータス取得
 	private void getRivalStatus() {
-		String input = "";
-		while(!input.equals("null") && !input.equals("END")) {
-			try {
-				input = br.readLine();
-			}catch(Exception e) {
-				System.out.println("nw get: "+e);
-				input = "END";
-			}
-			switch(input) {
+		String input[] = new String[2];
+		try {
+			input = br.readLine().split(",");
+		}catch(Exception e) {
+			System.out.println("nw get: "+e);
+			input[0] = "END";
+		}
+		while(!input[0].equals("null")) {
+			switch(input[0]) {
 			// 受信データなし
 			case "null":
 				break;
 			// 相手が初期ぷちゅペアリストを受信完了すると送られてくる
 			case "START":
 				if(programMode == Mode.SERVER) gm.canStart = true;
+				recvCount++;
 				break;
 			// 相手が負けた場合に送られてくる
 			case "END":
@@ -154,13 +157,22 @@ public class Network extends Thread {
 					gm.canStart = true;
 				}
 				break;
+			// 操作対象が変わると送られてくる
 			case "NEXT":
 				getPuchuIndex();
 				break;
 			// キー入力
 			default:
-				gm.setRivalInput(input);
+				gm.setRivalInput(input[0]);
+				if(recvCount != Integer.parseInt(input[1])) System.out.println("ずれ:" + recvCount + ", " + input[1]);
+				recvCount++;
 				break;
+			}
+			try {
+				input = br.readLine().split(",");
+			}catch(Exception e) {
+				System.out.println("nw get: "+e);
+				input[0] = "END";
 			}
 		}
 	}
@@ -202,7 +214,7 @@ public class Network extends Thread {
 			return;
 		}
 		while(index != gm.rivalIndex) {
-			try{ Thread.sleep(1); } catch(Exception e) { return; }
+			try{ sleep(1); } catch(Exception e) { return; }
 		}
 	}
 	
@@ -219,8 +231,9 @@ public class Network extends Thread {
 	// 自分のステータスを送信
 	public void sendStatus(String status) {
 		if(isAlive == false) return;
-		pw.println(status);
+		pw.println(status+","+sendCount);
 		pw.flush();
+		sendCount++;
 	}
 	
 	// ターゲットのぷちゅペアを送信

@@ -22,7 +22,7 @@ public class PuchuPair {
 	private int move_range_y = 0;
 	private static final float max_turn_anim_time = 5.0f; // 回転アニメーションの時間
 	private static final int slide_anim_speed = 20; // 横移動アニメーションの速度
-	private static final int max_move_anim_time = 5; // 移動アニメーションの時間
+	private static final int max_move_anim_time = 10; // 移動アニメーションの時間
 	
 	PuchuPair(int set_type1, int set_type2){
 		this.form = PuchuPair.Up;
