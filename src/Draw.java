@@ -16,7 +16,7 @@ public class Draw extends JPanel{
 	private GameInfo game = GameInfo.GAME_PLAYNOW;
 	
 	private Toolkit tk;
-	private Image img_background;
+	private Image img_background, img_field;
 	private Image img_puchu[] = new Image[9];
 	private Image img_van_anim;
 	private JLabel lb;	//ラベル
@@ -64,7 +64,8 @@ public class Draw extends JPanel{
 		lb = new JLabel();
 		lb.setPreferredSize(new Dimension(PanelW, PanelH));
 		tk = Toolkit.getDefaultToolkit();
-		img_background = tk.getImage(getClass().getResource("fieldbackground.png"));
+		img_background = tk.getImage(getClass().getResource("backmark.png"));
+		img_field = tk.getImage(getClass().getResource("background.png"));
 		
 		is_alive = false;
 	}
@@ -73,7 +74,8 @@ public class Draw extends JPanel{
 		lb = new JLabel();
 		lb.setPreferredSize(new Dimension(PanelW, PanelH));
 		tk = Toolkit.getDefaultToolkit();
-		img_background = tk.getImage(getClass().getResource("fieldbackground.png"));
+		img_background = tk.getImage(getClass().getResource("backmark.png"));
+		img_field = tk.getImage(getClass().getResource("background.png"));
 		
 		is_alive = true;
 		fd = _fd;
@@ -294,7 +296,7 @@ public class Draw extends JPanel{
 //		buffer = createImage(PanelW, PanelH);
 //		Graphics img_2d = buffer.getGraphics();
 		img_2d.setColor(new Color(60,60,60));
-		img_2d.fillRect(0, 0, PanelW, PanelH);
+		img_2d.drawImage(img_background, 0, 0, this);
 		img_2d.setFont(chain_font);
 		img_2d.setColor(chain_color);
 
@@ -347,7 +349,7 @@ public class Draw extends JPanel{
 			if ( is_vanish_anim && is_vanish_all ) { finishVanishAnim(); }
 		}
 		// 背景描写
-		img_2d.drawImage(img_background, 0, 0, this);
+		img_2d.drawImage(img_field, 0, 0, this);
 		
 		// れんさテキスト描写
 		if ( is_chain_display ) {
