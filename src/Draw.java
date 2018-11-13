@@ -57,8 +57,6 @@ public class Draw extends JPanel{
 	private static final int end_image_timing = 100;
 	private static final int end_time = 400;
 	
-	private AudioClip se_del, se_lose, se_drop, se_lose_voice, se_ready, se_start, se_win_voice;
-	
 	Draw() {	//nullプレイヤー用
 		this.setPreferredSize(new Dimension(PanelW, PanelH));
 		lb = new JLabel();
@@ -80,7 +78,12 @@ public class Draw extends JPanel{
 		is_alive = true;
 		fd = _fd;
 		initImages();
-		initSounds();
+		
+		for ( int i = 0; i < fd.cell.length; i++ ) {
+			for ( int j = 5; j < fd.cell[i].length; j++ ) {
+				fd.cell[i][j].type = Puchu.Obs;
+			}
+		}
 		
 		startReadyAnim();
 	}
@@ -93,40 +96,40 @@ public class Draw extends JPanel{
 		img_van_anim = tk.getImage(getClass().getResource("VanishAnimation.gif"));
 	}
 	
-	private void initSounds() {
-		se_del = Applet.newAudioClip(getClass().getResource("delpuchu.wav"));
-		se_lose = Applet.newAudioClip(getClass().getResource("lose.wav"));
-		se_drop = Applet.newAudioClip(getClass().getResource("rakka.wav"));
-		se_lose_voice = Applet.newAudioClip(getClass().getResource("losegirl.wav"));
-		se_ready = Applet.newAudioClip(getClass().getResource("youi.wav"));
-		se_start = Applet.newAudioClip(getClass().getResource("Start.wav"));
-		se_win_voice = Applet.newAudioClip(getClass().getResource("wingirl.wav"));
+	//-- SE発火
+	private void soundIgnition(String _wav) {
+		AudioClip _se = Applet.newAudioClip(getClass().getResource(_wav));
+		_se.play();
 	}
 	
+	//-- 開幕アニメーション開始
 	public void startReadyAnim() {
 		game = GameInfo.GAME_READY;
 		ready_state = AnimState.state1;
 		img_ready = tk.getImage(getClass().getResource("ready.png"));
 		img_start = tk.getImage(getClass().getResource("start.png"));
-		se_ready.play();
+		soundIgnition("youi.wav");
 	}
 	
+	//-- 開幕アニメーションスタート落下開始
 	private void nextReadyAnim() {
 		ready_state = AnimState.state4;
-		se_start.play();
+		soundIgnition("Start.wav");
 	}
 	
+	//-- 開幕アニメーション終了
 	private void finishReadyAnim() {
 		game = GameInfo.GAME_PLAYNOW;
 		ready_state = AnimState.state5;
 		System.out.println("ゲーム開始");
+		soundIgnition("pahu.wav");
 		fd.game_start();
 	}
 	
 	//-- 落下アニメーション開始
 	public void startDropAnim() {
 		is_drop_anim = true;
-		se_drop.play();
+		soundIgnition("rakka.wav");
 	}
 	
 	//-- 落下アニメーション終了
@@ -165,7 +168,7 @@ public class Draw extends JPanel{
 	
 	//-- ぷちゅの消滅準備完了
 	private void nextVanishAnim() {
-		se_del.play();
+		soundIgnition("delpuchu.wav");
 		is_vanish_delay = false;
 		is_vanish_all = false;
 		is_vanish_anim = true;
@@ -184,7 +187,7 @@ public class Draw extends JPanel{
 	public void startEndAnim(GameInfo _game) {
 		game = _game;
 		if ( _game == GameInfo.GAME_WIN ) { img_end = tk.getImage(getClass().getResource("yatta.png")); }
-		if ( _game == GameInfo.GAME_LOSE ) { img_end = tk.getImage(getClass().getResource("patankyu.png")); se_lose.play(); }
+		if ( _game == GameInfo.GAME_LOSE ) { img_end = tk.getImage(getClass().getResource("patankyu.png")); soundIgnition("lose.wav"); }
 		end_state = AnimState.state1;
 		end_anim_time = 0;
 	}
@@ -192,8 +195,17 @@ public class Draw extends JPanel{
 	//-- イメージ落下開始
 	private void startEndImgDrop() {
 		end_state = AnimState.state2;
-		if ( game == GameInfo.GAME_LOSE ) { se_lose_voice.play(); }
-		if ( game == GameInfo.GAME_WIN ) { se_win_voice.play(); }
+	}
+	
+	private void nextEndAnim() {
+		end_state = AnimState.state3;
+		 soundIgnition("wintext.wav");
+	}
+	
+	private void finishEndImageMovement() {
+		end_state = AnimState.state4;
+		if ( game == GameInfo.GAME_LOSE ) { soundIgnition("losegirl.wav"); }
+		if ( game == GameInfo.GAME_WIN ) { soundIgnition("wingirl.wav"); }
 	}
 	
 	//-- 決着時のアニメーション終了
@@ -203,6 +215,7 @@ public class Draw extends JPanel{
 		fd.game_end();
 	}
 	
+	//-- 開幕アニメーション状況更新
 	private void updateReadyAnim() {
 		switch(ready_state) {
 		case state1:
@@ -247,7 +260,17 @@ public class Draw extends JPanel{
 			end_anim_time++;
 			end_image_speed += end_image_accel; 
 			end_image_height += end_image_speed/5;
+			if ( end_image_height > 0 && end_image_speed > 0) { end_image_speed = (int)(end_image_speed * -0.7); nextEndAnim(); }
+			break;
+		case state3 :
+			end_anim_time++;
+			end_image_speed += end_image_accel; 
+			end_image_height += end_image_speed/5;
 			if ( end_image_height > 0 && end_image_speed > 0) { end_image_speed = (int)(end_image_speed * -0.7); }
+			if ( end_image_height >= 0 && Math.abs( end_image_speed ) <= 1 ) { finishEndImageMovement();}
+			break;
+		case state4 :
+			end_anim_time++;
 			if ( end_anim_time > end_time ) { finishEndAnim(); }
 			break;
 		}
