@@ -77,6 +77,9 @@ public class GameMain extends Thread {
 					frame.add(overlay);
 					frame.add(title);
 					frame.revalidate();
+					//BGM
+					setBGM(getClass().getResource("Title.wav"));
+					//setBGM(getClass().getResource("Title2.wav"));
 				} else {
 					if(isPaint) title.repaint();
 					overlay.repaint();
@@ -106,6 +109,8 @@ public class GameMain extends Thread {
 					frame.revalidate();
 					me.draw.requestFocus();
 					isPaint = false;
+					//BGM
+					setBGM(getClass().getResource("gamemusic.wav"));
 				} else {
 					// Fieldの画面描画関係
 					me.update();
@@ -141,6 +146,8 @@ public class GameMain extends Thread {
 					me.draw.requestFocus();
 					// ぷちゅ受信完了
 					if(nw.programMode == Network.Mode.CLIENT) nw.sendStatus("START");
+					//BGM
+					setBGM(getClass().getResource("gamemusic.wav"));
 				} else {
 					if(canStart) {
 						int temp = -1;
