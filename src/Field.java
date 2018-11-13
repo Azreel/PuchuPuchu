@@ -335,6 +335,14 @@ public class Field {
 		
 	}
 	
+	public void p1_defeat() {
+		
+	}
+	
+	public void p2_defeat() {
+
+	}
+	
 	public void game_start() {
 		switch_start();
 	}
