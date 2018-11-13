@@ -13,7 +13,7 @@ public class BGM extends Thread{
 			AudioFormat af = ais.getFormat();
 			DataLine.Info dataLine = new DataLine.Info(Clip.class,af);
 			clip = (Clip)AudioSystem.getLine(dataLine);
-			clip.loop(clip.LOOP_CONTINUOUSLY);
+			clip.open(ais);
 			isActive = true;
 		} catch (Exception e) {
 			System.out.println("BGM生成失敗");
@@ -22,13 +22,7 @@ public class BGM extends Thread{
 	
 	// 再生(スレッドのメイン)
 	public void run() {
-		try {
-			clip.open(ais);
-		} catch (Exception e) {
-			System.out.println("BGM再生失敗");
-			return;
-		}
-		clip.start();
+		clip.loop(Clip.LOOP_CONTINUOUSLY);
 		while(this.isActive) {
 			try {
 				Thread.sleep(100);

@@ -70,7 +70,6 @@ public class GameMain extends Thread {
 						frame.remove(rival.draw);
 						me = null;
 						rival = null;
-						nw = null;
 					}
 					// ネットワーク開始
 					nw = new Network(this);
