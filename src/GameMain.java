@@ -14,6 +14,7 @@ public class GameMain extends Thread {
 	public static final int PPSIZE = 200;
 	public final JFrame frame = new JFrame();
 	public boolean canStart = false;
+	public int rivalIndex = 0;
 	
 	private Status gameStatus = Status.GAME_TITLE;
 	private Status nextStatus;
@@ -24,8 +25,9 @@ public class GameMain extends Thread {
 	private int[][] ppInit = new int[PPSIZE][2];
 	private Field me = null;
 	private Field rival = null;
-	private int oldKey = 0;
+	private int meIndex = 0;
 	private boolean isFinish = false;
+	private boolean isUpdate = true;
 	
 	// コンストラクタ
 	GameMain(){
@@ -110,8 +112,9 @@ public class GameMain extends Thread {
 					if(isPaint) {
 						me.draw.repaint();
 						rival.draw.repaint();
+					} else {
+						overlay.repaint();
 					}
-					overlay.repaint();
 				}
 				break;
 			case GAME_DUO: // 2Pプレイ
@@ -140,16 +143,26 @@ public class GameMain extends Thread {
 					if(nw.programMode == Network.Mode.CLIENT) nw.sendStatus("START");
 				} else {
 					if(canStart) {
+						int temp = -1;
 						// Fieldの画面描画関係
-						me.update();
-						if(isPaint) me.draw.repaint();
-//						if(oldKey != me.key.KeyData && !isFinish) { //ゲームが終了したら送信しない
-//							nw.sentStatus(Integer.toString(me.key.KeyData));
-//							oldKey = me.key.KeyData;
-//						}
-						rival.update();
-						if(isPaint) rival.draw.repaint();
-						overlay.repaint();
+						temp = me.update();
+						if(temp != -1) {
+							meIndex = temp;
+							nw.sendPuchuIndex(meIndex);
+						}
+						if(isUpdate) {
+							temp = rival.update();
+							if(temp != -1) rivalIndex = temp;
+						} else {
+							isUpdate = true;
+						}
+						//if(isFinish) nw.Close();
+						if(isPaint) {
+							me.draw.repaint();
+							rival.draw.repaint();
+						} else {
+							overlay.repaint();
+						}
 					}
 				}
 				break;
@@ -262,6 +275,10 @@ public class GameMain extends Thread {
 			System.out.println("不正なキーデータ: "+key);
 			break;
 		}
+		
+		int temp = rival.update();
+		if(temp != -1) rivalIndex = temp;
+		isUpdate = false;
 	}
 	
 	// ライバルの負けを検知

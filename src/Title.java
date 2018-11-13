@@ -13,7 +13,6 @@ public class Title extends JPanel{
 	JButton soloBtn, duoBtn;
 	JTextField rivalIP;
 	JLabel rival, myIP;
-	Sound bgm = null;
 	Font btnFont = new Font(Font.DIALOG, Font.PLAIN, 24);
 	Font labelFont = new Font(Font.DIALOG, Font.PLAIN, 20);
 	GameMain.Status next = null;

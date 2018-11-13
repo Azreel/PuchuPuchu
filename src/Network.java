@@ -14,6 +14,7 @@ public class Network extends Thread {
 	Socket sc;
 	BufferedReader br;
 	PrintWriter pw;
+	int index = 0; //操作中のぷちゅ
 	
 	// コンストラクタ
 	Network(GameMain parent){
@@ -153,6 +154,9 @@ public class Network extends Thread {
 					gm.canStart = true;
 				}
 				break;
+			case "NEXT":
+				getPuchuIndex();
+				break;
 			// キー入力
 			default:
 				gm.setRivalInput(input);
@@ -189,6 +193,19 @@ public class Network extends Thread {
 		else return pairList;
 	}
 	
+	// ターゲットぷちゅペアの確認
+	private void getPuchuIndex(){
+		try {
+			index = Integer.parseInt(br.readLine());
+		} catch(Exception e) {
+			System.out.println("nw get: " + e);
+			return;
+		}
+		while(index != gm.rivalIndex) {
+			try{ Thread.sleep(1); } catch(Exception e) { return; }
+		}
+	}
+	
 	// 初期ぷちゅペアリスト送信
 	public void sendPuchu(String[] list) {
 		pw.println("MAKESTART");
@@ -201,7 +218,15 @@ public class Network extends Thread {
 	
 	// 自分のステータスを送信
 	public void sendStatus(String status) {
+		if(isAlive == false) return;
 		pw.println(status);
+		pw.flush();
+	}
+	
+	// ターゲットのぷちゅペアを送信
+	public void sendPuchuIndex(int index) {
+		pw.println("NEXT");
+		pw.println(Integer.toString(index));
 		pw.flush();
 	}
 }
