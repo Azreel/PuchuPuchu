@@ -40,7 +40,7 @@ public class Field {
 		} else {
 			draw = new Draw();
 		}
-		gm.fadeOut();
+		//gm.fadeOut();
 	}
 
 	
@@ -76,10 +76,10 @@ public class Field {
 			now_x = ( now.puchu1.x ) / 40;
 			now_y = ( now.puchu1.y ) / 40 + 2;
 			
-			System.out.println("now_x:" + now_x);
-			System.out.println("now_y:" + now_y);
 			if ( now_y == 13 || cell[now_x][now_y+1].type != 0 ) {
 				bottom_flag = true;
+				bottom_p1_flag = true;
+				bottom_p2_flag = true;
 			}
 			if ( now_x >= 5 && cell[now_x-1][now_y].type != 0 ) {
 				slide_right_flag = false;
@@ -110,6 +110,8 @@ public class Field {
 			
 			if ( now_y == 13 ) {
 				bottom_flag = true;
+				bottom_p1_flag = true;
+				bottom_p2_flag = true;
 			} else if ( cell[now_x][now_y+1].type != 0 ) {
 				bottom_p1_flag = true;
 				bottom_flag = true;
@@ -138,6 +140,8 @@ public class Field {
 			
 			if ( now_y == 13 || cell[now_x][now_y+1].type != 0 ) {
 				bottom_flag = true;
+				bottom_p1_flag = true;
+				bottom_p2_flag = true;
 			}
 			if ( now_x >= 5 && cell[now_x-2][now_y].type != 0 ) {
 				slide_right_flag = false;
@@ -168,6 +172,8 @@ public class Field {
 			
 			if ( now_y == 13 ) {
 				bottom_flag = true;
+				bottom_p1_flag = true;
+				bottom_p2_flag = true;
 			} else if ( cell[now_x][now_y+1].type != 0 ) {
 				bottom_p1_flag = true;
 				bottom_flag = true;
@@ -219,20 +225,39 @@ public class Field {
 	
 	public int update() {			//連続処理
 		
+		int drop_pos = 0;
+		
 		if ( moving_flag == true ) {
 			judge_key();
 			hit_puchu();
 			if ( bottom_flag != true ) {
 				now.fallDown(speed);
 			} else {
-				cell[now.puchu1.x/40][now.puchu1.y/40+2].copyPuchu(now.puchu1);
-				cell[now.puchu2.x/40][now.puchu2.y/40+2].copyPuchu(now.puchu2);
-				cell[now.puchu1.x/40][now.puchu1.y/40+2].dropDown(now.puchu1.y/40+2);
-				cell[now.puchu2.x/40][now.puchu2.y/40+2].dropDown(now.puchu2.y/40+2);
+				if ( bottom_p1_flag == false ) {
+					drop_pos = drop_p1_pos();
+					cell[now.puchu1.x/40][now.puchu1.y/40+2+drop_pos].copyPuchu(now.puchu1);
+					cell[now.puchu2.x/40][now.puchu2.y/40+2].copyPuchu(now.puchu2);
+					cell[now.puchu1.x/40][now.puchu1.y/40+2+drop_pos].dropDown(now.puchu1.y/40+2+drop_pos);
+					cell[now.puchu2.x/40][now.puchu2.y/40+2].dropDown(now.puchu2.y/40+2);
+				} else if ( bottom_p2_flag == false ) {
+					drop_pos = drop_p2_pos();
+					cell[now.puchu1.x/40][now.puchu1.y/40+2].copyPuchu(now.puchu1);
+					cell[now.puchu2.x/40][now.puchu2.y/40+2+drop_pos].copyPuchu(now.puchu2);
+					cell[now.puchu1.x/40][now.puchu1.y/40+2].dropDown(now.puchu1.y/40+2);
+					cell[now.puchu2.x/40][now.puchu2.y/40+2+drop_pos].dropDown(now.puchu2.y/40+2+drop_pos);
+				} else {
+					cell[now.puchu1.x/40][now.puchu1.y/40+2].copyPuchu(now.puchu1);
+					cell[now.puchu2.x/40][now.puchu2.y/40+2].copyPuchu(now.puchu2);
+					cell[now.puchu1.x/40][now.puchu1.y/40+2].dropDown(now.puchu1.y/40+2);
+					cell[now.puchu2.x/40][now.puchu2.y/40+2].dropDown(now.puchu2.y/40+2);
+				}
+				//System.out.println("drop_pos:" + drop_pos);
 				now = null;
 				draw.startDropAnim();
 				moving_flag = false;
 				bottom_flag = false;
+				bottom_p1_flag = false;
+				bottom_p2_flag = false;
 			}
 		}
 		if ( now != null ) {
@@ -295,5 +320,26 @@ public class Field {
 		} else if ( key.TurnRight == false ) {
 			turn_right_flag = true;
 		}
+	}
+	
+	private int drop_p1_pos() {
+		int pos_y = 0;
+		
+		if ( bottom_p2_flag == true ) {
+			while( now.puchu1.y/40+2+pos_y <= 13 && cell[now.puchu1.x/40][now.puchu1.y/40+2+pos_y].type == 0 ) {
+				pos_y++;
+			}
+		}
+		return pos_y-1;
+	}
+	private int drop_p2_pos() {
+		int pos_y = 0;
+		
+		if ( bottom_p1_flag == true ) {
+			while( now.puchu2.y/40+2+pos_y <= 13 && cell[now.puchu2.x/40][now.puchu2.y/40+2+pos_y].type == 0 ) {
+				pos_y++;
+			}
+		}
+		return pos_y-1;
 	}
 }
