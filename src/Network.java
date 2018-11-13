@@ -32,8 +32,7 @@ public class Network extends Thread {
 	
 	// スレッドのメイン
 	public void run() {
-		while(true) {
-			if(!isAlive) break;
+		while(isAlive) {
 			try {
 				switch(programMode){
 				case SERVER:
@@ -63,10 +62,18 @@ public class Network extends Thread {
 			}
 			try { sleep(1); } catch(Exception e) {}
 		}
+		try{ ss.close(); } catch(Exception e) {}
 	}
 	
 	// サーバーを閉じる
 	public void Close() {
+		if(!isConnect) {
+			// 1Pのときは自分を繋ぐことでacceptから抜ける
+			try {
+				Socket socket = new Socket("127.0.0.1", Port);
+				socket.close();
+			} catch(Exception e) {}
+		}
 		isAlive = false;
 	}
 	

@@ -70,7 +70,6 @@ public class GameMain extends Thread {
 						frame.remove(rival.draw);
 						me = null;
 						rival = null;
-						nw = null;
 					}
 					// ネットワーク開始
 					nw = new Network(this);
@@ -83,7 +82,7 @@ public class GameMain extends Thread {
 					frame.add(title);
 					frame.revalidate();
 					//BGM
-					setBGM(getClass().getResource("Title.wav"));
+					overlay.setBGM(getClass().getResource("Title.wav"));
 					//setBGM(getClass().getResource("Title2.wav"));
 				} else {
 					if(isPaint) title.repaint();
@@ -97,7 +96,6 @@ public class GameMain extends Thread {
 					nw.Close();
 					// タイトル除去
 					frame.remove(title);
-					//frame.remove(overlay);
 					title = null;
 					// ぷちゅ生成
 					makePuchu();
@@ -108,14 +106,13 @@ public class GameMain extends Thread {
 					rival = new Field(this, null);
 					rival.draw.setBounds(ScreenW/2, 0, ScreenW/2, ScreenH);
 					// フレームに追加
-					//frame.add(overlay);
 					frame.add(me.draw);
 					frame.add(rival.draw);
 					frame.revalidate();
 					me.draw.requestFocus();
 					isPaint = false;
 					//BGM
-					setBGM(getClass().getResource("gamemusic.wav"));
+					overlay.setBGM(getClass().getResource("gamemusic.wav"));
 				} else {
 					// Fieldの画面描画関係
 					me.update();
@@ -132,7 +129,6 @@ public class GameMain extends Thread {
 					System.out.println("2Pモード");
 					// タイトル除去
 					frame.remove(title);
-					frame.remove(overlay);
 					title = null;
 					// ぷちゅ生成
 					if(nw.programMode == Network.Mode.SERVER) nw.sendPuchu(makePuchu());
@@ -144,7 +140,6 @@ public class GameMain extends Thread {
 					rival = new Field(this, ppInit);
 					rival.draw.setBounds(ScreenW/2, 0, ScreenW/2, ScreenH);
 					// フレームに追加
-					frame.add(overlay);
 					frame.add(me.draw);
 					frame.add(rival.draw);
 					frame.revalidate();
@@ -152,7 +147,7 @@ public class GameMain extends Thread {
 					// ぷちゅ受信完了
 					if(nw.programMode == Network.Mode.CLIENT) nw.sendStatus("START");
 					//BGM
-					setBGM(getClass().getResource("gamemusic.wav"));
+					overlay.setBGM(getClass().getResource("gamemusic.wav"));
 				} else {
 					if(canStart) {
 						int temp = -1;
@@ -206,11 +201,6 @@ public class GameMain extends Thread {
 	public void fadeEnd() {
 		gameStatus = nextStatus;
 		isOverlay = false;
-	}
-	
-	// BGM設定
-	public void setBGM(URL path){
-		overlay.setBGM(path);
 	}
 	
 	// ゲーム終了の検知
