@@ -84,9 +84,8 @@ public class Key extends KeyAdapter {
 	}
 	
 	private void sendKeyData(int key) {
-		nw.sendStatus(Integer.toString(key));
 		if(key != oldKey) {
-			
+			nw.sendStatus(Integer.toString(key));
 			oldKey = key;
 		}
 	}
