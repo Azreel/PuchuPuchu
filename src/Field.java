@@ -85,28 +85,29 @@ public class Field {
 				bottom_p1_flag = true;
 				bottom_p2_flag = true;
 			}
-			if ( now_x >= 5 && cell[now_x-1][now_y].type != 0 ) {
-				slide_right_flag = false;
-				slide_left_flag = false;
-				turn_right_flag = false;
-				turn_left_flag = false;
-			} else if ( now_x <= 0 && cell[now_x+1][now_y].type != 0 ) {
-				slide_left_flag = false;
-				slide_right_flag = false;
-				turn_left_flag = false;
-				turn_right_flag = false;
-			} else if ( now_x >= 5 ) {
+			if ( now_x >= 5) {
 				slide_right_flag = false;
 				turn_right_flag = false;
-			} else if ( now_x <= 0 ) {
-				slide_left_flag = false;
-				turn_left_flag = false;
-			} else if ( cell[now_x-1][now_y].type != 0 ) {
-				slide_left_flag = false;
-				turn_left_flag = false;
+				
+				if ( cell[now_x-1][now_y].type != 0 ) {
+					slide_left_flag = false;
+					turn_left_flag = false;
+				}
 			} else if ( cell[now_x+1][now_y].type != 0 ) {
 				slide_right_flag = false;
 				turn_right_flag = false;
+			}
+			if ( now_x <= 0) {
+				slide_left_flag = false;
+				turn_left_flag = false;
+				
+				if ( cell[now_x+1][now_y].type != 0 ) {
+					slide_right_flag = false;
+					turn_right_flag = false;
+				}
+			} else if ( cell[now_x-1][now_y].type != 0 ) {
+				slide_left_flag = false;
+				turn_left_flag = false;
 			}
 		} else if ( now.form == 1 ) {
 			now_x = ( now.puchu1.x ) / 40;
@@ -147,25 +148,26 @@ public class Field {
 				bottom_p1_flag = true;
 				bottom_p2_flag = true;
 			}
-			if ( now_x >= 5 && cell[now_x-1][now_y].type != 0 ) {
-				slide_right_flag = false;
-				slide_left_flag = false;
-				turn_right_flag = false;
-				turn_left_flag = false;
-			} else if ( now_x <= 0 && cell[now_x+1][now_y].type != 0 ) {
-				slide_right_flag = false;
-				slide_left_flag = false;
-				turn_right_flag = false;
-				turn_left_flag =false;
-			} else if ( now_x >= 5 ) {
+			if ( now_x >= 5) {
 				slide_right_flag = false;
 				turn_left_flag = false;
-			} else if ( now_x <= 0 ) {
-				slide_left_flag = false;
-				turn_right_flag = false;
+				
+				if ( cell[now_x-1][now_y].type != 0 ) {
+					slide_left_flag = false;
+					turn_right_flag = false;
+				}
 			} else if ( cell[now_x+1][now_y].type != 0 ) {
 				slide_right_flag = false;
 				turn_left_flag = false;
+			}
+			if ( now_x <= 0) {
+				slide_left_flag = false;
+				turn_right_flag = false;
+				
+				if ( cell[now_x+1][now_y].type != 0 ) {
+					slide_right_flag = false;
+					turn_left_flag = false;
+				}
 			} else if ( cell[now_x-1][now_y].type != 0 ) {
 				slide_left_flag = false;
 				turn_right_flag = false;

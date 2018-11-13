@@ -65,8 +65,12 @@ public class GameMain extends Thread {
 				if(title == null) {
 					System.out.println("タイトル生成");
 					// 前のプレイデータを消去
-					me = null;
-					rival = null;
+					if(me != null || rival != null) {
+						frame.remove(me.draw);
+						frame.remove(rival.draw);
+						me = null;
+						rival = null;
+					}
 					// ネットワーク開始
 					nw = new Network(this);
 					nw.start();
