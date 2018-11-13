@@ -29,7 +29,7 @@ public class BGM extends Thread{
 		clip.loop(Clip.LOOP_CONTINUOUSLY);
 		while(this.isActive) {
 			try {
-				Thread.sleep(1);
+				Thread.sleep(5);
 				control.setValue((float)Math.log10(volume) * 20);
 			} catch(InterruptedException e) { }
 		}
