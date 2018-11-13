@@ -135,7 +135,7 @@ public class Network extends Thread {
 			System.out.println("nw get: "+e);
 			input[0] = "END";
 		}
-		while(!input[0].equals("null") && !input[0].equals("END")) {
+		while(!input[0].equals("null")) {
 			switch(input[0]) {
 			// 受信データなし
 			case "null":
