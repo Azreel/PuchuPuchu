@@ -58,6 +58,7 @@ public class Overlay extends JPanel{
         	g2D.setColor(new Color(0,0,0,(int)((fadeAlpha <= 1.0f ? fadeAlpha : 1.0f)*255)));
             g2D.fillRect(0, 0, w, h);
             fadeAlpha += 1.0f / fadeSpeed;
+            bgm.setVol(0.8f - fadeAlpha*3);
             if(fadeAlpha >= 1.0f) {
             	paintMode = Mode.STOP;
             	gm.fadeEnd();
