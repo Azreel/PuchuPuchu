@@ -176,6 +176,8 @@ public class Network extends Thread {
 				recvCount++;
 				break;
 			}
+			// 次のデータの読み込み
+			
 			try {
 				input = br.readLine().split(",");
 			}catch(Exception e) {
