@@ -115,7 +115,6 @@ public class Draw extends JPanel{
 //				fd.cell[i][j].type = Puchu.Obs;
 //			}
 //		}
-		startReadyAnim();
 	}
 	
 	//-- Image変数の初期化
