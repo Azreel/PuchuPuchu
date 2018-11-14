@@ -1,3 +1,4 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -26,7 +27,9 @@ public class Title extends JPanel{
 		this.setLayout(null);
 		
 		//背景画像
-		bg = tk.getImage(getClass().getResource("title.png"));
+		try {
+			bg = ImageIO.read(getClass().getResource("title.png"));
+		} catch (Exception e) {}
 		//自分のIPアドレス
         myIP = new JLabel(nw.getIPaddr());
         myIP.setBounds(225, 470, 400, 30);

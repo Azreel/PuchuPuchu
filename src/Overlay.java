@@ -49,6 +49,7 @@ public class Overlay extends JPanel{
 		titleBtn.setBounds(350, 500, 260, 60);
 		titleBtn.setFont(btnFont);
 		titleBtn.addActionListener(event -> {
+			paintMode = Mode.STOP;
 			gm.fadeIn(GameMain.Status.GAME_TITLE);
 		});
 		
@@ -102,7 +103,7 @@ public class Overlay extends JPanel{
         case RESULT:
         	g2D.setColor(new Color(0,0,0,120));
             g2D.fillRect(0, 0, w, h);
-        	g2D.drawImage(resultImg, 280, 50, this);
+        	g2D.drawImage(resultImg, 280, 50, null);
         	break;
         }
     }
