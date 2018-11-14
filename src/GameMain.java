@@ -106,16 +106,14 @@ public class GameMain extends Thread {
 					rival = new Field(this, null);
 					rival.draw.setBounds(ScreenW/2, 0, ScreenW/2, ScreenH);
 					// フレームに追加
-					me.draw.setVisible(false);
-					rival.draw.setVisible(false);
 					frame.add(me.draw);
 					frame.add(rival.draw);
-					me.draw.setVisible(true);
-					rival.draw.setVisible(true);
 					frame.revalidate();
 					me.draw.requestFocus();
-					//BGM
+					// BGM
 					overlay.setBGM(getClass().getResource("gamemusic.wav"));
+					// スタートアニメーション
+					me.draw.startReadyAnim();
 				} else {
 					// Fieldの画面描画関係
 					if(!isFinish) me.update();
@@ -149,8 +147,11 @@ public class GameMain extends Thread {
 					me.draw.requestFocus();
 					// ぷちゅ受信完了
 					if(nw.programMode == Network.Mode.CLIENT) nw.sendStatus("START");
-					//BGM
+					// BGM
 					overlay.setBGM(getClass().getResource("gamemusic.wav"));
+					// スタートアニメーション
+					me.draw.startReadyAnim();
+					rival.draw.startReadyAnim();
 				} else {
 					if(canStart) {
 						int temp = -1;
@@ -194,18 +195,11 @@ public class GameMain extends Thread {
 		overlay.FadeIn();
 	}
 	
-	// フェードアウト
+	// フェードアウト(点滅します)
 	public void fadeOut() {
 		nextStatus = gameStatus;
 		isOverlay = true;
 		overlay.FadeOut();
-	}
-	
-	// リザルト
-	public void resultDisp(int score) {
-		isFinish = true;
-		isOverlay = true;
-		overlay.Result(score);
 	}
 	
 	// フェード系終了
@@ -215,8 +209,10 @@ public class GameMain extends Thread {
 	}
 	
 	// ゲーム終了の検知
-	public void finishGame() {
+	public void finishGame(int score) {
 		isFinish = true;
+		isOverlay = true;
+		overlay.Result(score);
 		if(gameStatus == Status.GAME_DUO) {
 			nw.sendStatus("END");
 			nw.Close();
