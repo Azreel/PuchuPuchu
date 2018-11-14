@@ -82,8 +82,8 @@ public class GameMain extends Thread {
 					frame.add(title);
 					frame.revalidate();
 					//BGM
-					overlay.setBGM(getClass().getResource("Title.wav"));
-					//setBGM(getClass().getResource("Title2.wav"));
+					//overlay.setBGM(getClass().getResource("Title.wav"));
+					overlay.setBGM(getClass().getResource("Title2.wav"));
 				} else {
 					if(isPaint) title.repaint();
 					overlay.repaint();
