@@ -62,16 +62,18 @@ public class Draw extends JPanel{
 	private int end_image_height = -350, end_image_speed = 0, end_image_accel = 2;
 	private static final int end_anim_delay = 10;
 	private static final int end_image_timing = 100;
-	private static final int end_time = 300;
+	private static final int end_time = 200;
 	
 	private static enum Meteor {attack, counter, offset};
 	private Image img_meteor;
 	private AnimState send_state = AnimState.end;
 	private Meteor send_mode = Meteor.attack;
 	private int send_anim_time = 0;
+	private int send_anim_speed = 1;
+	private int send_anim_accel = 1;
+	private int send_obs_num = 0;
 	private int send_image_x = 0, send_image_y = 0;
-	private float send_image_range = 0.0f;
-	private int send_center_x = 0, send_center_y = 0;
+	private double send_image_angle = 0.0f;
 	
 	private int obs_num = 0;
 	
@@ -83,8 +85,12 @@ public class Draw extends JPanel{
 		lb = new JLabel();
 		lb.setPreferredSize(new Dimension(PanelW, PanelH));
 		tk = Toolkit.getDefaultToolkit();
+		try {
+			img_field = ImageIO.read(getClass().getResource("background.png"));			
+		} catch(Exception e) {
+			System.out.println(e);
+		}
 		img_background = tk.getImage(getClass().getResource("backmark.png"));
-		img_field = tk.getImage(getClass().getResource("background.png"));
 		
 		is_alive = false;
 	}
@@ -93,9 +99,13 @@ public class Draw extends JPanel{
 		lb = new JLabel();
 		lb.setPreferredSize(new Dimension(PanelW, PanelH));
 		tk = Toolkit.getDefaultToolkit();
+		try {
+			img_field = ImageIO.read(getClass().getResource("background.png"));			
+		} catch(Exception e) {
+			System.out.println(e);
+		}
 		img_background = tk.getImage(getClass().getResource("backmark.png"));
-		img_field = tk.getImage(getClass().getResource("background.png"));
-		
+
 		is_alive = true;
 		fd = _fd;
 		initImages();
@@ -198,7 +208,7 @@ public class Draw extends JPanel{
 		is_vanish_delay_all = false;
 		chain_text = _chain + "れんさ";
 		is_chain_get = true;
-//		startAttackAnim(_generate_obs_num);
+		send_obs_num = _generate_obs_num;
 	}
 	
 	//-- ぷちゅの消滅準備完了
@@ -209,6 +219,7 @@ public class Draw extends JPanel{
 		is_vanish_anim = true;
 		is_chain_display = true;
 		chain_display_time = 0;
+//		startAttackAnim();
 	}
 	
 	//-- ぷちゅの消滅アニメーション終了
@@ -216,21 +227,17 @@ public class Draw extends JPanel{
 		is_vanish_anim = false;
 		is_vanish_all = false;
 		fd.vanish_finish();
-		
-		//テスト
-		fd.drop_finish();
 	}
 	
 	//-- おじゃま発射アニメーション開始
-	private void startAttackAnim(int _generate_obs_num) {
+	private void startAttackAnim() {
 		send_state = AnimState.state1;
 		send_image_x = chain_x;
 		send_image_y = chain_y;
-		send_center_x = 600;
-		send_center_y = -200;
-		send_image_range = (float)Math.sqrt(Math.pow(send_center_x - send_image_x, 2) + Math.pow(send_center_y - send_image_y, 2));
+//		send_image_angle = Math.atan2((send_image_x - send_center_x), (send_image_y - send_center_y));
+//		send_image_angle = Math.atan2(send_center_x - send_image_y, send_center_y - send_image_y );
 		if ( obs_num == 0 ) { send_mode = Meteor.attack; }
-		else if ( obs_num - _generate_obs_num < 0 ) { send_mode = Meteor.counter; }
+		else if ( obs_num - send_obs_num < 0 ) { send_mode = Meteor.counter; }
 		else { send_mode = Meteor.offset; }
 	}
 	
@@ -392,6 +399,8 @@ public class Draw extends JPanel{
 		switch(send_state) {
 		case state1:
 			break;
+		case state2:
+			break;
 		}
 	}
 	private void updateOffsetAnim() {
@@ -470,11 +479,16 @@ public class Draw extends JPanel{
 						img_2d.drawImage(img_puchu[Puchu.Obs], margin_w + (int)(Draw.Squares * ((fd.cell.length - 1.0) / (obs_num-1)))*i, margin_h - Draw.Squares - 5, this);									
 					}
 				}
-			}			
+			}
+			if ( send_state != AnimState.end ) {
+				updateAttackAnim();
+				img_2d.drawImage(img_puchu[Puchu.Obs], send_image_x, send_image_y, this);
+			}
+			
 			// スコア表示
 			img_2d.setColor(score_color);
 			img_2d.setFont(score_font);
-			img_2d.drawString(String.format("%08d", score ), margin_w+Draw.Squares*6, 500);
+			img_2d.drawString(String.format("%07d", score ), margin_w+Draw.Squares*6+5, 500);
 			
 			// れんさテキスト描写
 			if ( is_chain_display ) {
@@ -501,7 +515,7 @@ public class Draw extends JPanel{
 				img_2d.drawImage(img_end, margin_w, end_image_height + margin_h, this);
 				break;
 			}
-		}		
+		}	
 //		g.drawImage(buffer, 0, 0, this);		
 	}
 }

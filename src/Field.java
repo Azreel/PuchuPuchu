@@ -31,7 +31,7 @@ public class Field {
 	private int k = 0;
 	private int comb_figure1 = 0;
 	private int comb_figure2 = 0;
-	private int chain_count = 0;
+	private int chain_count = 0;	//連鎖数
 	private int all_comb = 0;
 	private int comb_puyo = 0;
 	private int switch_figure;
@@ -398,7 +398,7 @@ public class Field {
 			for ( int i = 5; i >= 0; i-- ) {
 				if ( cell[i][j].type != Puchu.Emp && cell[i][j+1].type == Puchu.Emp ) {
 					k = 1;
-					while( j+k < 12 && cell[i][j+k+1].type == Puchu.Emp ) {
+					while( j+k < 13 && cell[i][j+k+1].type == Puchu.Emp ) {
 						k++;
 					}
 					
