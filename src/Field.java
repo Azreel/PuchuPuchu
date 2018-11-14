@@ -24,9 +24,11 @@ public class Field {
 	private boolean slide_right_flag = true;//右に移動できるか
 	private boolean game_end_flag = false;
 	private boolean van_puchu = false;
+	private boolean is_drop = false;
 	
 	private int now_x = 0;
 	private int now_y = 0;
+	private int k = 0;
 	private int comb_figure1 = 0;
 	private int comb_figure2 = 0;
 	private int chain_count = 0;
@@ -51,7 +53,7 @@ public class Field {
 		} else {
 			draw = new Draw();
 		}
-		//gm.fadeOut();
+		gm.fadeOut();
 	}
 
 	
@@ -65,7 +67,6 @@ public class Field {
 	}
 	
 	public void switch_next() {	//ぷちゅの更新
-		moving_flag = true;
 		now = next[0];
 		
 		for ( int i = 0; i < 2; i++ ) {
@@ -80,6 +81,7 @@ public class Field {
 		next[0].setPosition(265, -40);
 		next[1].setPosition(290, 50);
 		next[2].setPosition(315, 140);
+		moving_flag = true;
 	}
 	
 	public void hit_puchu() {
@@ -247,7 +249,7 @@ public class Field {
 		int drop_pos = 0;
 		
 		if ( game_end_flag ) {
-			gm.resultDisp(GameMain.Status.GAME_TITLE);
+			gm.resultDisp(score);
 		}
 		
 		if ( moving_flag == true ) {
@@ -305,6 +307,7 @@ public class Field {
 	}
 	
 	public void drop_finish() {
+		van_puchu = false;
 		
 		for ( int i = 5; i >= 0; i-- ) {
 			for ( int j = 13; j >= 2; j-- ) {
@@ -314,7 +317,6 @@ public class Field {
 			}
 		}
 
-		System.out.println("a");
 		for ( int i = 5; i >= 0; i-- ) {
 			for ( int j = 13; j >= 2; j-- ) {
 				if ( cell[i][j].type != Puchu.Emp && cell[i][j].combine_count >= 3 ) {
@@ -334,7 +336,7 @@ public class Field {
 	}
 	
 	public void vanish_finish() {
-		
+		drop_puchu();
 	}
 	
 	public void judge_key() {
@@ -388,6 +390,26 @@ public class Field {
 			}
 		}
 		return pos_y-1;
+	}
+	
+	private void drop_puchu() {
+		
+		for ( int j = 12; j >= 2; j-- ) {
+			for ( int i = 5; i >= 0; i-- ) {
+				if ( cell[i][j].type != Puchu.Emp && cell[i][j+1].type == Puchu.Emp ) {
+					k = 1;
+					while( j+k < 12 && cell[i][j+k+1].type == Puchu.Emp ) {
+						k++;
+					}
+					
+					cell[i][j+k].copyPuchu(cell[i][j]);
+					cell[i][j+k].dropDown(j+k);
+//					cell[i][j].type = Puchu.Emp;
+					cell[i][j] = new Puchu(Puchu.Emp, i*Draw.Squares, j*Draw.Squares);
+				}
+			}
+		}
+		draw.startDropAnim();
 	}
 	
 	public void game_end() {

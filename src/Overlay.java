@@ -2,15 +2,21 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.net.URL;
+import java.text.DecimalFormat;
 
 public class Overlay extends JPanel{
 	final int fadeSpeed = 60;
+	final Toolkit tk = Toolkit.getDefaultToolkit();
+	final Font btnFont = new Font(Font.DIALOG, Font.PLAIN, 24);
+	final Font labelFont = new Font(Font.DIALOG, Font.PLAIN, 40);
+	
 	static enum Mode {STOP, FADEIN, FADEOUT, PAUSE, RESULT};
 	Mode paintMode = Mode.STOP;
 	float fadeAlpha;
 	GameMain gm;
 	BGM bgm;
 	boolean isPlay = false;
+	Image resultImg;
 	
 	Overlay(GameMain parent){
 		gm = parent;
@@ -18,17 +24,36 @@ public class Overlay extends JPanel{
 	}
 	
 	public void FadeIn() {
+		this.removeAll();
 		paintMode = Mode.FADEIN;
 		fadeAlpha = 0.0f;
 	}
 	
 	public void FadeOut() {
+		this.removeAll();
 		paintMode = Mode.FADEOUT;
 		fadeAlpha = 1.0f;
 	}
 	
 	public void Result(int score) {
 		paintMode = Mode.RESULT;
+		resultImg = tk.createImage(getClass().getResource("result.png"));
+		DecimalFormat df = new DecimalFormat("0000000");
+		//スコア
+		JLabel scoreLabel = new JLabel("SCORE：" + df.format(score));
+		scoreLabel.setBounds(310, 300, 500, 40);
+		scoreLabel.setFont(labelFont);
+		scoreLabel.setForeground(new Color(255,255,255));
+        //リターンボタン
+		JButton titleBtn = new JButton("タイトルに戻る");
+		titleBtn.setBounds(350, 500, 260, 60);
+		titleBtn.setFont(btnFont);
+		titleBtn.addActionListener(event -> {
+			gm.fadeIn(GameMain.Status.GAME_TITLE);
+		});
+		
+		this.add(scoreLabel);
+		this.add(titleBtn);
 	}
 	
 	public void setBGM(URL path) {
@@ -58,7 +83,7 @@ public class Overlay extends JPanel{
         	g2D.setColor(new Color(0,0,0,(int)((fadeAlpha <= 1.0f ? fadeAlpha : 1.0f)*255)));
             g2D.fillRect(0, 0, w, h);
             fadeAlpha += 1.0f / fadeSpeed;
-            bgm.setVol(0.8f - fadeAlpha*3);
+            bgm.setVol(0.8f - fadeAlpha*3.5f);
             if(fadeAlpha >= 1.0f) {
             	paintMode = Mode.STOP;
             	gm.fadeEnd();
@@ -75,6 +100,9 @@ public class Overlay extends JPanel{
             }
         	break;
         case RESULT:
+        	g2D.setColor(new Color(0,0,0,120));
+            g2D.fillRect(0, 0, w, h);
+        	g2D.drawImage(resultImg, 280, 50, this);
         	break;
         }
     }

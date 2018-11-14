@@ -1,5 +1,4 @@
 import java.awt.*;
-import java.net.URL;
 import java.util.Random;
 
 import javax.swing.*;
@@ -104,7 +103,7 @@ public class GameMain extends Thread {
 					me.draw.setBounds(0, 0, ScreenW/2, ScreenH);
 					// nullプレイヤーフィールド
 					rival = new Field(this, null);
-					rival.draw.setBounds(ScreenW/2, 0, ScreenW/2, ScreenH);
+					rival.draw.setBounds(ScreenW/2-1, 0, ScreenW/2, ScreenH);
 					// フレームに追加
 					frame.add(me.draw);
 					frame.add(rival.draw);
@@ -174,6 +173,7 @@ public class GameMain extends Thread {
 				}
 				break;
 			}
+			nw.flushBuffer();
 			loopDelay = MSPF - (System.currentTimeMillis() - start);
 		}
 	}
@@ -186,15 +186,21 @@ public class GameMain extends Thread {
 	// フェードイン
 	public void fadeIn(Status next) {
 		nextStatus = next;
-		overlay.FadeIn();
 		isOverlay = true;
+		overlay.FadeIn();
 	}
 	
 	// フェードアウト
 	public void fadeOut() {
 		nextStatus = gameStatus;
-		overlay.FadeOut();
 		isOverlay = true;
+		overlay.FadeOut();
+	}
+	
+	// リザルト
+	public void resultDisp(int score) {
+		isOverlay = true;
+		overlay.Result(score);
 	}
 	
 	// フェード系終了
