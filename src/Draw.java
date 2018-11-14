@@ -21,6 +21,7 @@ public class Draw extends JPanel{
 	private Toolkit tk;
 	private Image img_background, img_field;
 	private Image img_puchu[] = new Image[9];
+	private Image img_obs_notice;
 	private BufferedImage img_van_anim;
 	private BufferedImage[] imgs_van = new BufferedImage[10];
 	private JLabel lb;	//ラベル
@@ -122,10 +123,9 @@ public class Draw extends JPanel{
 		for ( int i = 1; i <= 8; i++ ) {
 			img_puchu[i] = tk.getImage(getClass().getResource("puchu"+i+".png"));			
 		}
-//		img_van_anim = tk.getImage(getClass().getResource("vanishingAnime.png"));
+		img_obs_notice = tk.getImage(getClass().getResource("puchu8_notice"));
 		try {
 			img_van_anim = ImageIO.read(getClass().getResource("vanishingAnime.png"));
-//			img_van_anim = ImageIO.read(new File("vanishingAnime.png"));
 			for ( int i = 0; i < 10; i++ ) {
 				imgs_van[i] = img_van_anim.getSubimage(i*Draw.Squares*2, 0, Draw.Squares*2, Draw.Squares*2);
 			}			
@@ -174,19 +174,7 @@ public class Draw extends JPanel{
 	private void finishDropAnim() {
 		is_drop_anim = false;
 		is_drop_all = false;
-//		fd.drop_finish();
-		
-		//テスト
-		if ( fd.cell[2][2].type != Puchu.Emp ) { startEndAnim(GameInfo.GAME_LOSE);}
-		else if ( fd.cell[0][2].type!= Puchu.Emp ) { startEndAnim(GameInfo.GAME_WIN);}
-		else { fd.drop_finish();}
-//		else {
-//			fd.cell[5][13].vanishOut();
-//			fd.cell[4][13].vanishOut();
-//			fd.cell[3][13].vanishOut();
-//			fd.cell[5][12].vanishOut();
-//			startVanishAnim(1, 10);
-//		}
+		fd.drop_finish();
 	}
 	
 	//-- ぷちゅペアの移動アニメーション開始
@@ -251,7 +239,7 @@ public class Draw extends JPanel{
 	//-- 決着時のアニメーション開始
 	public void startEndAnim(GameInfo _game) {
 		game = _game;
-		if ( _game == GameInfo.GAME_WIN ) { img_end = tk.getImage(getClass().getResource("yatta.png")); }
+		if ( _game == GameInfo.GAME_WIN ) { img_end = tk.getImage(getClass().getResource("yatta.png")); soundIgnition("Ascension.wav");}
 		if ( _game == GameInfo.GAME_LOSE ) { img_end = tk.getImage(getClass().getResource("patankyu.png")); soundIgnition("lose.wav"); }
 		end_state = AnimState.state1;
 		end_anim_time = 0;
@@ -473,9 +461,9 @@ public class Draw extends JPanel{
 			if ( obs_num != 0 ) {
 				for ( int i = obs_num-1; i >= 0; i-- ) {
 					if ( obs_num <= fd.cell.length ) {
-						img_2d.drawImage(img_puchu[Puchu.Obs], margin_w + Draw.Squares*i, margin_h - Draw.Squares - 5, this);									
+						img_2d.drawImage(img_obs_notice, margin_w + img_obs_notice.getWidth(this)*i, margin_h - Draw.Squares - 5, this);									
 					} else {
-						img_2d.drawImage(img_puchu[Puchu.Obs], margin_w + (int)(Draw.Squares * ((fd.cell.length - 1.0) / (obs_num-1)))*i, margin_h - Draw.Squares - 5, this);									
+						img_2d.drawImage(img_obs_notice, margin_w + (int)(img_obs_notice.getWidth(this) * ((fd.cell.length - 1.0) / (obs_num-1)))*i, margin_h - Draw.Squares - 5, this);									
 					}
 				}
 			}
