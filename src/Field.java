@@ -327,7 +327,7 @@ public class Field {
 		if ( van_puchu == false ) {
 			chain_count = 0;
 			if ( cell[2][2].type == Puchu.Emp ) {
-				gm.finishGame();
+				gm.finishGame(score);
 				draw.startEndAnim(Draw.GameInfo.GAME_LOSE);
 			}
 			switch_start();
