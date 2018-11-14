@@ -10,12 +10,13 @@ public class Key extends KeyAdapter {
 	public boolean TurnLeft;
 	public boolean Enter;
 	
-	private int KeyData = 0; //送信用
 	private int oldKey = 0;
 	private Network nw;
+	private Field field;
 
-	Key(Network parent){
-		nw = parent;
+	Key(Field parent, Network _nw){
+		field = parent;
+		nw = _nw;
 	}
 	
 	// キーボードが押された時の処理(文字)
@@ -84,9 +85,8 @@ public class Key extends KeyAdapter {
 	}
 	
 	private void sendKeyData(int key) {
-		if(key != oldKey) {
+		if(field.moving_flag) {
 			nw.sendStatus(Integer.toString(key));
-			oldKey = key;
 		}
 	}
 }

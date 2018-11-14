@@ -16,6 +16,7 @@ public class Field {
 	
 	public boolean bottom_flag = false; 	//当たり判定
 	public boolean moving_flag = false;		//移動できるかどうか
+	public boolean lose_flag = false;
 	private boolean bottom_p1_flag = false;	//どのぷちゅが底にあるか
 	private boolean bottom_p2_flag = false;	
 	private boolean turn_left_flag = true;	//左回転できるか
@@ -41,6 +42,7 @@ public class Field {
 	private int speed = 1;
 	private int[][] cp_player = new int[GameMain.PPSIZE][2];
 	private GameMain gm;
+	private int puchu_count = 0;
 	
 	public Field(GameMain game, int[][] player) {			//nullプレイヤー用
 		
@@ -48,7 +50,7 @@ public class Field {
 		init_cell();
 		if ( player != null ) {
 			draw = new Draw(this);
-			key = new Key(gm.nw);
+			key = new Key(this, gm.nw);
 			init_player(player);
 			create_puchu(player);
 			
@@ -71,6 +73,7 @@ public class Field {
 	
 	public void switch_next() {	//ぷちゅの更新
 		now = next[0];
+		puchu_count++;
 		
 		for ( int i = 0; i < 2; i++ ) {
 			next[i] = next[i+1];	//次のぷちゅの更新
@@ -250,12 +253,14 @@ public class Field {
 	public int update() {			//連続処理
 		
 		int drop_pos = 0;
+		int puchu_index = -1;
 		
 		if ( moving_flag == true ) {
 			judge_key();
 			hit_puchu();
 			if ( bottom_flag != true ) {
 				now.fallDown(speed);
+				puchu_index = puchu_count;
 			} else {
 				if ( bottom_p1_flag == false ) {
 					drop_pos = drop_p1_pos();
@@ -283,11 +288,7 @@ public class Field {
 				bottom_p2_flag = false;
 			}
 		}
-		if ( now != null ) {
-			return -1;
-		} else {
-			return switch_figure;
-		}
+		return puchu_index;
 	}
 	private void init_player(int[][] player) {
 		for ( int i = 0; i < GameMain.PPSIZE; i++ ) {
@@ -330,6 +331,7 @@ public class Field {
 		if ( van_puchu == false ) {
 			chain_count = 0;
 			if ( cell[2][2].type != Puchu.Emp ) {
+				lose_flag = true;
 				gm.finishGame();
 				draw.startEndAnim(Draw.GameInfo.GAME_LOSE);
 			}

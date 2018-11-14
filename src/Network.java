@@ -6,17 +6,17 @@ public class Network extends Thread {
 	public static enum Mode { SERVER, CLIENT };
 	
 	public Mode programMode = Mode.SERVER;
+	public boolean isConnect = false;
+	public int index = 0; //操作中のぷちゅ
 	
 	GameMain gm;
 	boolean isAlive = true;
-	boolean isConnect = false;
 	ServerSocket ss;
 	Socket sc;
 	BufferedReader br;
 	PrintWriter pw;
-	int index = 0; //操作中のぷちゅ
-	int sendCount = 0;
-	int recvCount = 0;
+	//int sendCount = 0;
+	//int recvCount = 0;
 	boolean isFlush = true; //バッファが空か
 	
 	// コンストラクタ
@@ -31,7 +31,7 @@ public class Network extends Thread {
 		}
 	}
 	
-	// スレッドのメイン
+	// 接続待ち(スレッドのメイン)
 	public void run() {
 		while(isAlive) {
 			try {
@@ -59,23 +59,20 @@ public class Network extends Thread {
 				if(isConnect) getRivalStatus();
 			}catch(Exception e) {
 				System.out.println("nw run: "+e);
-				if(isConnect) break;
+				break;
 			}
-			try { sleep(1); } catch(Exception e) {}
+			try { sleep(100); } catch(Exception e) {}
 		}
-		try{ ss.close(); } catch(Exception e) {}
 	}
 	
 	// サーバーを閉じる
 	public void Close() {
-		if(!isConnect) {
-			// 1Pのときは自分を繋ぐことでacceptから抜ける
-			try {
-				Socket socket = new Socket("127.0.0.1", Port);
-				socket.close();
-			} catch(Exception e) {}
-		}
+		try{
+			if(!isConnect && programMode == Mode.SERVER) ss.close();
+			else sc.close(); 
+		} catch(Exception e) {}
 		isAlive = false;
+		isConnect = false;
 	}
 	
 	// 自分のIPアドレスを取得
@@ -135,58 +132,48 @@ public class Network extends Thread {
 	}
 	
 	// 相手のステータス取得
-	private void getRivalStatus() {
-		if(index != gm.rivalIndex) return; //indexがズレていたら待機
-		String input[] = new String[2];
-		try {
-			input = br.readLine().split(",");
-		}catch(Exception e) {
-			System.out.println("nw get: "+e);
-			input[0] = "END";
-		}
-		while(!input[0].equals("null")) {
-			switch(input[0]) {
+	public void getRivalStatus() {
+		String input;
+		while(true) {
+			// コマンドを読む
+			try {
+				if(br.ready()) input = br.readLine();
+				else break;
+			}catch(Exception e) {
+				System.out.println("nw get: "+e);
+				input = "END";
+			}
+			// コマンドによって分岐
+			switch(input) {
 			// 受信データなし
 			case "null":
-				break;
+				return;
 			// 相手が初期ぷちゅペアリストを受信完了すると送られてくる
 			case "START":
-				if(programMode == Mode.SERVER) gm.canStart = true;
-				recvCount++;
+				gm.canStart = true;
 				break;
 			// 相手が負けた場合に送られてくる
 			case "END":
+				gm.canStart = true; // 無理やりスタート
 				gm.finishRival();
 				Close();
 				return;
 			// 初期ぷちゅペア受信開始
 			case "MAKESTART":
-				if(programMode == Mode.CLIENT) {
-					gm.makePuchuByServer(getPuchuList());
-					gm.canStart = true;
-				}
+				gm.makePuchuByServer(getPuchuList());
+				gm.canStart = true;
 				break;
 			// 操作対象が変わると送られてくる
 			case "NEXT":
 				getPuchuIndex();
-				if(index != gm.rivalIndex) return; //indexがズレていたら待機
+				gm.resetRivalInput();
 				break;
 			// キー入力
 			default:
-				gm.setRivalInput(input[0]);
-				if(recvCount != Integer.parseInt(input[1])) System.out.println("ずれ:" + recvCount + ", " + input[1]);
-				recvCount++;
+				gm.setRivalInput(input);
 				break;
 			}
-			// 次のデータの読み込み
-			try {
-				input = br.readLine().split(",");
-			}catch(Exception e) {
-				System.out.println("nw get: "+e);
-				input[0] = "END";
-			}
 		}
-		
 	}
 	
 	// 初期ぷちゅペアリスト受信
@@ -239,9 +226,8 @@ public class Network extends Thread {
 	// 自分のステータスを送信
 	public void sendStatus(String status) {
 		if(isAlive == false) return;
-		pw.println(status+","+sendCount);
-		isFlush = false;
-		sendCount++;
+		pw.println(status);
+		pw.flush();
 	}
 	
 	// ターゲットのぷちゅペアを送信
@@ -249,13 +235,5 @@ public class Network extends Thread {
 		pw.println("NEXT");
 		pw.println(Integer.toString(index));
 		pw.flush();
-	}
-	
-	// バッファに溜まったデータを一気に送信する
-	public void flushBuffer() {
-		if(!isFlush) {
-			pw.flush();
-			isFlush = true;
-		}
 	}
 }
