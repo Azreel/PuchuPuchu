@@ -57,7 +57,7 @@ public class Draw extends JPanel{
 	private static final int end_image_timing = 100;
 	private static final int end_time = 400;
 	
-	private AudioClip se_del, se_lose, se_drop;
+	private AudioClip se_del, se_lose, se_drop, se_lose_voice, se_ready, se_start, se_win_voice;
 	
 	Draw() {	//nullプレイヤー用
 		this.setPreferredSize(new Dimension(PanelW, PanelH));
@@ -95,6 +95,10 @@ public class Draw extends JPanel{
 		se_del = Applet.newAudioClip(getClass().getResource("delpuchu.wav"));
 		se_lose = Applet.newAudioClip(getClass().getResource("lose.wav"));
 		se_drop = Applet.newAudioClip(getClass().getResource("rakka.wav"));
+		se_lose_voice = Applet.newAudioClip(getClass().getResource("losegirl.wav"));
+		se_ready = Applet.newAudioClip(getClass().getResource("youi.wav"));
+		se_start = Applet.newAudioClip(getClass().getResource("Start.wav"));
+		se_win_voice = Applet.newAudioClip(getClass().getResource("wingirl.wav"));
 	}
 	
 	public void startReadyAnim() {
@@ -102,10 +106,12 @@ public class Draw extends JPanel{
 		ready_state = AnimState.state1;
 		img_ready = tk.getImage(getClass().getResource("ready.png"));
 		img_start = tk.getImage(getClass().getResource("start.png"));
+		se_ready.play();
 	}
 	
 	private void nextReadyAnim() {
 		ready_state = AnimState.state4;
+		se_start.play();
 	}
 	
 	private void finishReadyAnim() {
@@ -184,6 +190,8 @@ public class Draw extends JPanel{
 	//-- イメージ落下開始
 	private void startEndImgDrop() {
 		end_state = AnimState.state2;
+		if ( game == GameInfo.GAME_LOSE ) { se_lose_voice.play(); }
+		if ( game == GameInfo.GAME_WIN ) { se_win_voice.play(); }
 	}
 	
 	//-- 決着時のアニメーション終了
