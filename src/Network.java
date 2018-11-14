@@ -17,6 +17,7 @@ public class Network extends Thread {
 	int index = 0; //操作中のぷちゅ
 	int sendCount = 0;
 	int recvCount = 0;
+	boolean isFlush = true; //バッファが空か
 	
 	// コンストラクタ
 	Network(GameMain parent){
@@ -239,7 +240,7 @@ public class Network extends Thread {
 	public void sendStatus(String status) {
 		if(isAlive == false) return;
 		pw.println(status+","+sendCount);
-		pw.flush();
+		isFlush = false;
 		sendCount++;
 	}
 	
@@ -248,5 +249,13 @@ public class Network extends Thread {
 		pw.println("NEXT");
 		pw.println(Integer.toString(index));
 		pw.flush();
+	}
+	
+	// バッファに溜まったデータを一気に送信する
+	public void flushBuffer() {
+		if(!isFlush) {
+			pw.flush();
+			isFlush = true;
+		}
 	}
 }

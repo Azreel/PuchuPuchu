@@ -174,6 +174,7 @@ public class GameMain extends Thread {
 				}
 				break;
 			}
+			nw.flushBuffer();
 			loopDelay = MSPF - (System.currentTimeMillis() - start);
 		}
 	}
