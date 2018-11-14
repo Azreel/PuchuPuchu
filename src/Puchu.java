@@ -17,10 +17,12 @@ public class Puchu {
 	public int draw_x, draw_y;	// 描画に使用する座標(アニメーションのため遅延して動作する)
 	public boolean is_match_position_drop = true;			// 判定位置と描写位置が一致しているか
 	public boolean is_check = false;
+	public int combine_count = 0;
+	public int van_flame_count = 0;
 	private int drop_bound_time = 0;
 	private int van_time = 0;
 	private int bound_anim_count = 1; // バウンドアニメーションの回数
-	private static final int drop_anim_speed = 20;	// 落下アニメーションの落下速度
+	private static final int drop_anim_speed = 10;	// 落下アニメーションの落下速度
 	private static final int bound_anim_speed = 6; // バウンドアニメーションの速度(小さいほど早い)
 	private static final int max_van_time = 50; // 死に際ぷちゅの顔が表示される時間
 	private static final int max_van_time_after = 40; // 消滅アニメーション再生から終了判定をとるまでの時間
@@ -79,12 +81,14 @@ public class Puchu {
 	public void vanishOut() {
 		type = Puchu.Van;
 		van_time = 0;
+		van_flame_count = 0;
 	}
 	
 	//-- 消滅のディレイ
 	public void vanishOutDelay() {
 		van_time++;
 		if ( van_time > max_van_time ) {
+			System.out.println("vanishing");
 			type = Puchu.Vanishing;
 		}
 	}
@@ -92,8 +96,11 @@ public class Puchu {
 	//-- 消滅アニメーション
 	public void vanishOutAnim() {
 		van_time++;
+		if ( van_flame_count < 9 ) { van_flame_count++; }
 		if ( van_time > max_van_time + max_van_time_after ) {
 			type = Puchu.Emp;
+			combine_count = 0;
+			is_check = false;
 		}
 	}
 	
