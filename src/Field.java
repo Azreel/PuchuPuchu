@@ -53,7 +53,7 @@ public class Field {
 		} else {
 			draw = new Draw();
 		}
-		gm.fadeOut();
+		//gm.fadeOut();
 	}
 
 	
@@ -248,10 +248,6 @@ public class Field {
 		
 		int drop_pos = 0;
 		
-		if ( game_end_flag ) {
-			gm.resultDisp(score);
-		}
-		
 		if ( moving_flag == true ) {
 			judge_key();
 			hit_puchu();
@@ -329,9 +325,15 @@ public class Field {
 		}
 		
 		if ( van_puchu == false ) {
+			chain_count = 0;
+			if ( cell[2][2].type == Puchu.Emp ) {
+				gm.finishGame();
+				draw.startEndAnim(Draw.GameInfo.GAME_LOSE);
+			}
 			switch_start();
 		} else {
-			draw.startVanishAnim(1, 0);
+			chain_count++;
+			draw.startVanishAnim(chain_count, 0);
 		}
 	}
 	
@@ -413,7 +415,7 @@ public class Field {
 	}
 	
 	public void game_end() {
-		game_end_flag = true;
+		gm.finishGame(score);
 	}
 	
 	public void p1_defeat() {
