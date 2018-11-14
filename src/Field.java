@@ -329,9 +329,11 @@ public class Field {
 		}
 		
 		if ( van_puchu == false ) {
+			chain_count = 0;
 			switch_start();
 		} else {
-			draw.startVanishAnim(1, 0);
+			chain_count++;
+			draw.startVanishAnim(chain_count, 0);
 		}
 	}
 	
