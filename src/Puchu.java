@@ -88,7 +88,6 @@ public class Puchu {
 	public void vanishOutDelay() {
 		van_time++;
 		if ( van_time > max_van_time ) {
-			System.out.println("vanishing");
 			type = Puchu.Vanishing;
 		}
 	}
