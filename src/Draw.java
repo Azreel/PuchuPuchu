@@ -123,7 +123,7 @@ public class Draw extends JPanel{
 		for ( int i = 1; i <= 8; i++ ) {
 			img_puchu[i] = tk.getImage(getClass().getResource("puchu"+i+".png"));			
 		}
-		img_obs_notice = tk.getImage(getClass().getResource("puchu8_notice"));
+		img_obs_notice = tk.getImage(getClass().getResource("puchu8_notice.png"));
 		try {
 			img_van_anim = ImageIO.read(getClass().getResource("vanishingAnime.png"));
 			for ( int i = 0; i < 10; i++ ) {

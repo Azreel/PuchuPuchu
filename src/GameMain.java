@@ -208,11 +208,15 @@ public class GameMain extends Thread {
 		isOverlay = false;
 	}
 	
-	// ゲーム終了の検知
-	public void finishGame(int score) {
-		isFinish = true;
+	// リザルトの表示
+	public void resultDisp(int score) {
 		isOverlay = true;
 		overlay.Result(score);
+	}
+	
+	// ゲーム終了の検知
+	public void finishGame() {
+		isFinish = true;
 		if(gameStatus == Status.GAME_DUO) {
 			nw.sendStatus("END");
 			nw.Close();
