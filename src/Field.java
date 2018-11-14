@@ -2,6 +2,8 @@ import java.awt.*;
 import java.util.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.applet.Applet;
+import java.applet.AudioClip;
 
 public class Field {
 	
@@ -12,6 +14,7 @@ public class Field {
 	public PuchuPair[] next = new PuchuPair[3];
 	public Draw draw;
 	public Key key;
+	public AudioClip turn_sound;
 	public int[] obs_puyo = new int[6];
 	
 	public boolean bottom_flag = false; 	//当たり判定
@@ -51,7 +54,7 @@ public class Field {
 			key = new Key(gm.nw);
 			init_player(player);
 			create_puchu(player);
-			
+			turn_sound = Applet.newAudioClip(getClass().getResource("ojama.wav"));
 			draw.addKeyListener(key);
 		} else {
 			draw = new Draw();
@@ -363,12 +366,14 @@ public class Field {
 			speed = 1;
 		}
 		if ( key.TurnLeft == true && turn_left_flag ) {
+			turn_sound.play();
 			now.turnLeft();
 			turn_left_flag = false;
 		} else if ( key.TurnLeft == false ){
 			turn_left_flag = true;
 		}
 		if ( key.TurnRight == true && turn_right_flag ) {
+			turn_sound.play();
 			now.turnRight();
 			turn_right_flag = false;
 		} else if ( key.TurnRight == false ) {
@@ -406,7 +411,6 @@ public class Field {
 					while( j+k < 13 && cell[i][j+k+1].type == Puchu.Emp ) {
 						k++;
 					}
-					
 					cell[i][j+k].copyPuchu(cell[i][j]);
 					cell[i][j+k].dropDown(j+k);
 //					cell[i][j].type = Puchu.Emp;
