@@ -27,7 +27,9 @@ public class GameMain extends Thread {
 	private Field rival = null;
 	private int meIndex = 0;
 	private boolean isFinish = false;
-	private ArrayList<Integer> keyBuffer = new ArrayList<Integer>();
+	private int nowKey = -1;
+	private long nowKeyTime = -1;
+	private boolean isFirst = true;
 	//private boolean isUpdate = true;
 	
 	// コンストラクタ
@@ -71,6 +73,9 @@ public class GameMain extends Thread {
 						frame.remove(rival.draw);
 						me = null;
 						rival = null;
+						canStart = false;
+						isFirst = true;
+						nw.Close();
 					}
 					isFinish = false;
 					// ネットワーク開始
@@ -142,7 +147,7 @@ public class GameMain extends Thread {
 					title = null;
 					// ぷちゅ生成
 					if(nw.programMode == Network.Mode.SERVER) nw.sendPuchu(makePuchu());
-					else while(!canStart) { try{ sleep(1); } catch(Exception e) {}}
+					else while(!canStart) { nw.getRivalStatus(); }
 					// プレイヤーフィールド
 					me = new Field(this, ppInit);
 					me.draw.setBounds(0, 0, ScreenW/2, ScreenH);
@@ -156,28 +161,39 @@ public class GameMain extends Thread {
 					me.draw.requestFocus();
 					// 準備完了
 					nw.sendStatus("START");
+					while(!canStart) { nw.getRivalStatus(); }
 					// BGM
 					overlay.setBGM(getClass().getResource("gamemusic.wav"));
 					// スタートアニメーション
-					while(!canStart) { try{ sleep(1); } catch(Exception e) {}}
 					me.draw.startReadyAnim();
 					rival.draw.startReadyAnim();
 				} else {
+					if(nowKey != -1 && nw.index == rivalIndex) {
+						if(nowKeyTime > MSPF) {
+							if(loopDelay > 0) nowKeyTime -= loopDelay;
+							setRivalInput(nowKey, true);
+						} else {
+							if(nowKeyTime > 0) try { sleep(nowKeyTime); } catch(Exception e) {}
+							setRivalInput(nowKey, false);
+							nowKey = -1;
+							nowKeyTime = -1;
+						}
+					} else if(nw.isConnect) {
+						nw.getRivalStatus();
+					}
 					if(canStart) {
 						// 状態更新
 						int temp;
-						// ライバル
-						if(!isFinish && nw.index >= rivalIndex) {
-							temp = rival.update();
-							if(temp != -1) rivalIndex = temp;
-						}
-						// 自分
 						if(!isFinish) {
+							// 自分
 							temp = me.update();
 							if(temp != meIndex) {
 								meIndex = temp;
 								if(meIndex != -1) nw.sendPuchuIndex(meIndex);
 							}
+							// ライバル
+							temp = rival.update();
+							if(temp != -1) rivalIndex = temp;
 						}
 						// 画面描画
 						if(isPaint) {
@@ -257,48 +273,40 @@ public class GameMain extends Thread {
 	}
 	
 	// ライバルのキー入力を反映
-	public void setRivalInput(String key) {
-		int keyCode;
+	public void getRivalInput(String key) {
+		String[] keyData = key.split(":");
+
 		// キー情報の取り出し
 		try {
-			keyCode = Integer.parseInt(key);
-			System.out.println(keyCode);
+			nowKey = Integer.parseInt(keyData[0]);
+			nowKeyTime = Long.parseLong(keyData[1]);
+			//System.out.println(key);
 		} catch(Exception e) {
 			System.out.println("不正なキーデータ: "+key);
 			return;
 		}
-		setRivalKey(keyCode);
 	}
 	
 	// ライバルのキーをセット
-	private void setRivalKey(int keyCode) {
-		boolean isPress;
-		// 押したのか押されたのか
-		if(keyCode > 0) {
-			isPress = true;
-		} else {
-			isPress = false;
-			keyCode *= -1;
-		}
-		
-		switch(keyCode) {
-		case 1:
+	private void setRivalInput(int key, boolean isPress) {
+		switch(key) {
+		case 1: // ←キー
 			rival.key.Left = isPress;
 			break;
-		case 2:
+		case 2: // →キー
 			rival.key.Right = isPress;
 			break;
-		case 3:
+		case 3: // ↓キー
 			rival.key.Down = isPress;
 			break;
-		case 4:
+		case 4: // Zキー
 			rival.key.TurnLeft = isPress;
 			break;
-		case 5:
+		case 5: // Xキー
 			rival.key.TurnRight = isPress;
 			break;
 		default:
-			System.out.println("不正なキーデータ: "+keyCode);
+			System.out.println("不正なキーデータ: "+key);
 			break;
 		}
 	}
@@ -310,16 +318,18 @@ public class GameMain extends Thread {
 		rival.key.Down = false;
 		rival.key.TurnLeft = false;
 		rival.key.TurnRight = false;
+		nowKey = -1;
+		nowKeyTime = -1;
 	}
 	
 	// ライバルの負けを検知
 	public void finishRival() {
-		while(!rival.lose_flag) {
-			// 相手に高速で合わせる
-			nw.getRivalStatus();
-			rival.update();
-			rival.draw.repaint();
-		}
+//		while(!rival.lose_flag) {
+//			// 相手に高速で合わせる
+//			nw.getRivalStatus();
+//			rival.update();
+//			rival.draw.repaint();
+//		}
 		isFinish = true;
 		nw.Close();
 	}

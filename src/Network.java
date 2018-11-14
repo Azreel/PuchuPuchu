@@ -17,7 +17,6 @@ public class Network extends Thread {
 	PrintWriter pw;
 	//int sendCount = 0;
 	//int recvCount = 0;
-	boolean isFlush = true; //バッファが空か
 	
 	// コンストラクタ
 	Network(GameMain parent){
@@ -33,7 +32,7 @@ public class Network extends Thread {
 	
 	// 接続待ち(スレッドのメイン)
 	public void run() {
-		while(isAlive) {
+		while(!isConnect && isAlive) {
 			try {
 				switch(programMode){
 				case SERVER:
@@ -56,10 +55,8 @@ public class Network extends Thread {
 				case CLIENT:
 					break;
 				}
-				if(isConnect) getRivalStatus();
 			}catch(Exception e) {
 				System.out.println("nw run: "+e);
-				break;
 			}
 			try { sleep(10); } catch(Exception e) {}
 		}
@@ -73,6 +70,7 @@ public class Network extends Thread {
 		} catch(Exception e) {}
 		isAlive = false;
 		isConnect = false;
+		System.out.println("接続解除");
 	}
 	
 	// 自分のIPアドレスを取得
@@ -134,44 +132,43 @@ public class Network extends Thread {
 	// 相手のステータス取得
 	public void getRivalStatus() {
 		String input;
-		while(true) {
-			try {
-				if(br.ready()) input = br.readLine();
-				else return;
-			}catch(Exception e) {
-				System.out.println("nw get: "+e);
-				input = "END";
-			}
-			// コマンドによって分岐
-			switch(input) {
-			// 受信データなし
-			case "null":
-				break;
-			// 相手が初期ぷちゅペアリストを受信完了すると送られてくる
-			case "START":
-				gm.canStart = true;
-				break;
-			// 相手が負けた場合に送られてくる
-			case "END":
-				gm.canStart = true; // 無理やりスタート
-				gm.finishRival();
-				Close();
-				return;
-			// 初期ぷちゅペア受信開始
-			case "MAKESTART":
-				gm.makePuchuByServer(getPuchuList());
-				gm.canStart = true;
-				break;
-			// 操作対象が変わると送られてくる
-			case "NEXT":
-				getPuchuIndex();
-				gm.resetRivalInput();
-				break;
-			// キー入力
-			default:
-				gm.setRivalInput(input);
-				break;
-			}
+		try {
+			if(br.ready()) input = br.readLine();
+			else return;
+			System.out.println(input);
+		}catch(Exception e) {
+			System.out.println("nw get: "+e);
+			input = "END";
+		}
+		// コマンドによって分岐
+		switch(input) {
+		// 受信データなし
+		case "null":
+			break;
+		// 相手が初期ぷちゅペアリストを受信完了すると送られてくる
+		case "START":
+			gm.canStart = true;
+			break;
+		// 相手が負けた場合に送られてくる
+		case "END":
+			gm.canStart = true; // 無理やりスタート
+			gm.finishRival();
+			Close();
+			break;
+		// 初期ぷちゅペア受信開始
+		case "MAKESTART":
+			gm.makePuchuByServer(getPuchuList());
+			gm.canStart = true;
+			break;
+		// 操作対象が変わると送られてくる
+		case "NEXT":
+			getPuchuIndex();
+			//gm.resetRivalInput();
+			break;
+		// キー入力
+		default:
+			gm.getRivalInput(input);
+			break;
 		}
 	}
 	
@@ -207,6 +204,7 @@ public class Network extends Thread {
 	private void getPuchuIndex(){
 		try {
 			index = Integer.parseInt(br.readLine());
+			System.out.println(index);
 		} catch(Exception e) {
 			System.out.println("nw get: " + e);
 		}

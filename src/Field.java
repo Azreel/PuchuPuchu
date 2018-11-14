@@ -50,7 +50,7 @@ public class Field {
 		init_cell();
 		if ( player != null ) {
 			draw = new Draw(this);
-			key = new Key(this, gm.nw);
+			key = new Key(gm.nw);
 			init_player(player);
 			create_puchu(player);
 			
@@ -290,6 +290,7 @@ public class Field {
 		}
 		return puchu_index;
 	}
+	
 	private void init_player(int[][] player) {
 		for ( int i = 0; i < GameMain.PPSIZE; i++ ) {
 			for ( int j = 0; j < 2; j++ ) {
