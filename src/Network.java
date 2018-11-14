@@ -61,7 +61,7 @@ public class Network extends Thread {
 				System.out.println("nw run: "+e);
 				break;
 			}
-			try { sleep(100); } catch(Exception e) {}
+			try { sleep(10); } catch(Exception e) {}
 		}
 	}
 	
@@ -135,10 +135,9 @@ public class Network extends Thread {
 	public void getRivalStatus() {
 		String input;
 		while(true) {
-			// コマンドを読む
 			try {
 				if(br.ready()) input = br.readLine();
-				else break;
+				else return;
 			}catch(Exception e) {
 				System.out.println("nw get: "+e);
 				input = "END";
@@ -147,7 +146,7 @@ public class Network extends Thread {
 			switch(input) {
 			// 受信データなし
 			case "null":
-				return;
+				break;
 			// 相手が初期ぷちゅペアリストを受信完了すると送られてくる
 			case "START":
 				gm.canStart = true;

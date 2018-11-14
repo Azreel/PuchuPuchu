@@ -142,7 +142,7 @@ public class GameMain extends Thread {
 					title = null;
 					// ぷちゅ生成
 					if(nw.programMode == Network.Mode.SERVER) nw.sendPuchu(makePuchu());
-					else while(!canStart) { nw.getRivalStatus(); }
+					else while(!canStart) { try{ sleep(1); } catch(Exception e) {}}
 					// プレイヤーフィールド
 					me = new Field(this, ppInit);
 					me.draw.setBounds(0, 0, ScreenW/2, ScreenH);
@@ -159,17 +159,10 @@ public class GameMain extends Thread {
 					// BGM
 					overlay.setBGM(getClass().getResource("gamemusic.wav"));
 					// スタートアニメーション
-					while(!canStart) { nw.getRivalStatus(); }
+					while(!canStart) { try{ sleep(1); } catch(Exception e) {}}
 					me.draw.startReadyAnim();
 					rival.draw.startReadyAnim();
 				} else {
-					// 相手のキー入力を取り出す
-					if(nw.isConnect) nw.getRivalStatus();
-					// 相手のキーを1つだけ取り出す
-					if(nw.index == rivalIndex && !keyBuffer.isEmpty()) {
-						setRivalKey(keyBuffer.get(0));
-						keyBuffer.remove(0);
-					}
 					if(canStart) {
 						// 状態更新
 						int temp;
@@ -274,8 +267,7 @@ public class GameMain extends Thread {
 			System.out.println("不正なキーデータ: "+key);
 			return;
 		}
-		// 全部一旦バッファに入れる
-		keyBuffer.add(keyCode);
+		setRivalKey(keyCode);
 	}
 	
 	// ライバルのキーをセット
@@ -318,15 +310,6 @@ public class GameMain extends Thread {
 		rival.key.Down = false;
 		rival.key.TurnLeft = false;
 		rival.key.TurnRight = false;
-		// 入ってるキー情報を全て消費
-		if(!keyBuffer.isEmpty()) {
-			for(int code : keyBuffer) {
-				setRivalKey(code);
-				rival.update();
-				rival.draw.repaint();
-			}
-			keyBuffer.clear();
-		}
 	}
 	
 	// ライバルの負けを検知
