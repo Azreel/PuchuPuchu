@@ -1,7 +1,10 @@
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
+import java.io.File;
 import java.util.*;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.applet.Applet;
 import java.applet.AudioClip;
@@ -16,9 +19,10 @@ public class Draw extends JPanel{
 	private GameInfo game = GameInfo.GAME_PLAYNOW;
 	
 	private Toolkit tk;
-	private Image img_background;
+	private Image img_background, img_field;
 	private Image img_puchu[] = new Image[9];
-	private Image img_van_anim;
+	private BufferedImage img_van_anim;
+	private BufferedImage[] imgs_van = new BufferedImage[10];
 	private JLabel lb;	//ラベル
 	private Field fd;
 	private Image buffer;
@@ -31,6 +35,9 @@ public class Draw extends JPanel{
 	private static final int max_chain_display_time = 60;
 	private boolean is_chain_get = false;
 	private boolean is_chain_display = false;
+	
+	private Font score_font = new Font("Dialog", Font.BOLD, 40);
+	private Color score_color = Color.white;
 	
 	private boolean is_alive = true;
 	private boolean is_drop_anim = false, is_drop_all = false;
@@ -52,19 +59,32 @@ public class Draw extends JPanel{
 	private Image img_end;
 	private AnimState end_state = AnimState.state1;
 	private int end_anim_time = 0;
-	private int end_image_height = -350, end_image_speed = 0, end_image_accel = 4;
+	private int end_image_height = -350, end_image_speed = 0, end_image_accel = 2;
 	private static final int end_anim_delay = 10;
 	private static final int end_image_timing = 100;
-	private static final int end_time = 400;
+	private static final int end_time = 300;
 	
-	private AudioClip se_del, se_lose, se_drop, se_lose_voice, se_ready, se_start, se_win_voice;
+	private static enum Meteor {attack, counter, offset};
+	private Image img_meteor;
+	private AnimState send_state = AnimState.end;
+	private Meteor send_mode = Meteor.attack;
+	private int send_anim_time = 0;
+	private int send_image_x = 0, send_image_y = 0;
+	private float send_image_range = 0.0f;
+	private int send_center_x = 0, send_center_y = 0;
+	
+	private int obs_num = 0;
+	
+	//テスト
+	int score = 9999;
 	
 	Draw() {	//nullプレイヤー用
 		this.setPreferredSize(new Dimension(PanelW, PanelH));
 		lb = new JLabel();
 		lb.setPreferredSize(new Dimension(PanelW, PanelH));
 		tk = Toolkit.getDefaultToolkit();
-		img_background = tk.getImage(getClass().getResource("fieldbackground.png"));
+		img_background = tk.getImage(getClass().getResource("backmark.png"));
+		img_field = tk.getImage(getClass().getResource("background.png"));
 		
 		is_alive = false;
 	}
@@ -73,13 +93,18 @@ public class Draw extends JPanel{
 		lb = new JLabel();
 		lb.setPreferredSize(new Dimension(PanelW, PanelH));
 		tk = Toolkit.getDefaultToolkit();
-		img_background = tk.getImage(getClass().getResource("fieldbackground.png"));
+		img_background = tk.getImage(getClass().getResource("backmark.png"));
+		img_field = tk.getImage(getClass().getResource("background.png"));
 		
 		is_alive = true;
 		fd = _fd;
 		initImages();
-		initSounds();
 		
+//		for ( int i = 0; i < fd.cell.length; i++ ) {
+//			for ( int j = 5; j < fd.cell[i].length; j++ ) {
+//				fd.cell[i][j].type = Puchu.Obs;
+//			}
+//		}
 		startReadyAnim();
 	}
 	
@@ -88,43 +113,52 @@ public class Draw extends JPanel{
 		for ( int i = 1; i <= 8; i++ ) {
 			img_puchu[i] = tk.getImage(getClass().getResource("puchu"+i+".png"));			
 		}
-		img_van_anim = tk.getImage(getClass().getResource("VanishAnimation.gif"));
+//		img_van_anim = tk.getImage(getClass().getResource("vanishingAnime.png"));
+		try {
+			img_van_anim = ImageIO.read(getClass().getResource("vanishingAnime.png"));
+//			img_van_anim = ImageIO.read(new File("vanishingAnime.png"));
+			for ( int i = 0; i < 10; i++ ) {
+				imgs_van[i] = img_van_anim.getSubimage(i*Draw.Squares*2, 0, Draw.Squares*2, Draw.Squares*2);
+			}			
+		} catch(Exception e) {
+			System.out.println(e);
+		}
 	}
 	
-	private void initSounds() {
-		se_del = Applet.newAudioClip(getClass().getResource("delpuchu.wav"));
-		se_lose = Applet.newAudioClip(getClass().getResource("lose.wav"));
-		se_drop = Applet.newAudioClip(getClass().getResource("rakka.wav"));
-		se_lose_voice = Applet.newAudioClip(getClass().getResource("losegirl.wav"));
-		se_ready = Applet.newAudioClip(getClass().getResource("youi.wav"));
-		se_start = Applet.newAudioClip(getClass().getResource("Start.wav"));
-		se_win_voice = Applet.newAudioClip(getClass().getResource("wingirl.wav"));
+	//-- SE発火
+	private void soundIgnition(String _wav) {
+		AudioClip _se = Applet.newAudioClip(getClass().getResource(_wav));
+		_se.play();
 	}
 	
+	//-- 開幕アニメーション開始
 	public void startReadyAnim() {
 		game = GameInfo.GAME_READY;
 		ready_state = AnimState.state1;
 		img_ready = tk.getImage(getClass().getResource("ready.png"));
 		img_start = tk.getImage(getClass().getResource("start.png"));
-		se_ready.play();
+		soundIgnition("youi.wav");
 	}
 	
+	//-- 開幕アニメーションスタート落下開始
 	private void nextReadyAnim() {
 		ready_state = AnimState.state4;
-		se_start.play();
+		soundIgnition("Start.wav");
 	}
 	
+	//-- 開幕アニメーション終了
 	private void finishReadyAnim() {
 		game = GameInfo.GAME_PLAYNOW;
 		ready_state = AnimState.state5;
 		System.out.println("ゲーム開始");
+		soundIgnition("pahu.wav");
 		fd.game_start();
 	}
 	
 	//-- 落下アニメーション開始
 	public void startDropAnim() {
 		is_drop_anim = true;
-		se_drop.play();
+		soundIgnition("rakka.wav");
 	}
 	
 	//-- 落下アニメーション終了
@@ -137,6 +171,13 @@ public class Draw extends JPanel{
 		if ( fd.cell[2][2].type != Puchu.Emp ) { startEndAnim(GameInfo.GAME_LOSE);}
 		else if ( fd.cell[0][2].type!= Puchu.Emp ) { startEndAnim(GameInfo.GAME_WIN);}
 		else { fd.drop_finish();}
+//		else {
+//			fd.cell[5][13].vanishOut();
+//			fd.cell[4][13].vanishOut();
+//			fd.cell[3][13].vanishOut();
+//			fd.cell[5][12].vanishOut();
+//			startVanishAnim(1, 10);
+//		}
 	}
 	
 	//-- ぷちゅペアの移動アニメーション開始
@@ -149,21 +190,20 @@ public class Draw extends JPanel{
 		is_move_anim = false;
 		is_move_all = false;
 		fd.switch_next();
-		
-//		if ( game == GameInfo.GAME_PLAYNOW ) { fd.switch_next(); }
 	}
 	
 	//-- ぷちゅの消滅アニメーション開始
-	public void startVanishAnim(int _chain) {
+	public void startVanishAnim(int _chain, int _generate_obs_num) {
 		is_vanish_delay = true;
-		
+		is_vanish_delay_all = false;
 		chain_text = _chain + "れんさ";
 		is_chain_get = true;
+//		startAttackAnim(_generate_obs_num);
 	}
 	
 	//-- ぷちゅの消滅準備完了
 	private void nextVanishAnim() {
-		se_del.play();
+		soundIgnition("delpuchu.wav");
 		is_vanish_delay = false;
 		is_vanish_all = false;
 		is_vanish_anim = true;
@@ -176,13 +216,37 @@ public class Draw extends JPanel{
 		is_vanish_anim = false;
 		is_vanish_all = false;
 		fd.vanish_finish();
+		
+		//テスト
+		fd.drop_finish();
+	}
+	
+	//-- おじゃま発射アニメーション開始
+	private void startAttackAnim(int _generate_obs_num) {
+		send_state = AnimState.state1;
+		send_image_x = chain_x;
+		send_image_y = chain_y;
+		send_center_x = 600;
+		send_center_y = -200;
+		send_image_range = (float)Math.sqrt(Math.pow(send_center_x - send_image_x, 2) + Math.pow(send_center_y - send_image_y, 2));
+		if ( obs_num == 0 ) { send_mode = Meteor.attack; }
+		else if ( obs_num - _generate_obs_num < 0 ) { send_mode = Meteor.counter; }
+		else { send_mode = Meteor.offset; }
+	}
+	
+	private void finishAttackAnim() {
+		
+	}
+	
+	private void setObsNum() {
+//		obs_num = fd.obs_num;
 	}
 	
 	//-- 決着時のアニメーション開始
 	public void startEndAnim(GameInfo _game) {
 		game = _game;
 		if ( _game == GameInfo.GAME_WIN ) { img_end = tk.getImage(getClass().getResource("yatta.png")); }
-		if ( _game == GameInfo.GAME_LOSE ) { img_end = tk.getImage(getClass().getResource("patankyu.png")); se_lose.play(); }
+		if ( _game == GameInfo.GAME_LOSE ) { img_end = tk.getImage(getClass().getResource("patankyu.png")); soundIgnition("lose.wav"); }
 		end_state = AnimState.state1;
 		end_anim_time = 0;
 	}
@@ -190,8 +254,19 @@ public class Draw extends JPanel{
 	//-- イメージ落下開始
 	private void startEndImgDrop() {
 		end_state = AnimState.state2;
-		if ( game == GameInfo.GAME_LOSE ) { se_lose_voice.play(); }
-		if ( game == GameInfo.GAME_WIN ) { se_win_voice.play(); }
+	}
+	
+	//-- イメージバウンド(1回目)
+	private void nextEndAnim() {
+		end_state = AnimState.state3;
+		 soundIgnition("wintext.wav");
+	}
+	
+	//-- イメージバウンド停止
+	private void finishEndImageMovement() {
+		end_state = AnimState.state4;
+		if ( game == GameInfo.GAME_LOSE ) { soundIgnition("losegirl.wav"); }
+		if ( game == GameInfo.GAME_WIN ) { soundIgnition("wingirl.wav"); }
 	}
 	
 	//-- 決着時のアニメーション終了
@@ -201,6 +276,7 @@ public class Draw extends JPanel{
 		fd.game_end();
 	}
 	
+	//-- 開幕アニメーション状況更新
 	private void updateReadyAnim() {
 		switch(ready_state) {
 		case state1:
@@ -244,8 +320,18 @@ public class Draw extends JPanel{
 		case state2 :
 			end_anim_time++;
 			end_image_speed += end_image_accel; 
-			end_image_height += end_image_speed/5;
+			end_image_height += end_image_speed;
+			if ( end_image_height > 0 && end_image_speed > 0) { end_image_speed = (int)(end_image_speed * -0.7); nextEndAnim(); }
+			break;
+		case state3 :
+			end_anim_time++;
+			end_image_speed += end_image_accel; 
+			end_image_height += end_image_speed;
 			if ( end_image_height > 0 && end_image_speed > 0) { end_image_speed = (int)(end_image_speed * -0.7); }
+			if ( end_image_height >= 0 && Math.abs( end_image_speed ) <= 1 ) { finishEndImageMovement();}
+			break;
+		case state4 :
+			end_anim_time++;
 			if ( end_anim_time > end_time ) { finishEndAnim(); }
 			break;
 		}
@@ -286,24 +372,49 @@ public class Draw extends JPanel{
 			_pair.drawingMovePosition(); 
 		}
 	}
+	
+	private void updateAttackAnim() {
+		send_anim_time++;
+		switch(send_mode) {
+		case attack:
+			updateSendAnim();
+			break;
+		case offset:
+			updateOffsetAnim();
+			break;
+		case counter:
+			updateCounterAnim();
+			break;
+		}
+	}
+	
+	private void updateSendAnim() {
+		switch(send_state) {
+		case state1:
+			break;
+		}
+	}
+	private void updateOffsetAnim() {
 		
+	}
+	private void updateCounterAnim() {
+		
+	}
+	
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D img_2d = (Graphics2D) g;
 //		buffer = createImage(PanelW, PanelH);
 //		Graphics img_2d = buffer.getGraphics();
-		img_2d.setColor(new Color(60,60,60));
-		img_2d.fillRect(0, 0, PanelW, PanelH);
-		img_2d.setFont(chain_font);
-		img_2d.setColor(chain_color);
+		img_2d.drawImage(img_background, 0, 0, this);
 
 		if ( is_alive ) {
 			// 初期処理
 			if ( is_drop_anim ) { is_drop_all = true; }
 			if ( is_move_anim ) { is_move_all = true; }
-			if ( is_vanish_delay ) { is_vanish_delay_all = true; }
 			if ( is_vanish_anim ) { is_vanish_all = true; }
+			if ( is_vanish_delay ) { is_vanish_delay_all = true; }
 			
 			// 盤面配列内のぷちゅ描写
 			for( int i = 0; i < fd.cell.length; i++ ) {
@@ -321,7 +432,7 @@ public class Draw extends JPanel{
 						break;
 					}
 					if ( fd.cell[i][j].type == Puchu.Vanishing ) {
-						img_2d.drawImage(img_van_anim, fd.cell[i][j].draw_x + margin_w - Draw.Squares/2, fd.cell[i][j].draw_y + margin_h - Draw.Squares/2, this);
+						img_2d.drawImage(imgs_van[fd.cell[i][j].van_flame_count], fd.cell[i][j].draw_x + margin_w - Draw.Squares/2, fd.cell[i][j].draw_y + margin_h - Draw.Squares/2, this);
 					} else {
 						img_2d.drawImage(img_puchu[fd.cell[i][j].type], fd.cell[i][j].draw_x + margin_w, fd.cell[i][j].draw_y + margin_h, this);
 					}
@@ -347,30 +458,50 @@ public class Draw extends JPanel{
 			if ( is_vanish_anim && is_vanish_all ) { finishVanishAnim(); }
 		}
 		// 背景描写
-		img_2d.drawImage(img_background, 0, 0, this);
+		img_2d.drawImage(img_field, 0, 0, this);
 		
-		// れんさテキスト描写
-		if ( is_chain_display ) {
-			chain_display_time++;
-			img_2d.drawString(chain_text, chain_x, chain_y - chain_display_time);
-			if ( chain_display_time > max_chain_display_time ) { is_chain_display = false; }
-		}
-		
-		switch(game) {
-		case GAME_PLAYNOW:
-		case GAME_READY :
-			if ( ready_state != AnimState.end ) {			
-				updateReadyAnim();
-				img_2d.drawImage(img_ready, margin_w, ready_image_height+ margin_h, this);
-				img_2d.drawImage(img_start, margin_w, start_image_height + margin_h, this);
+		if ( is_alive ) {
+			// 予告おじゃまぷちゅ描写
+			if ( obs_num != 0 ) {
+				for ( int i = obs_num-1; i >= 0; i-- ) {
+					if ( obs_num <= fd.cell.length ) {
+						img_2d.drawImage(img_puchu[Puchu.Obs], margin_w + Draw.Squares*i, margin_h - Draw.Squares - 5, this);									
+					} else {
+						img_2d.drawImage(img_puchu[Puchu.Obs], margin_w + (int)(Draw.Squares * ((fd.cell.length - 1.0) / (obs_num-1)))*i, margin_h - Draw.Squares - 5, this);									
+					}
+				}
+			}			
+			// スコア表示
+			img_2d.setColor(score_color);
+			img_2d.setFont(score_font);
+			img_2d.drawString(String.format("%08d", score ), margin_w+Draw.Squares*6, 500);
+			
+			// れんさテキスト描写
+			if ( is_chain_display ) {
+				chain_display_time++;
+				img_2d.setColor(chain_color);
+				img_2d.setFont(chain_font);
+				img_2d.drawString(chain_text, chain_x, chain_y - chain_display_time);
+				if ( chain_display_time > max_chain_display_time ) { is_chain_display = false; }
 			}
-			break;
-		case GAME_WIN :
-		case GAME_LOSE :
-			updateEndImgDrop();
-			img_2d.drawImage(img_end, margin_w, end_image_height + margin_h, this);
-			break;
-		}
-//		g.drawImage(buffer, 0, 0, this);
+			
+			// ゲーム中以外のタイミング管理
+			switch(game) {
+			case GAME_PLAYNOW:
+			case GAME_READY :
+				if ( ready_state != AnimState.end ) {			
+					updateReadyAnim();
+					img_2d.drawImage(img_ready, margin_w, ready_image_height+ margin_h, this);
+					img_2d.drawImage(img_start, margin_w, start_image_height + margin_h, this);
+				}
+				break;
+			case GAME_WIN :
+			case GAME_LOSE :
+				updateEndImgDrop();
+				img_2d.drawImage(img_end, margin_w, end_image_height + margin_h, this);
+				break;
+			}
+		}		
+//		g.drawImage(buffer, 0, 0, this);		
 	}
 }
