@@ -136,6 +136,7 @@ public class Network extends Thread {
 	
 	// 相手のステータス取得
 	private void getRivalStatus() {
+		if(index != gm.rivalIndex) return; //indexがズレていたら待機
 		String input[] = new String[2];
 		try {
 			input = br.readLine().split(",");
@@ -157,7 +158,7 @@ public class Network extends Thread {
 			case "END":
 				gm.finishRival();
 				Close();
-				break;
+				return;
 			// 初期ぷちゅペア受信開始
 			case "MAKESTART":
 				if(programMode == Mode.CLIENT) {
@@ -168,6 +169,7 @@ public class Network extends Thread {
 			// 操作対象が変わると送られてくる
 			case "NEXT":
 				getPuchuIndex();
+				if(index != gm.rivalIndex) return; //indexがズレていたら待機
 				break;
 			// キー入力
 			default:
@@ -177,7 +179,6 @@ public class Network extends Thread {
 				break;
 			}
 			// 次のデータの読み込み
-			
 			try {
 				input = br.readLine().split(",");
 			}catch(Exception e) {
@@ -185,6 +186,7 @@ public class Network extends Thread {
 				input[0] = "END";
 			}
 		}
+		
 	}
 	
 	// 初期ぷちゅペアリスト受信
@@ -221,10 +223,6 @@ public class Network extends Thread {
 			index = Integer.parseInt(br.readLine());
 		} catch(Exception e) {
 			System.out.println("nw get: " + e);
-			return;
-		}
-		while(index != gm.rivalIndex) {
-			try{ sleep(1); } catch(Exception e) { return; }
 		}
 	}
 	

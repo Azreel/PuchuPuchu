@@ -70,6 +70,7 @@ public class GameMain extends Thread {
 						me = null;
 						rival = null;
 					}
+					isFinish = false;
 					// ネットワーク開始
 					nw = new Network(this);
 					nw.start();
@@ -103,18 +104,21 @@ public class GameMain extends Thread {
 					me.draw.setBounds(0, 0, ScreenW/2, ScreenH);
 					// nullプレイヤーフィールド
 					rival = new Field(this, null);
-					rival.draw.setBounds(ScreenW/2-1, 0, ScreenW/2, ScreenH);
+					rival.draw.setBounds(ScreenW/2, 0, ScreenW/2, ScreenH);
 					// フレームに追加
+					me.draw.setVisible(false);
+					rival.draw.setVisible(false);
 					frame.add(me.draw);
 					frame.add(rival.draw);
+					me.draw.setVisible(true);
+					rival.draw.setVisible(true);
 					frame.revalidate();
 					me.draw.requestFocus();
-					isPaint = false;
 					//BGM
 					overlay.setBGM(getClass().getResource("gamemusic.wav"));
 				} else {
 					// Fieldの画面描画関係
-					me.update();
+					if(!isFinish) me.update();
 					if(isPaint) {
 						me.draw.repaint();
 						rival.draw.repaint();
@@ -151,13 +155,13 @@ public class GameMain extends Thread {
 					if(canStart) {
 						int temp = -1;
 						// Fieldの画面描画関係
-						temp = me.update();
+						if(!isFinish) temp = me.update();
 						if(temp != -1) {
 							meIndex = temp;
 							nw.sendPuchuIndex(meIndex);
 						}
 						if(isUpdate) {
-							temp = rival.update();
+							if(!isFinish) temp = rival.update();
 							if(temp != -1) rivalIndex = temp;
 						} else {
 							isUpdate = true;
@@ -199,6 +203,7 @@ public class GameMain extends Thread {
 	
 	// リザルト
 	public void resultDisp(int score) {
+		isFinish = true;
 		isOverlay = true;
 		overlay.Result(score);
 	}

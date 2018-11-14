@@ -53,7 +53,7 @@ public class Field {
 		} else {
 			draw = new Draw();
 		}
-		gm.fadeOut();
+		//gm.fadeOut();
 	}
 
 	
