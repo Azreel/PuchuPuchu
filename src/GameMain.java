@@ -106,8 +106,12 @@ public class GameMain extends Thread {
 					rival = new Field(this, null);
 					rival.draw.setBounds(ScreenW/2, 0, ScreenW/2, ScreenH);
 					// フレームに追加
+					me.draw.setVisible(false);
+					rival.draw.setVisible(false);
 					frame.add(me.draw);
 					frame.add(rival.draw);
+					me.draw.setVisible(true);
+					rival.draw.setVisible(true);
 					frame.revalidate();
 					me.draw.requestFocus();
 					//BGM
