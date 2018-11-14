@@ -1,3 +1,4 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -6,6 +7,8 @@ import java.awt.event.ActionListener;
 public class Title extends JPanel{
 	final Toolkit tk = Toolkit.getDefaultToolkit();
 	final int fadeSpeed = 60;
+	final Font btnFont = new Font(Font.DIALOG, Font.PLAIN, 24);
+	final Font labelFont = new Font(Font.DIALOG, Font.PLAIN, 20);
 	
 	GameMain gm;
 	Network nw;
@@ -13,20 +16,20 @@ public class Title extends JPanel{
 	JButton soloBtn, duoBtn;
 	JTextField rivalIP;
 	JLabel rival, myIP;
-	Sound bgm;
-	Font btnFont = new Font("MS ゴシック", Font.PLAIN, 24);
-	Font labelFont = new Font("MS ゴシック", Font.PLAIN, 20);
 	GameMain.Status next = null;
 	boolean isFade = false;
 	float fadeAlpha = 0.0f;
 	
+	// コンストラクタ
 	Title(GameMain parent, Network client) {
 		gm = parent;
 		nw = client;
 		this.setLayout(null);
 		
 		//背景画像
-		bg = tk.getImage(getClass().getResource("title.png"));
+		try {
+			bg = ImageIO.read(getClass().getResource("title.png"));
+		} catch (Exception e) {}
 		//自分のIPアドレス
         myIP = new JLabel(nw.getIPaddr());
         myIP.setBounds(225, 470, 400, 30);
@@ -48,23 +51,22 @@ public class Title extends JPanel{
 		duoBtn.setBounds(570, 530, 160, 60);
 		duoBtn.setFont(btnFont);
 		duoBtn.addActionListener(new DuoPlayBtn());
-		//BGM
-		bgm = new Sound(getClass().getResource("Title.wav"));
         
         this.add(soloBtn);
         this.add(duoBtn);
         this.add(rival);
         this.add(rivalIP);
         this.add(myIP);
-        bgm.Play();
     }
 	
+	// 1Pプレイボタン用イベントリスナー
 	private class SoloPlayBtn implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
 			setFade(GameMain.Status.GAME_SOLO);
 		}
 	}
 	
+	// 2Pプレイボタン用イベントリスナー
 	private class DuoPlayBtn implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
 			if(nw.Connect(rivalIP.getText())) {
@@ -76,36 +78,23 @@ public class Title extends JPanel{
 		}
 	}
 	
+	// クライアントの接続確認
 	public void rivalApply() {
-		JLabel label = new JLabel("相手の接続を受けました");
-	    JOptionPane.showMessageDialog(gm.frame, label);
+	    JOptionPane.showMessageDialog(gm.frame, new JLabel("相手の接続を受けました"));
 	    setFade(GameMain.Status.GAME_DUO);
 	}
 	
+	// フェード開始用
 	private void setFade(GameMain.Status status) {
-		next = status;
-		isFade = true;
 		this.removeAll();
+		gm.fadeIn(status);
 	}
 	
+	// 描画
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2D = (Graphics2D) g;
         g2D.drawImage(bg, null, this);
-        if(isFade) {
-        	int xx = this.getWidth();
-            int yy = this.getHeight();
-            g2D.setColor(new Color(0,0,0,(int)((fadeAlpha <= 1.0f ? fadeAlpha : 1.0f)*255)));
-            g2D.fillRect(0, 0, xx, yy);
-            fadeAlpha += 1.0f / fadeSpeed;
-            if(fadeAlpha >= 1.0f){
-            	bgm.Stop();
-            	bgm.Close();
-            	gm.setStatus(next);
-            	return;
-            }
-            //bgm.setVolume(1.0f - fadeAlpha);
-        }
     }
 }

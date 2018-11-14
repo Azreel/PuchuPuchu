@@ -8,62 +8,85 @@ public class Key extends KeyAdapter {
 	public boolean Down;
 	public boolean TurnRight;
 	public boolean TurnLeft;
-	public String KeyData;
+	public boolean Enter;
+	
+	private int KeyData = 0; //送信用
+	private int oldKey = 0;
+	private Network nw;
 
-	public void keyTyped(KeyEvent e) {// キーボードが押された時の処理(文字)
+	Key(Network parent){
+		nw = parent;
+	}
+	
+	// キーボードが押された時の処理(文字)
+	public void keyTyped(KeyEvent e) {
 	}
 
-	public void keyPressed(KeyEvent e) {// キーボードが押された時の処理
+	// キーボードが押された時の処理
+	public void keyPressed(KeyEvent e) {
 		switch (e.getKeyCode()) {
-		case KeyEvent.VK_LEFT:// ←キーが押されている間
+		case KeyEvent.VK_LEFT:// ←キー
 			Left = true;
-			KeyData = "LEFTPRESS";
+			sendKeyData(1);
 			break;
-		case KeyEvent.VK_RIGHT:// →キーが押されている間
+		case KeyEvent.VK_RIGHT:// →キー
 			Right = true;
-			KeyData = "RIGHTPRESS";
+			sendKeyData(2);
 			break;
-		case KeyEvent.VK_DOWN:// ↓キーが押されている間
+		case KeyEvent.VK_DOWN:// ↓キー
 			Down = true;
-			KeyData = "DOWNPRESS";
+			sendKeyData(3);
 			break;
-		case KeyEvent.VK_Z:// Zキーが押されている間
+		case KeyEvent.VK_Z:// Zキー
 			TurnLeft = true;
-			KeyData = "ZPRESS";
+			sendKeyData(4);
 			break;
-		case KeyEvent.VK_X:// Xキーが押されている間
+		case KeyEvent.VK_X:// Xキー
 			TurnRight = true;
-			KeyData = "XPRESS";
+			sendKeyData(5);
 			break;
-		case KeyEvent.VK_Q:// Qキーが押されている間
+		case KeyEvent.VK_Q:// Qキー
 			System.exit(0);
 			break;
+		case KeyEvent.VK_ENTER:// Enterキー
+			Enter = true;
+			break;
 		}
-
 	}
 
-	public void keyReleased(KeyEvent e) {// キーボードから離された時の処理
+	// キーボードから離された時の処理
+	public void keyReleased(KeyEvent e) {
 		switch (e.getKeyCode()) {
-		case KeyEvent.VK_LEFT:// ←キーが押されている間
+		case KeyEvent.VK_LEFT:// ←キー
 			Left = false;
-			KeyData = "LEFTRELEASE";
+			sendKeyData(-1);
 			break;
-		case KeyEvent.VK_RIGHT:// →キーが押されている間
+		case KeyEvent.VK_RIGHT:// →キー
 			Right = false;
-			KeyData = "RIGHTRELEASE";
+			sendKeyData(-2);
 			break;
-		case KeyEvent.VK_DOWN:// ↓キーが押されている間
+		case KeyEvent.VK_DOWN:// ↓キー
 			Down = false;
-			KeyData = "DOWNRELEASE";
+			sendKeyData(-3);
 			break;
-		case KeyEvent.VK_Z:// Zキーが押されている間
-			TurnLeft = true;
-			KeyData = "ZRELEASE";
+		case KeyEvent.VK_Z:// Zキー
+			TurnLeft = false;
+			sendKeyData(-4);
 			break;
-		case KeyEvent.VK_X:// Xキーが押されている間
-			TurnRight = true;
-			KeyData = "XRELEASE";
+		case KeyEvent.VK_X:// Xキー
+			TurnRight = false;
+			sendKeyData(-5);
 			break;
+		case KeyEvent.VK_ENTER:// Enterキー
+			Enter = false;
+			break;
+		}
+	}
+	
+	private void sendKeyData(int key) {
+		nw.sendStatus(Integer.toString(key));
+		if(key != oldKey) {
+			oldKey = key;
 		}
 	}
 }
