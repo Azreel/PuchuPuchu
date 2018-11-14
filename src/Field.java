@@ -28,6 +28,9 @@ public class Field {
 	
 	private int now_x = 0;
 	private int now_y = 0;
+	private int time = 0;
+	private int landing_time = 0;
+	private static final int max_land_time = 0;
 	private int k = 0;
 	private int comb_figure1 = 0;
 	private int comb_figure2 = 0;
@@ -326,8 +329,8 @@ public class Field {
 		
 		if ( van_puchu == false ) {
 			chain_count = 0;
-			if ( cell[2][2].type == Puchu.Emp ) {
-				gm.finishGame(score);
+			if ( cell[2][2].type != Puchu.Emp ) {
+				gm.finishGame();
 				draw.startEndAnim(Draw.GameInfo.GAME_LOSE);
 			}
 			switch_start();
@@ -396,7 +399,7 @@ public class Field {
 	
 	private void drop_puchu() {
 		
-		for ( int j = 12; j >= 2; j-- ) {
+		for ( int j = 12; j >= 0; j-- ) {
 			for ( int i = 5; i >= 0; i-- ) {
 				if ( cell[i][j].type != Puchu.Emp && cell[i][j+1].type == Puchu.Emp ) {
 					k = 1;
@@ -415,7 +418,7 @@ public class Field {
 	}
 	
 	public void game_end() {
-		gm.finishGame(score);
+		gm.resultDisp(score);
 	}
 	
 	public void p1_defeat() {
