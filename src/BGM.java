@@ -4,7 +4,9 @@ import javax.sound.sampled.*;
 public class BGM extends Thread{
 	private AudioInputStream ais;
 	private Clip clip;
+	private FloatControl control;
 	private boolean isActive;
+	private float volume = 0.8f;
 	
 	// コンストラクタ
 	BGM(URL url) {
@@ -13,7 +15,9 @@ public class BGM extends Thread{
 			AudioFormat af = ais.getFormat();
 			DataLine.Info dataLine = new DataLine.Info(Clip.class,af);
 			clip = (Clip)AudioSystem.getLine(dataLine);
-			clip.loop(clip.LOOP_CONTINUOUSLY);
+			clip.open(ais);
+			control = (FloatControl)clip.getControl(FloatControl.Type.MASTER_GAIN);
+			control.setValue((float)Math.log10(volume) * 20);
 			isActive = true;
 		} catch (Exception e) {
 			System.out.println("BGM生成失敗");
@@ -22,16 +26,11 @@ public class BGM extends Thread{
 	
 	// 再生(スレッドのメイン)
 	public void run() {
-		try {
-			clip.open(ais);
-		} catch (Exception e) {
-			System.out.println("BGM再生失敗");
-			return;
-		}
-		clip.start();
+		clip.loop(Clip.LOOP_CONTINUOUSLY);
 		while(this.isActive) {
 			try {
-				Thread.sleep(100);
+				Thread.sleep(1);
+				control.setValue((float)Math.log10(volume) * 20);
 			} catch(InterruptedException e) { }
 		}
 		clip.close();
@@ -40,5 +39,11 @@ public class BGM extends Thread{
 	// 停止
 	public void Stop() {
 		this.isActive = false;
+	}
+	
+	// 音量調整
+	public void setVol(float vol) {
+		if(vol <= 0.1f) vol = 0.0f;
+		volume = vol;
 	}
 }

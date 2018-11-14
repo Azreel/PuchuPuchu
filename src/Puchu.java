@@ -20,13 +20,11 @@ public class Puchu {
 	private int drop_bound_time = 0;
 	private int van_time = 0;
 	private int bound_anim_count = 1; // バウンドアニメーションの回数
-	private boolean is_drop_se = false;
 	private static final int drop_anim_speed = 20;	// 落下アニメーションの落下速度
 	private static final int bound_anim_speed = 6; // バウンドアニメーションの速度(小さいほど早い)
 	private static final int max_van_time = 50; // 死に際ぷちゅの顔が表示される時間
 	private static final int max_van_time_after = 40; // 消滅アニメーション再生から終了判定をとるまでの時間
 	private static final int max_end_flame = 200;
-	private AudioClip se_drop = Applet.newAudioClip(getClass().getResource("rakka.wav"));
 	
 	
 	Puchu(int set_type, int set_x, int set_y) {
@@ -49,14 +47,12 @@ public class Puchu {
 		is_match_position_drop = false;
 		drop_bound_time = 0;
 		bound_anim_count = 1;
-		is_drop_se = false;
 	}
 	
 	//-- ぷちゅの落下アニメーション
 	public void drawingDropDown() {
 		draw_y += drop_anim_speed;
 		if ( draw_y >= y ) {
-//			if ( !is_drop_se ) { is_drop_se = true; se_drop.play();}
 			draw_y = y;
 			drawingDropBound();
 		}
@@ -77,7 +73,6 @@ public class Puchu {
 		is_match_position_drop = false;
 		drop_bound_time = 0;
 		bound_anim_count = 3;
-		is_drop_se = false;
 	}
 	
 	//-- 消滅開始
