@@ -15,6 +15,7 @@ public class GameMain extends Thread {
 	public final JFrame frame = new JFrame();
 	public boolean canStart = false;
 	public int rivalIndex = 1;
+	public long frameCount;
 	
 	private Status gameStatus = Status.GAME_TITLE;
 	private Status nextStatus;
@@ -26,11 +27,11 @@ public class GameMain extends Thread {
 	private Field me = null;
 	private Field rival = null;
 	private int meIndex = 0;
-	private boolean isFinish = false;
+	private boolean isMeFinish = false;
+	private boolean isRivalFinish = false;
 	private int nowKey = -1;
 	private long nowKeyTime = -1;
-	private boolean isFirst = true;
-	//private boolean isUpdate = true;
+	private boolean isUpdate = true;
 	
 	// コンストラクタ
 	GameMain(){
@@ -74,10 +75,10 @@ public class GameMain extends Thread {
 						me = null;
 						rival = null;
 						canStart = false;
-						isFirst = true;
+						isMeFinish = false;
+						isRivalFinish = false;
 						nw.Close();
 					}
-					isFinish = false;
 					// ネットワーク開始
 					nw = new Network(this);
 					nw.start();
@@ -107,11 +108,12 @@ public class GameMain extends Thread {
 					// ぷちゅ生成
 					makePuchu();
 					// プレイヤーフィールド
-					me = new Field(this, ppInit);
+					me = new Field(this, ppInit, true);
 					me.draw.setBounds(0, 0, ScreenW/2, ScreenH);
 					// nullプレイヤーフィールド
-					rival = new Field(this, null);
+					rival = new Field(this, ppInit, false); //debug
 					rival.draw.setBounds(ScreenW/2, 0, ScreenW/2, ScreenH);
+					rival.key = me.key; //debug
 					// フレームに追加
 					frame.add(me.draw);
 					frame.add(rival.draw);
@@ -121,15 +123,11 @@ public class GameMain extends Thread {
 					overlay.setBGM(getClass().getResource("gamemusic.wav"));
 					// スタートアニメーション
 					me.draw.startReadyAnim();
+					rival.draw.startReadyAnim();//debug
 				} else {
 					// 状態更新
-					//if(!isFinish) me.update();
-					int temp = -1;
-					if(!isFinish) temp = me.update();
-					if(temp != meIndex) {
-						meIndex = temp;
-						if(meIndex != -1) System.out.println(meIndex);
-					}
+					if(!isMeFinish) me.update();
+					rival.update();//debug
 					// 画面描画
 					if(isPaint) {
 						me.draw.repaint();
@@ -147,12 +145,12 @@ public class GameMain extends Thread {
 					title = null;
 					// ぷちゅ生成
 					if(nw.programMode == Network.Mode.SERVER) nw.sendPuchu(makePuchu());
-					else while(!canStart) { nw.getRivalStatus(); }
+					else while(!canStart) { nw.getRivalStatus(false); }
 					// プレイヤーフィールド
-					me = new Field(this, ppInit);
+					me = new Field(this, ppInit, true);
 					me.draw.setBounds(0, 0, ScreenW/2, ScreenH);
 					// ライバルプレイヤーフィールド
-					rival = new Field(this, ppInit);
+					rival = new Field(this, ppInit, false);
 					rival.draw.setBounds(ScreenW/2, 0, ScreenW/2, ScreenH);
 					// フレームに追加
 					frame.add(me.draw);
@@ -161,14 +159,16 @@ public class GameMain extends Thread {
 					me.draw.requestFocus();
 					// 準備完了
 					nw.sendStatus("START");
-					while(!canStart) { nw.getRivalStatus(); }
+					while(!canStart) { nw.getRivalStatus(false); }
 					// BGM
 					overlay.setBGM(getClass().getResource("gamemusic.wav"));
 					// スタートアニメーション
 					me.draw.startReadyAnim();
 					rival.draw.startReadyAnim();
+					frameCount = 0;
 				} else {
-					if(nowKey != -1 || nw.index <= rivalIndex) {
+					if(nowKey != -1 || nw.index == rivalIndex) {
+						isUpdate = true;
 						if(nowKeyTime > MSPF) {
 							if(loopDelay > 0) nowKeyTime -= loopDelay;
 							setRivalInput(nowKey, true);
@@ -177,22 +177,33 @@ public class GameMain extends Thread {
 							if(nowKey != -1) setRivalInput(nowKey, false);
 							nowKey = -1;
 							nowKeyTime = -1;
-							if(nw.isConnect) nw.getRivalStatus();
+							if(nw.isConnect) nw.getRivalStatus(true);
 						}
+					}else if(nw.index < rivalIndex) {
+						// なぜか自分のほうが早くなった場合
+						System.out.println("ずれ");
+						isUpdate = false;
+						if(nw.isConnect) nw.getRivalStatus(false); // キー情報を捨ててしまう
 					}
 					if(canStart) {
 						// 状態更新
 						int temp;
-						if(!isFinish) {
+						if(!isMeFinish) {
 							// 自分
 							temp = me.update();
 							if(temp != meIndex) {
+								if(meIndex == -1 && temp != -1) nw.sendField(me.cell); //次のぷちゅが降り始めたらフィールド全体を送信
 								meIndex = temp;
 								if(meIndex != -1) nw.sendPuchuIndex(meIndex);
 							}
+						}
+						if(!isRivalFinish && isUpdate) {
 							// ライバル
 							temp = rival.update();
-							if(temp != -1) rivalIndex = temp;
+							if(temp != -1 && temp != rivalIndex) {
+								rivalIndex = temp;
+								if(nw.isConnect) nw.getRivalStatus(false); // 着地したときに次のデータを取り出してしまう
+							}
 						}
 						// 画面描画
 						if(isPaint) {
@@ -236,10 +247,16 @@ public class GameMain extends Thread {
 	}
 	
 	// ゲーム終了の検知
-	public void finishGame() {
-		isFinish = true;
+	public void finishGame(boolean isMe) {
+		if(isMe) {
+			isMeFinish = true;
+			// rival.Win()
+		} else {
+			isRivalFinish = true;
+			// me.Win()
+		}
 		if(gameStatus == Status.GAME_DUO) {
-			nw.sendStatus("END");
+			if(isMe) nw.sendStatus("END");
 			nw.Close();
 		}
 	}
@@ -317,19 +334,20 @@ public class GameMain extends Thread {
 		rival.key.Down = false;
 		rival.key.TurnLeft = false;
 		rival.key.TurnRight = false;
-		nowKey = -1;
-		nowKeyTime = -1;
+		me.update();
+	}
+	
+	// ライバルのフィールドを同期
+	public void setRivalField(int[][] type) {
+		for(int i = 0; i < 6; i++) {
+			for(int j = 0; j < 14; j++) {
+				rival.cell[i][j].type = type[i][j];
+			}
+		}
 	}
 	
 	// ライバルの負けを検知
 	public void finishRival() {
-//		while(!rival.lose_flag) {
-//			// 相手に高速で合わせる
-//			nw.getRivalStatus();
-//			rival.update();
-//			rival.draw.repaint();
-//		}
-		isFinish = true;
 		nw.Close();
 	}
 	

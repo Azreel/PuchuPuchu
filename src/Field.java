@@ -19,7 +19,6 @@ public class Field {
 	
 	public boolean bottom_flag = false; 	//当たり判定
 	public boolean moving_flag = false;		//移動できるかどうか
-	public boolean lose_flag = false;
 	private boolean bottom_p1_flag = false;	//どのぷちゅが底にあるか
 	private boolean bottom_p2_flag = false;	
 	private boolean turn_left_flag = true;	//左回転できるか
@@ -29,6 +28,7 @@ public class Field {
 	private boolean game_end_flag = false;
 	private boolean van_puchu = false;
 	private boolean is_drop = false;
+	private boolean is_me = true;
 	
 	private int now_x = 0;
 	private int now_y = 0;
@@ -45,13 +45,14 @@ public class Field {
 	private GameMain gm;
 	private int puchu_count = 0;
 	
-	public Field(GameMain game, int[][] player) {			//nullプレイヤー用
+	public Field(GameMain game, int[][] player, boolean me) {			//nullプレイヤー用
 		
 		gm = game;
+		is_me = me;
 		init_cell();
 		if ( player != null ) {
 			draw = new Draw(this);
-			key = new Key(gm.nw);
+			key = new Key(gm);
 			init_player(player);
 			create_puchu(player);
 			turn_sound = Applet.newAudioClip(getClass().getResource("ojama.wav"));
@@ -221,6 +222,7 @@ public class Field {
 			}
 		}
 	}
+	
 	private void init_cell() {
 		
 		for ( int i = 0; i < 6; i++ ) {
@@ -333,8 +335,7 @@ public class Field {
 		if ( van_puchu == false ) {		//ぷちゅが消えないとき
 			chain_count = 0;
 			if ( cell[2][2].type != Puchu.Emp ) {
-				lose_flag = true;
-				gm.finishGame();
+				gm.finishGame(is_me);
 				draw.startEndAnim(Draw.GameInfo.GAME_LOSE);
 			}
 			switch_start();

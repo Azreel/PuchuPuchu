@@ -10,15 +10,15 @@ public class Key extends KeyAdapter {
 	public boolean TurnRight;
 	public boolean Enter;
 	
-	private Network nw;
+	private GameMain gm;
 	private long leftTime;
 	private long rightTime;
 	private long downTime;
 	private long turnLeftTime;
 	private long turnRightTime;
 
-	Key(Network _nw){
-		nw = _nw;
+	Key(GameMain _gm){
+		gm = _gm;
 	}
 	
 	// キーボードが押された時の処理(文字)
@@ -111,7 +111,7 @@ public class Key extends KeyAdapter {
 		}
 	}
 	
-	private void sendKeyData(int key, long time) {
-		nw.sendStatus(key + ":" + time);
+	private void sendKeyData(int key, long frame) {
+		gm.nw.sendStatus(key + ":" + frame);
 	}
 }
