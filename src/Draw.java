@@ -46,7 +46,7 @@ public class Draw extends JPanel{
 	private boolean is_vanish_delay = false, is_vanish_delay_all = false;
 	private boolean is_vanish_anim = false, is_vanish_all = false;
 	
-	private static enum AnimState {state1, state2, state3, state4, state5, end };
+	private static enum AnimState {state1, state2, state3, state4, state5, state6, end };
 	
 	private Image img_ready, img_start;
 	private AnimState ready_state = AnimState.end;
@@ -77,6 +77,9 @@ public class Draw extends JPanel{
 	private double send_image_angle = 0.0f;
 	
 	private int obs_num = 0;
+	private int obs_width = 0;
+	
+	private AudioClip se_drop, se_delete;
 	
 	//テスト
 	int score = 9999;
@@ -110,6 +113,8 @@ public class Draw extends JPanel{
 		is_alive = true;
 		fd = _fd;
 		initImages();
+		initSound();
+		obs_width = Draw.Squares*fd.cell.length/img_obs_notice.getWidth(this);
 		
 //		for ( int i = 0; i < fd.cell.length; i++ ) {
 //			for ( int j = 5; j < fd.cell[i].length; j++ ) {
@@ -123,8 +128,8 @@ public class Draw extends JPanel{
 		for ( int i = 1; i <= 8; i++ ) {
 			img_puchu[i] = tk.getImage(getClass().getResource("puchu"+i+".png"));			
 		}
-		img_obs_notice = tk.getImage(getClass().getResource("puchu8_notice.png"));
 		try {
+			img_obs_notice = ImageIO.read(getClass().getResource("puchu8_notice.png"));
 			img_van_anim = ImageIO.read(getClass().getResource("vanishingAnime.png"));
 			for ( int i = 0; i < 10; i++ ) {
 				imgs_van[i] = img_van_anim.getSubimage(i*Draw.Squares*2, 0, Draw.Squares*2, Draw.Squares*2);
@@ -132,6 +137,12 @@ public class Draw extends JPanel{
 		} catch(Exception e) {
 			System.out.println(e);
 		}
+	}
+	
+	//-- よく発火するSEの初期化
+	private void initSound() {
+		se_delete = Applet.newAudioClip(getClass().getResource("delpuchu.wav"));
+		se_drop = Applet.newAudioClip(getClass().getResource("rakka.wav"));
 	}
 	
 	//-- SE発火
@@ -146,19 +157,24 @@ public class Draw extends JPanel{
 		ready_state = AnimState.state1;
 		img_ready = tk.getImage(getClass().getResource("ready.png"));
 		img_start = tk.getImage(getClass().getResource("start.png"));
-		soundIgnition("youi.wav");
+	}
+	
+	//-- 開幕ボイス発火
+	private void nextReadyVoice() {
+		ready_state = AnimState.state2;
+		soundIgnition("youi.wav");		
 	}
 	
 	//-- 開幕アニメーションスタート落下開始
 	private void nextReadyAnim() {
-		ready_state = AnimState.state4;
+		ready_state = AnimState.state5;
 		soundIgnition("Start.wav");
 	}
 	
 	//-- 開幕アニメーション終了
 	private void finishReadyAnim() {
 		game = GameInfo.GAME_PLAYNOW;
-		ready_state = AnimState.state5;
+		ready_state = AnimState.state6;
 		System.out.println("ゲーム開始");
 		soundIgnition("pahu.wav");
 		fd.game_start();
@@ -167,7 +183,7 @@ public class Draw extends JPanel{
 	//-- 落下アニメーション開始
 	public void startDropAnim() {
 		is_drop_anim = true;
-		soundIgnition("rakka.wav");
+		se_drop.play();
 	}
 	
 	//-- 落下アニメーション終了
@@ -200,7 +216,7 @@ public class Draw extends JPanel{
 	
 	//-- ぷちゅの消滅準備完了
 	private void nextVanishAnim() {
-		soundIgnition("delpuchu.wav");
+		se_delete.play();
 		is_vanish_delay = false;
 		is_vanish_all = false;
 		is_vanish_anim = true;
@@ -276,26 +292,31 @@ public class Draw extends JPanel{
 		case state1:
 			ready_anim_time++;
 			ready_image_height = -(int)(Math.pow((ready_anim_timing - ready_anim_time),2)/10);
-			if ( ready_anim_time > ready_anim_timing ) { ready_state = AnimState.state2; }
+			if ( ready_image_height > -margin_h ) { nextReadyVoice(); }
 			break;
 		case state2:
 			ready_anim_time++;
-			if ( ready_anim_time > start_anim_timing ) { ready_state = AnimState.state3; }
+			ready_image_height = -(int)(Math.pow((ready_anim_timing - ready_anim_time),2)/10);
+			if ( ready_anim_time > ready_anim_timing ) { ready_state = AnimState.state3; }
 			break;
 		case state3:
+			ready_anim_time++;
+			if ( ready_anim_time > start_anim_timing ) { ready_state = AnimState.state4; }
+			break;
+		case state4:
 			ready_anim_time++;
 			start_image_speed += start_image_accel;
 			start_image_height += start_image_speed/5;
 			if ( start_image_height > -80 && start_image_speed >0 ) { start_image_speed = (int)(start_image_speed * -0.7); nextReadyAnim(); }
 			break;
-		case state4:
+		case state5:
 			ready_anim_time++;
 			start_image_speed += start_image_accel;
 			start_image_height += start_image_speed/10;
 			ready_image_height += ready_image_speed;
 			if ( ready_anim_time > start_delay ) { finishReadyAnim(); }
 			break;
-		case state5:
+		case state6:
 			ready_anim_time++;
 			start_image_speed += start_image_accel;
 			start_image_height += start_image_speed/10;
@@ -460,10 +481,10 @@ public class Draw extends JPanel{
 			// 予告おじゃまぷちゅ描写
 			if ( obs_num != 0 ) {
 				for ( int i = obs_num-1; i >= 0; i-- ) {
-					if ( obs_num <= fd.cell.length ) {
+					if ( obs_num <= obs_width ) {
 						img_2d.drawImage(img_obs_notice, margin_w + img_obs_notice.getWidth(this)*i, margin_h - Draw.Squares - 5, this);									
 					} else {
-						img_2d.drawImage(img_obs_notice, margin_w + (int)(img_obs_notice.getWidth(this) * ((fd.cell.length - 1.0) / (obs_num-1)))*i, margin_h - Draw.Squares - 5, this);									
+						img_2d.drawImage(img_obs_notice, margin_w + (int)(img_obs_notice.getWidth(this) * i * ((obs_width - 1.0) / (obs_num-1))), margin_h - Draw.Squares - 5, this);									
 					}
 				}
 			}

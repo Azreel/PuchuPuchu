@@ -6,44 +6,57 @@ public class Key extends KeyAdapter {
 	public boolean Left;
 	public boolean Right;
 	public boolean Down;
-	public boolean TurnRight;
 	public boolean TurnLeft;
+	public boolean TurnRight;
 	public boolean Enter;
 	
-	private int KeyData = 0; //送信用
-	private int oldKey = 0;
 	private Network nw;
+	private long leftTime;
+	private long rightTime;
+	private long downTime;
+	private long turnLeftTime;
+	private long turnRightTime;
 
-	Key(Network parent){
-		nw = parent;
+	Key(Network _nw){
+		nw = _nw;
 	}
 	
 	// キーボードが押された時の処理(文字)
 	public void keyTyped(KeyEvent e) {
 	}
 
-	// キーボードが押された時の処理
+	// キーボードが押された時の処理(連続で入力あり)
 	public void keyPressed(KeyEvent e) {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:// ←キー
-			Left = true;
-			sendKeyData(1);
+			if(!Left) {
+				Left = true;
+				leftTime = System.currentTimeMillis();
+			}
 			break;
 		case KeyEvent.VK_RIGHT:// →キー
-			Right = true;
-			sendKeyData(2);
+			if(!Right) {
+				Right = true;
+				rightTime = System.currentTimeMillis();
+			}
 			break;
 		case KeyEvent.VK_DOWN:// ↓キー
-			Down = true;
-			sendKeyData(3);
+			if(!Down) {
+				Down = true;
+				downTime = System.currentTimeMillis();
+			}
 			break;
 		case KeyEvent.VK_Z:// Zキー
-			TurnLeft = true;
-			sendKeyData(4);
+			if(!TurnLeft) {
+				TurnLeft = true;
+				turnLeftTime = System.currentTimeMillis();
+			}
 			break;
 		case KeyEvent.VK_X:// Xキー
-			TurnRight = true;
-			sendKeyData(5);
+			if(!TurnRight) {
+				TurnRight = true;
+				turnRightTime = System.currentTimeMillis();
+			}
 			break;
 		case KeyEvent.VK_Q:// Qキー
 			System.exit(0);
@@ -58,24 +71,39 @@ public class Key extends KeyAdapter {
 	public void keyReleased(KeyEvent e) {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:// ←キー
-			Left = false;
-			sendKeyData(-1);
+			if(Left) {
+				Left = false;
+				leftTime = System.currentTimeMillis() - leftTime;
+				sendKeyData(1, leftTime);
+			}
 			break;
 		case KeyEvent.VK_RIGHT:// →キー
-			Right = false;
-			sendKeyData(-2);
+			if(Right) {
+				Right = false;
+				rightTime = System.currentTimeMillis() - rightTime;
+				sendKeyData(2, rightTime);
+			}
 			break;
 		case KeyEvent.VK_DOWN:// ↓キー
-			Down = false;
-			sendKeyData(-3);
+			if(Down) {
+				Down = false;
+				downTime = System.currentTimeMillis() - downTime;
+				sendKeyData(3, downTime);
+			}
 			break;
 		case KeyEvent.VK_Z:// Zキー
-			TurnLeft = false;
-			sendKeyData(-4);
+			if(TurnLeft) {
+				TurnLeft = false;
+				turnLeftTime = System.currentTimeMillis() - turnLeftTime;
+				sendKeyData(4, turnLeftTime);
+			}
 			break;
 		case KeyEvent.VK_X:// Xキー
-			TurnRight = false;
-			sendKeyData(-5);
+			if(TurnRight) {
+				TurnRight = false;
+				turnRightTime = System.currentTimeMillis() - turnRightTime;
+				sendKeyData(5, turnRightTime);
+			}
 			break;
 		case KeyEvent.VK_ENTER:// Enterキー
 			Enter = false;
@@ -83,10 +111,7 @@ public class Key extends KeyAdapter {
 		}
 	}
 	
-	private void sendKeyData(int key) {
-		nw.sendStatus(Integer.toString(key));
-		if(key != oldKey) {
-			oldKey = key;
-		}
+	private void sendKeyData(int key, long time) {
+		nw.sendStatus(key + ":" + time);
 	}
 }
