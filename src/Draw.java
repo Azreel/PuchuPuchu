@@ -38,7 +38,10 @@ public class Draw extends JPanel{
 	private boolean is_chain_display = false;
 	
 	private Font score_font = new Font("Dialog", Font.BOLD, 40);
-	private Color score_color = Color.white;
+	private Color score_color = Color.black;
+	private int score_draw = 0, score_now = 0, score_update_value = 0;
+	private static final int score_update_span = 10;
+	private AnimState score_state = AnimState.end;
 	
 	private boolean is_alive = true;
 	private boolean is_drop_anim = false, is_drop_all = false;
@@ -79,10 +82,8 @@ public class Draw extends JPanel{
 	private int obs_num = 0;
 	private int obs_width = 0;
 	
-	private AudioClip se_drop, se_delete;
 	
-	//テスト
-	int score = 9999;
+	private AudioClip se_drop, se_delete;
 	
 	Draw() {	//nullプレイヤー用
 		this.setPreferredSize(new Dimension(PanelW, PanelH));
@@ -116,9 +117,11 @@ public class Draw extends JPanel{
 		initSound();
 		obs_width = Draw.Squares*fd.cell.length/img_obs_notice.getWidth(this);
 		
+		// 最大連鎖セット(下のfinishMoveAnimのところも有効化)
+//		int[][] _set= {{0,3,2,3,1,1,2,1,2,2,1,1,2,1},{0,6,3,5,3,2,3,2,4,3,3,2,3,2},{0,0,0,5,6,3,4,3,5,4,4,3,4,3},{0,1,6,1,6,4,5,4,6,5,5,4,5,4},{0,3,6,3,1,5,1,5,2,6,6,5,6,5},{0,1,2,2,3,2,1,6,1,2,2,1,1,6}};
 //		for ( int i = 0; i < fd.cell.length; i++ ) {
-//			for ( int j = 5; j < fd.cell[i].length; j++ ) {
-//				fd.cell[i][j].type = Puchu.Obs;
+//			for ( int j = 0; j < fd.cell[i].length; j++ ) {
+//				fd.cell[i][j].type = _set[i][j];
 //			}
 //		}
 	}
@@ -203,16 +206,34 @@ public class Draw extends JPanel{
 		is_move_anim = false;
 		is_move_all = false;
 		fd.switch_next();
+		
+		//最大連鎖セット
+//		fd.next[0].puchu1.type = 6;
+//		fd.next[0].puchu2.type = 5;
+//		fd.switch_next();
 	}
 	
 	//-- ぷちゅの消滅アニメーション開始
+	public void startVanishAnim(int _chain, int _generate_obs_num, int _score) {
+		is_vanish_delay = true;
+		is_vanish_delay_all = false;
+		is_chain_display = false;
+		chain_display_time = 0;
+		chain_text = _chain + "れんさ";
+		is_chain_get = true;
+		send_obs_num = _generate_obs_num;
+		score_now = _score;
+	}
 	public void startVanishAnim(int _chain, int _generate_obs_num) {
 		is_vanish_delay = true;
 		is_vanish_delay_all = false;
+		is_chain_display = false;
+		chain_display_time = 0;
 		chain_text = _chain + "れんさ";
 		is_chain_get = true;
 		send_obs_num = _generate_obs_num;
 	}
+	
 	
 	//-- ぷちゅの消滅準備完了
 	private void nextVanishAnim() {
@@ -223,6 +244,7 @@ public class Draw extends JPanel{
 		is_chain_display = true;
 		chain_display_time = 0;
 //		startAttackAnim();
+		setScore(score_now);
 	}
 	
 	//-- ぷちゅの消滅アニメーション終了
@@ -250,6 +272,14 @@ public class Draw extends JPanel{
 	
 	private void setObsNum() {
 //		obs_num = fd.obs_num;
+	}
+	
+	//-- スコアの更新
+	public void setScore(int _score) {
+		score_now = _score;
+		score_update_value = (score_now - score_draw)/score_update_span;
+		if ( score_update_value == 0 ) { score_update_value = 1; }
+		score_state = AnimState.state1;
 	}
 	
 	//-- 決着時のアニメーション開始
@@ -418,6 +448,16 @@ public class Draw extends JPanel{
 		
 	}
 	
+	//-- スコアのフレーム毎更新
+	private void updateScoreValue() {
+		if ( score_draw + score_update_value < score_now ) {
+			score_draw += score_update_value;
+		} else {
+			score_draw = score_now;
+			score_state = AnimState.end;
+		}
+	}
+	
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -494,9 +534,10 @@ public class Draw extends JPanel{
 			}
 			
 			// スコア表示
+			if ( score_state != AnimState.end ) { updateScoreValue(); }
 			img_2d.setColor(score_color);
 			img_2d.setFont(score_font);
-			img_2d.drawString(String.format("%07d", score ), margin_w+Draw.Squares*6+5, 500);
+			img_2d.drawString(String.format("%07d", score_draw ), margin_w+Draw.Squares*6+5, 500);
 			
 			// れんさテキスト描写
 			if ( is_chain_display ) {
