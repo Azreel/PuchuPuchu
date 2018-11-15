@@ -130,7 +130,7 @@ public class Network extends Thread {
 	}
 	
 	// 相手のステータス取得
-	public void getRivalStatus() {
+	public void getRivalStatus(boolean key) {
 		String input;
 		try {
 			if(br.ready()) input = br.readLine();
@@ -165,9 +165,13 @@ public class Network extends Thread {
 			getPuchuIndex();
 			//gm.resetRivalInput();
 			break;
+		// フィールド全体の同期
+		case "FIELDSTART":
+			getRivalField();
+			break;
 		// キー入力
 		default:
-			gm.getRivalInput(input);
+			if(key) gm.getRivalInput(input);
 			break;
 		}
 	}
@@ -210,6 +214,37 @@ public class Network extends Thread {
 		}
 	}
 	
+	// ライバルのフィールドを取得
+	private void getRivalField() {
+		int[][] cell = new int[6][14];
+		String temp;
+		String[] splited;
+		int column = 0;
+		while(true) {
+			try {
+				temp = br.readLine();
+			}catch (Exception e) {
+				System.out.println("nw get: " + e);
+				return;
+			}
+			if(temp.equals("FIELDEND")) break;
+			if(column > 5) {
+				System.out.println("不正なデータ");
+				return;
+			}
+			splited = temp.split(",");
+			if(splited.length != 14) {
+				System.out.println("不正なデータ");
+				return;
+			}
+			for(int i = 0; i < 14; i++) {
+				cell[column][i] = Integer.parseInt(splited[i]);
+			}
+			column++;
+		}
+		gm.setRivalField(cell);
+	}
+	
 	// 初期ぷちゅペアリスト送信
 	public void sendPuchu(String[] list) {
 		pw.println("MAKESTART");
@@ -231,6 +266,21 @@ public class Network extends Thread {
 	public void sendPuchuIndex(int index) {
 		pw.println("NEXT");
 		pw.println(Integer.toString(index));
+		pw.flush();
+	}
+	
+	// フィールド情報送信
+	public void sendField(Puchu[][] cell) {
+		String column = "";
+		pw.println("FIELDSTART");
+		for(int i = 0; i < 6; i++) {
+			for(int j = 0; j < 14; j++) {
+				column += cell[i][j].type + ",";
+			}
+			pw.println(column);
+			column = "";
+		}
+		pw.println("FIELDEND");
 		pw.flush();
 	}
 }
