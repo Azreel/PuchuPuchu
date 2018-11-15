@@ -39,8 +39,6 @@ public class Field {
 	private int comb_figure1 = 0;
 	private int comb_figure2 = 0;
 	private int chain_count = 0;	//連鎖数
-	private int all_comb = 0;
-	private int comb_puyo = 0;
 	private int switch_figure;
 	private int speed = 1;
 	private int[][] cp_player = new int[GameMain.PPSIZE][2];
@@ -325,8 +323,6 @@ public class Field {
 			for ( int j = 13; j >= 2; j-- ) {
 				if ( cell[i][j].type != Puchu.Emp && cell[i][j].combine_count >= 3 ) {
 					van_puchu = true;
-					all_comb += cell[i][j].combine_count;
-					comb_puyo++;
 					cell[i][j].vanishOut();
 				}
 			}
@@ -340,9 +336,9 @@ public class Field {
 				draw.startEndAnim(Draw.GameInfo.GAME_LOSE);
 			}
 			switch_start();
-		} else {
-			chain_count++;
+		} else{
 			draw.startVanishAnim(chain_count, 0);
+			chain_count++;
 		}
 	}
 	
@@ -407,6 +403,7 @@ public class Field {
 	
 	private void drop_puchu() {
 		
+		is_drop = false;
 		for ( int j = 12; j >= 0; j-- ) {
 			for ( int i = 5; i >= 0; i-- ) {
 				if ( cell[i][j].type != Puchu.Emp && cell[i][j+1].type == Puchu.Emp ) {
@@ -416,12 +413,17 @@ public class Field {
 					}
 					cell[i][j+k].copyPuchu(cell[i][j]);
 					cell[i][j+k].dropDown(j+k);
+					is_drop = true;
 //					cell[i][j].type = Puchu.Emp;
 					cell[i][j] = new Puchu(Puchu.Emp, i*Draw.Squares, j*Draw.Squares);
 				}
 			}
 		}
-		draw.startDropAnim();
+		if ( is_drop ) {
+			draw.startDropAnim();
+		} else {
+			switch_start();
+		}
 	}
 	
 	public void game_end() {
