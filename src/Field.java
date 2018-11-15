@@ -52,7 +52,7 @@ public class Field {
 		init_cell();
 		if ( player != null ) {
 			draw = new Draw(this);
-			key = new Key(gm.nw);
+			key = new Key(gm);
 			init_player(player);
 			create_puchu(player);
 			turn_sound = Applet.newAudioClip(getClass().getResource("ojama.wav"));
@@ -221,6 +221,7 @@ public class Field {
 			}
 		}
 	}
+	
 	private void init_cell() {
 		
 		for ( int i = 0; i < 6; i++ ) {

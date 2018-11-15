@@ -15,6 +15,7 @@ public class GameMain extends Thread {
 	public final JFrame frame = new JFrame();
 	public boolean canStart = false;
 	public int rivalIndex = 1;
+	public long frameCount;
 	
 	private Status gameStatus = Status.GAME_TITLE;
 	private Status nextStatus;
@@ -110,8 +111,9 @@ public class GameMain extends Thread {
 					me = new Field(this, ppInit, true);
 					me.draw.setBounds(0, 0, ScreenW/2, ScreenH);
 					// nullプレイヤーフィールド
-					rival = new Field(this, null, false);
+					rival = new Field(this, ppInit, false); //debug
 					rival.draw.setBounds(ScreenW/2, 0, ScreenW/2, ScreenH);
+					rival.key = me.key; //debug
 					// フレームに追加
 					frame.add(me.draw);
 					frame.add(rival.draw);
@@ -121,9 +123,11 @@ public class GameMain extends Thread {
 					overlay.setBGM(getClass().getResource("gamemusic.wav"));
 					// スタートアニメーション
 					me.draw.startReadyAnim();
+					rival.draw.startReadyAnim();//debug
 				} else {
 					// 状態更新
 					if(!isMeFinish) me.update();
+					rival.update();//debug
 					// 画面描画
 					if(isPaint) {
 						me.draw.repaint();
@@ -161,6 +165,7 @@ public class GameMain extends Thread {
 					// スタートアニメーション
 					me.draw.startReadyAnim();
 					rival.draw.startReadyAnim();
+					frameCount = 0;
 				} else {
 					if(nowKey != -1 || nw.index == rivalIndex) {
 						isUpdate = true;
@@ -195,7 +200,10 @@ public class GameMain extends Thread {
 						if(!isRivalFinish && isUpdate) {
 							// ライバル
 							temp = rival.update();
-							if(temp != -1) rivalIndex = temp;
+							if(temp != -1 && temp != rivalIndex) {
+								rivalIndex = temp;
+								if(nw.isConnect) nw.getRivalStatus(false); // 着地したときに次のデータを取り出してしまう
+							}
 						}
 						// 画面描画
 						if(isPaint) {
@@ -326,8 +334,7 @@ public class GameMain extends Thread {
 		rival.key.Down = false;
 		rival.key.TurnLeft = false;
 		rival.key.TurnRight = false;
-		nowKey = -1;
-		nowKeyTime = -1;
+		me.update();
 	}
 	
 	// ライバルのフィールドを同期
