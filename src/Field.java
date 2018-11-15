@@ -91,6 +91,7 @@ public class Field {
 		moving_flag = true;
 	}
 	
+	//ぷちゅの当たり判定
 	public void hit_puchu() {
 		if ( now.form == 0 ) {
 			now_x = ( now.puchu1.x ) / 40;
@@ -292,6 +293,7 @@ public class Field {
 		return puchu_index;
 	}
 	
+	//ぷちゅの種類のコピー
 	private void init_player(int[][] player) {
 		for ( int i = 0; i < GameMain.PPSIZE; i++ ) {
 			for ( int j = 0; j < 2; j++ ) {
@@ -309,8 +311,8 @@ public class Field {
 	}
 	
 	public void drop_finish() {
-		van_puchu = false;
 		
+		van_puchu = false;
 		for ( int i = 5; i >= 0; i-- ) {
 			for ( int j = 13; j >= 2; j-- ) {
 				if ( cell[i][j].type != Puchu.Emp ) {
@@ -328,7 +330,7 @@ public class Field {
 			}
 		}
 		
-		if ( van_puchu == false ) {
+		if ( van_puchu == false ) {		//ぷちゅが消えないとき
 			chain_count = 0;
 			if ( cell[2][2].type != Puchu.Emp ) {
 				lose_flag = true;
@@ -336,9 +338,11 @@ public class Field {
 				draw.startEndAnim(Draw.GameInfo.GAME_LOSE);
 			}
 			switch_start();
-		} else{
+		} else{							//ぷちゅが消えるとき
+			if ( moving_flag == false ) {
+				chain_count++;
+			}
 			draw.startVanishAnim(chain_count, 0);
-			chain_count++;
 		}
 	}
 	
@@ -346,6 +350,7 @@ public class Field {
 		drop_puchu();
 	}
 	
+	//key操作関係
 	public void judge_key() {
 		if ( key.Left == true && slide_left_flag ) {
 			now.slideLeft();
