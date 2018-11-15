@@ -7,7 +7,7 @@ public class Network extends Thread {
 	
 	public Mode programMode = Mode.SERVER;
 	public boolean isConnect = false;
-	public int index = 0; //操作中のぷちゅ
+	public int index = 1; //操作中のぷちゅ
 	
 	GameMain gm;
 	boolean isAlive = true;

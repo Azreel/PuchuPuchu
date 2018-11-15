@@ -14,7 +14,7 @@ public class GameMain extends Thread {
 	public static final int PPSIZE = 200;
 	public final JFrame frame = new JFrame();
 	public boolean canStart = false;
-	public int rivalIndex = 0;
+	public int rivalIndex = 1;
 	
 	private Status gameStatus = Status.GAME_TITLE;
 	private Status nextStatus;
@@ -168,18 +168,17 @@ public class GameMain extends Thread {
 					me.draw.startReadyAnim();
 					rival.draw.startReadyAnim();
 				} else {
-					if(nowKey != -1 && nw.index == rivalIndex) {
+					if(nowKey != -1 || nw.index <= rivalIndex) {
 						if(nowKeyTime > MSPF) {
 							if(loopDelay > 0) nowKeyTime -= loopDelay;
 							setRivalInput(nowKey, true);
 						} else {
 							if(nowKeyTime > 0) try { sleep(nowKeyTime); } catch(Exception e) {}
-							setRivalInput(nowKey, false);
+							if(nowKey != -1) setRivalInput(nowKey, false);
 							nowKey = -1;
 							nowKeyTime = -1;
+							if(nw.isConnect) nw.getRivalStatus();
 						}
-					} else if(nw.isConnect) {
-						nw.getRivalStatus();
 					}
 					if(canStart) {
 						// 状態更新
