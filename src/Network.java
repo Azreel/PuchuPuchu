@@ -220,6 +220,7 @@ public class Network extends Thread {
 		String temp;
 		String[] splited;
 		int column = 0;
+		
 		while(true) {
 			try {
 				temp = br.readLine();
