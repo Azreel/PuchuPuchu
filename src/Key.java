@@ -31,31 +31,31 @@ public class Key extends KeyAdapter {
 		case KeyEvent.VK_LEFT:// ←キー
 			if(!Left) {
 				Left = true;
-				leftTime = System.currentTimeMillis();
+				gm.nw.sendStatus(1 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_RIGHT:// →キー
 			if(!Right) {
 				Right = true;
-				rightTime = System.currentTimeMillis();
+				gm.nw.sendStatus(2 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_DOWN:// ↓キー
 			if(!Down) {
 				Down = true;
-				downTime = System.currentTimeMillis();
+				gm.nw.sendStatus(3 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_Z:// Zキー
 			if(!TurnLeft) {
 				TurnLeft = true;
-				turnLeftTime = System.currentTimeMillis();
+				gm.nw.sendStatus(4 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_X:// Xキー
 			if(!TurnRight) {
 				TurnRight = true;
-				turnRightTime = System.currentTimeMillis();
+				gm.nw.sendStatus(5 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_Q:// Qキー
@@ -73,36 +73,31 @@ public class Key extends KeyAdapter {
 		case KeyEvent.VK_LEFT:// ←キー
 			if(Left) {
 				Left = false;
-				leftTime = System.currentTimeMillis() - leftTime;
-				sendKeyData(1, leftTime);
+				gm.nw.sendStatus(-1 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_RIGHT:// →キー
 			if(Right) {
 				Right = false;
-				rightTime = System.currentTimeMillis() - rightTime;
-				sendKeyData(2, rightTime);
+				gm.nw.sendStatus(-2 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_DOWN:// ↓キー
 			if(Down) {
 				Down = false;
-				downTime = System.currentTimeMillis() - downTime;
-				sendKeyData(3, downTime);
+				gm.nw.sendStatus(-3 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_Z:// Zキー
 			if(TurnLeft) {
 				TurnLeft = false;
-				turnLeftTime = System.currentTimeMillis() - turnLeftTime;
-				sendKeyData(4, turnLeftTime);
+				gm.nw.sendStatus(-4 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_X:// Xキー
 			if(TurnRight) {
 				TurnRight = false;
-				turnRightTime = System.currentTimeMillis() - turnRightTime;
-				sendKeyData(5, turnRightTime);
+				gm.nw.sendStatus(-5 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_ENTER:// Enterキー
@@ -111,7 +106,4 @@ public class Key extends KeyAdapter {
 		}
 	}
 	
-	private void sendKeyData(int key, long frame) {
-		gm.nw.sendStatus(key + ":" + frame);
-	}
 }

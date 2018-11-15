@@ -163,7 +163,6 @@ public class Network extends Thread {
 		// 操作対象が変わると送られてくる
 		case "NEXT":
 			getPuchuIndex();
-			gm.resetRivalInput();
 			break;
 		// フィールド全体の同期
 		case "FIELDSTART":

@@ -1,5 +1,4 @@
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Random;
 
 import javax.swing.*;
@@ -29,8 +28,8 @@ public class GameMain extends Thread {
 	private int meIndex = 0;
 	private boolean isMeFinish = false;
 	private boolean isRivalFinish = false;
-	private int nowKey = -1;
-	private long nowKeyTime = -1;
+	private int nowKey = 0;
+	private long nowKeyTime = 0;
 	private boolean isUpdate = true;
 	
 	// コンストラクタ
@@ -167,24 +166,23 @@ public class GameMain extends Thread {
 					rival.draw.startReadyAnim();
 					frameCount = 0;
 				} else {
-					if(nowKey != -1 || nw.index == rivalIndex) {
-						isUpdate = true;
-						if(nowKeyTime > MSPF) {
-							if(loopDelay > 0) nowKeyTime -= loopDelay;
-							setRivalInput(nowKey, true);
-						} else {
-							if(nowKeyTime > 0) try { sleep(nowKeyTime); } catch(Exception e) {}
-							if(nowKey != -1) setRivalInput(nowKey, false);
-							nowKey = -1;
-							nowKeyTime = -1;
-							if(nw.isConnect) nw.getRivalStatus(true);
-						}
-					}else if(nw.index < rivalIndex) {
-						// なぜか自分のほうが早くなった場合
-						System.out.println("ずれ");
-						isUpdate = false;
-						if(nw.isConnect) nw.getRivalStatus(false); // キー情報を捨ててしまう
+					if(nowKeyTime >= frameCount && nw.index == rivalIndex) { // キーのフレームと自分のフレームが一致したとき
+						if(nowKey != 0) setRivalInput(nowKey);
+//						nowKey = 0;
+//						nowKeyTime = 0;
+//						if(nw.isConnect) nw.getRivalStatus(true); // 次のキーに行く
+//						isUpdate = true;
+					} else if(nowKeyTime < frameCount || nw.index < rivalIndex) { // 自分のフレームのほうが早いときorインデックスが完全にずれたとき
+						if(nw.isConnect) nw.getRivalStatus(true);
+//						if(nowKey < 0) setRivalInput(nowKey); // 離したキー情報のみ無理やり反映
+//						nowKey = 0;
+//						nowKeyTime = 0;
+//						isUpdate = false;
+					} else { // 何も無いとき
+						if(nw.isConnect) nw.getRivalStatus(true); // 次のデータ取り出し
+						//isUpdate = true;
 					}
+					// スタート同期済み
 					if(canStart) {
 						// 状態更新
 						int temp;
@@ -192,7 +190,10 @@ public class GameMain extends Thread {
 							// 自分
 							temp = me.update();
 							if(temp != meIndex) {
-								if(meIndex == -1 && temp != -1) nw.sendField(me.cell); //次のぷちゅが降り始めたらフィールド全体を送信
+								if(meIndex == -1 && temp != -1) {
+									nw.sendField(me.cell); //次のぷちゅが降り始めたらフィールド全体を送信
+									resetInput(me.key); //長押しを一旦解除
+								}
 								meIndex = temp;
 								if(meIndex != -1) nw.sendPuchuIndex(meIndex);
 							}
@@ -200,15 +201,13 @@ public class GameMain extends Thread {
 						if(!isRivalFinish && isUpdate) {
 							// ライバル
 							temp = rival.update();
-							if(temp != -1 && temp != rivalIndex) {
-								rivalIndex = temp;
-								if(nw.isConnect) nw.getRivalStatus(false); // 着地したときに次のデータを取り出してしまう
-							}
+							if(temp != -1) rivalIndex = temp;
 						}
 						// 画面描画
 						if(isPaint) {
 							me.draw.repaint();
 							rival.draw.repaint();
+							frameCount++;
 						} else {
 							overlay.repaint();
 						}
@@ -304,7 +303,13 @@ public class GameMain extends Thread {
 	}
 	
 	// ライバルのキーをセット
-	private void setRivalInput(int key, boolean isPress) {
+	private void setRivalInput(int key) {
+		boolean isPress = true;
+		
+		if(key < 0) {
+			isPress = false;
+			key *= -1;
+		}
 		switch(key) {
 		case 1: // ←キー
 			rival.key.Left = isPress;
@@ -327,14 +332,13 @@ public class GameMain extends Thread {
 		}
 	}
 	
-	// ライバルのキーを一旦リセット
-	public void resetRivalInput() {
-		rival.key.Left = false;
-		rival.key.Right = false;
-		rival.key.Down = false;
-		rival.key.TurnLeft = false;
-		rival.key.TurnRight = false;
-		me.update();
+	// キーを一旦リセット
+	public void resetInput(Key key) {
+		key.Left = false;
+		key.Right = false;
+		key.Down = false;
+		key.TurnLeft = false;
+		key.TurnRight = false;
 	}
 	
 	// ライバルのフィールドを同期
