@@ -7,7 +7,9 @@ import java.applet.AudioClip;
 
 public class Field {
 	
-	public int score = 0;
+	private int score = 0;
+	private int sub_score = 0;
+	private int rn_score = 0;
 	public Puchu[][] cell = new Puchu[6][14];
 	public Puchu first_puchu;
 	public PuchuPair now;
@@ -15,7 +17,8 @@ public class Field {
 	public Draw draw;
 	public Key key;
 	public AudioClip turn_sound;
-	public int[] obs_puyo = new int[6];
+	public AudioClip slide_sound;
+	public int[] obs_puchu = new int[6];
 	
 	public boolean bottom_flag = false; 	//当たり判定
 	public boolean moving_flag = false;		//移動できるかどうか
@@ -32,6 +35,7 @@ public class Field {
 	
 	private int now_x = 0;
 	private int now_y = 0;
+	private int obs_count = 0;
 	private int time = 0;
 	private int landing_time = 0;
 	private static final int max_land_time = 0;
@@ -41,9 +45,17 @@ public class Field {
 	private int chain_count = 0;	//連鎖数
 	private int switch_figure;
 	private int speed = 1;
+	private int[] comb_point = {0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512};
+	private int[] link_point = {0, 2, 3, 4, 5, 6, 7, 10};
+	private int[] color_point = {0, 3, 6, 12, 24, 48};
+	private int[] link_all = {9, 16, 18, 34, 36, 45, 50, 52};
+	private int[][] real_link = {{3, 3}, {4, 3}, {3, 3}, {3, 5}, {3, 6}, {3, 6}, {5, 5}, {6, 4}};
 	private int[][] cp_player = new int[GameMain.PPSIZE][2];
+	private int[] color_check = {0, 0, 0, 0, 0, 0};
 	private GameMain gm;
-	private int puchu_count = 0;
+	private int puchu_count = 0;	//消えるぷちゅの個数
+	private int link_count = 0;		//消えるぷちゅの連結数
+	private int color_count = 0;	//消えるぷちゅの種類
 	
 	public Field(GameMain game, int[][] player, boolean me) {			//nullプレイヤー用
 		
@@ -56,6 +68,7 @@ public class Field {
 			init_player(player);
 			create_puchu(player);
 			turn_sound = Applet.newAudioClip(getClass().getResource("ojama.wav"));
+			slide_sound = Applet.newAudioClip(getClass().getResource("slide.wav"));
 			draw.addKeyListener(key);
 		} else {
 			draw = new Draw();
@@ -94,11 +107,11 @@ public class Field {
 	
 	//ぷちゅの当たり判定
 	public void hit_puchu() {
-		if ( now.form == 0 ) {
+		if ( now.form == PuchuPair.Up ) {
 			now_x = ( now.puchu1.x ) / 40;
 			now_y = ( now.puchu1.y ) / 40 + 2;
 			
-			if ( now_y == 13 || cell[now_x][now_y+1].type != 0 ) {
+			if ( now_y == 13 || cell[now_x][now_y+1].type != Puchu.Emp ) {
 				bottom_flag = true;
 				bottom_p1_flag = true;
 				bottom_p2_flag = true;
@@ -107,11 +120,11 @@ public class Field {
 				slide_right_flag = false;
 				turn_right_flag = false;
 				
-				if ( cell[now_x-1][now_y].type != 0 ) {
+				if ( cell[now_x-1][now_y].type != Puchu.Emp ) {
 					slide_left_flag = false;
 					turn_left_flag = false;
 				}
-			} else if ( cell[now_x+1][now_y].type != 0 ) {
+			} else if ( cell[now_x+1][now_y].type != Puchu.Emp ) {
 				slide_right_flag = false;
 				turn_right_flag = false;
 			}
@@ -119,15 +132,15 @@ public class Field {
 				slide_left_flag = false;
 				turn_left_flag = false;
 				
-				if ( cell[now_x+1][now_y].type != 0 ) {
+				if ( cell[now_x+1][now_y].type != Puchu.Emp ) {
 					slide_right_flag = false;
 					turn_right_flag = false;
 				}
-			} else if ( cell[now_x-1][now_y].type != 0 ) {
+			} else if ( cell[now_x-1][now_y].type != Puchu.Emp ) {
 				slide_left_flag = false;
 				turn_left_flag = false;
 			}
-		} else if ( now.form == 1 ) {
+		} else if ( now.form == PuchuPair.Right ) {
 			now_x = ( now.puchu1.x ) / 40;
 			now_y = ( now.puchu1.y ) / 40 + 2;
 			
@@ -135,33 +148,33 @@ public class Field {
 				bottom_flag = true;
 				bottom_p1_flag = true;
 				bottom_p2_flag = true;
-			} else if ( cell[now_x][now_y+1].type != 0 ) {
+			} else if ( cell[now_x][now_y+1].type != Puchu.Emp ) {
 				bottom_p1_flag = true;
 				bottom_flag = true;
-			} else if ( cell[now_x+1][now_y+1].type != 0 ) {
+			} else if ( cell[now_x+1][now_y+1].type != Puchu.Emp ) {
 				bottom_p2_flag = true;
 				bottom_flag = true;
 			}
-			if ( now_x >= 4 && cell[now_x-1][now_y].type != 0 ) {
+			if ( now_x >= 4 && cell[now_x-1][now_y].type != Puchu.Emp ) {
 				slide_right_flag = false;
 				slide_left_flag = false;
-			} else if ( now_x <= 0 && cell[now_x+2][now_y].type != 0 ) {
+			} else if ( now_x <= 0 && cell[now_x+2][now_y].type != Puchu.Emp ) {
 				slide_left_flag = false;
 				slide_right_flag = false;
 			} else if ( now_x >= 4 ) {
 				slide_right_flag = false;
 			} else if ( now_x <= 0 ) {
 				slide_left_flag = false;
-			} else if ( cell[now_x-1][now_y].type != 0 ) {
+			} else if ( cell[now_x-1][now_y].type != Puchu.Emp ) {
 				slide_left_flag = false;
-			} else if ( cell[now_x+2][now_y].type != 0 ) {
+			} else if ( cell[now_x+2][now_y].type != Puchu.Emp ) {
 				slide_right_flag = false;
 			}
-		} else if ( now.form == 2 ) {
+		} else if ( now.form == PuchuPair.Bottom ) {
 			now_x = ( now.puchu2.x ) / 40;
 			now_y = ( now.puchu2.y ) / 40 + 2;
 			
-			if ( now_y == 13 || cell[now_x][now_y+1].type != 0 ) {
+			if ( now_y == 13 || cell[now_x][now_y+1].type != Puchu.Emp ) {
 				bottom_flag = true;
 				bottom_p1_flag = true;
 				bottom_p2_flag = true;
@@ -170,11 +183,11 @@ public class Field {
 				slide_right_flag = false;
 				turn_left_flag = false;
 				
-				if ( cell[now_x-1][now_y].type != 0 ) {
+				if ( cell[now_x-1][now_y].type != Puchu.Emp ) {
 					slide_left_flag = false;
 					turn_right_flag = false;
 				}
-			} else if ( cell[now_x+1][now_y].type != 0 ) {
+			} else if ( cell[now_x+1][now_y].type != Puchu.Emp ) {
 				slide_right_flag = false;
 				turn_left_flag = false;
 			}
@@ -182,11 +195,11 @@ public class Field {
 				slide_left_flag = false;
 				turn_right_flag = false;
 				
-				if ( cell[now_x+1][now_y].type != 0 ) {
+				if ( cell[now_x+1][now_y].type != Puchu.Emp ) {
 					slide_right_flag = false;
 					turn_left_flag = false;
 				}
-			} else if ( cell[now_x-1][now_y].type != 0 ) {
+			} else if ( cell[now_x-1][now_y].type != Puchu.Emp ) {
 				slide_left_flag = false;
 				turn_right_flag = false;
 			}
@@ -198,26 +211,26 @@ public class Field {
 				bottom_flag = true;
 				bottom_p1_flag = true;
 				bottom_p2_flag = true;
-			} else if ( cell[now_x][now_y+1].type != 0 ) {
+			} else if ( cell[now_x][now_y+1].type != Puchu.Emp ) {
 				bottom_p1_flag = true;
 				bottom_flag = true;
-			} else if ( cell[now_x-1][now_y+1].type != 0 ) {
+			} else if ( cell[now_x-1][now_y+1].type != Puchu.Emp ) {
 				bottom_p2_flag = true;
 				bottom_flag = true;
 			}
-			if ( now_x >= 5 && cell[now_x-2][now_y].type != 0 ) {
+			if ( now_x >= 5 && cell[now_x-2][now_y].type != Puchu.Emp ) {
 				slide_right_flag = false;
 				slide_left_flag = false;
-			} else if ( now_x <= 1 && cell[now_x+1][now_y].type != 0 ) {
+			} else if ( now_x <= 1 && cell[now_x+1][now_y].type != Puchu.Emp ) {
 				slide_right_flag = false;
 				slide_left_flag = false;
 			} else if ( now_x >= 5 ) {
 				slide_right_flag = false;
 			} else if ( now_x <= 1 ) {
 				slide_left_flag = false;
-			} else if ( cell[now_x-2][now_y].type != 0 ) {
+			} else if ( cell[now_x-2][now_y].type != Puchu.Emp ) {
 				slide_left_flag = false;
-			} else if ( cell[now_x+1][now_y].type != 0 ) {
+			} else if ( cell[now_x+1][now_y].type != Puchu.Emp ) {
 				slide_right_flag = false;
 			}
 		}
@@ -234,7 +247,6 @@ public class Field {
 	
 	private int puchu_comb(int coord_x, int coord_y) {
 		int figure = 1;
-		
 		cell[coord_x][coord_y].is_check = true;
 		
 		if ( coord_y > 2 && cell[coord_x][coord_y-1].is_check == false && cell[coord_x][coord_y].type == cell[coord_x][coord_y-1].type ) {		//フレーム内かつ上が同じpuchu
@@ -250,7 +262,6 @@ public class Field {
 			figure += puchu_comb(coord_x+1, coord_y);
 		}
 		cell[coord_x][coord_y].is_check = false;
-		
 		return figure;
 	}
 	
@@ -315,6 +326,9 @@ public class Field {
 	public void drop_finish() {
 		
 		van_puchu = false;
+		puchu_count = 0;
+		link_count = 0;
+		color_count = 0;
 		for ( int i = 5; i >= 0; i-- ) {
 			for ( int j = 13; j >= 2; j-- ) {
 				if ( cell[i][j].type != Puchu.Emp ) {
@@ -326,24 +340,38 @@ public class Field {
 		for ( int i = 5; i >= 0; i-- ) {
 			for ( int j = 13; j >= 2; j-- ) {
 				if ( cell[i][j].type != Puchu.Emp && cell[i][j].combine_count >= 3 ) {
+					link_count += cell[i][j].combine_count;
 					van_puchu = true;
+					color_check[cell[i][j].type-1] = 1;
+					puchu_count++;
 					cell[i][j].vanishOut();
 				}
 			}
 		}
-		
+
 		if ( van_puchu == false ) {		//ぷちゅが消えないとき
 			chain_count = 0;
+			obs_count = 0;
 			if ( cell[2][2].type != Puchu.Emp ) {
 				gm.finishGame(is_me);
 				draw.startEndAnim(Draw.GameInfo.GAME_LOSE);
 			}
 			switch_start();
 		} else{							//ぷちゅが消えるとき
+			cal_color();
+			cal_link();
+			//System.out.println("link:" + link_count);
+			//System.out.println("color:" + color_count);
+			//System.out.println("puchu" + puchu_count);
 			if ( moving_flag == false ) {
 				chain_count++;
 			}
-			draw.startVanishAnim(chain_count, 0);
+			sub_score = cal_score(puchu_count, chain_count, link_count, color_count);
+			score += sub_score;
+			//System.out.println("score:" + score);
+			cal_obs();
+			//System.out.println("obs:" + obs_count);
+			draw.startVanishAnim(chain_count, obs_count, score);
 		}
 	}
 	
@@ -354,12 +382,14 @@ public class Field {
 	//key操作関係
 	public void judge_key() {
 		if ( key.Left == true && slide_left_flag ) {
+			slide_sound.play();
 			now.slideLeft();
 			slide_left_flag = false;
 		} else if ( key.Left == false ) {
 			slide_left_flag = true;
 		}
 		if ( key.Right == true && slide_right_flag ) {
+			slide_sound.play();
 			now.slideRight();
 			slide_right_flag = false;
 		} else if ( key.Right == false ) {
@@ -445,7 +475,57 @@ public class Field {
 	}
 	
 	public void game_start() {
+		key.canInput();
 		switch_start();
+	}
+	
+	private int cal_score(int puchu_count, int comb, int link, int color) {
+		int score = 0;
+		
+		if ( comb_point[comb-1] + link + color_point[color-1] == 0 ) {
+			score = 40;
+		} else {
+			score = puchu_count*10*(comb_point[comb-1] + link + color_point[color-1]);
+		}
+		return score;
+	}
+	
+	//ぷちゅの種類の計算
+	private void cal_color() {
+		
+		for ( int i = 0; i < color_check.length; i++ ) {
+			if ( color_check[i] != 0 ) {
+				color_count++;
+			}
+			color_check[i] = 0;
+		}
+	}
+	
+	//連結数の計算
+	private void cal_link() {
+		
+		if ( link_count > 50 ) {
+			link_count = 10;
+		} else {
+			for ( int i = 0; i < link_all.length; i++ ) {
+				if ( link_all[i] == link_count ) {
+					link_count = link_point[real_link[i][0]-3] + link_point[real_link[i][1]-3];
+				}
+			}
+			if ( puchu_count == 5 ) {
+					link_count = link_point[2];
+			} else if ( link_count == 25 ) {
+					link_count = link_point[0]+link_point[1];
+			}
+		}
+		
+	}
+	
+	private void cal_obs() {
+		
+		obs_count = (sub_score + rn_score) / 70;
+		rn_score = (sub_score + rn_score) % 70;
+	
 	}
 	
 }

@@ -16,6 +16,7 @@ public class Key extends KeyAdapter {
 	private long downTime;
 	private long turnLeftTime;
 	private long turnRightTime;
+	private boolean canKeyInput = false;
 
 	Key(GameMain _gm){
 		gm = _gm;
@@ -29,33 +30,33 @@ public class Key extends KeyAdapter {
 	public void keyPressed(KeyEvent e) {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:// ←キー
-			if(!Left) {
+			if(!Left && canKeyInput) {
 				Left = true;
-				leftTime = System.currentTimeMillis();
+				gm.nw.sendStatus(1 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_RIGHT:// →キー
-			if(!Right) {
+			if(!Right && canKeyInput) {
 				Right = true;
-				rightTime = System.currentTimeMillis();
+				gm.nw.sendStatus(2 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_DOWN:// ↓キー
-			if(!Down) {
+			if(!Down && canKeyInput) {
 				Down = true;
-				downTime = System.currentTimeMillis();
+				gm.nw.sendStatus(3 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_Z:// Zキー
-			if(!TurnLeft) {
+			if(!TurnLeft && canKeyInput) {
 				TurnLeft = true;
-				turnLeftTime = System.currentTimeMillis();
+				gm.nw.sendStatus(4 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_X:// Xキー
-			if(!TurnRight) {
+			if(!TurnRight && canKeyInput) {
 				TurnRight = true;
-				turnRightTime = System.currentTimeMillis();
+				gm.nw.sendStatus(5 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_Q:// Qキー
@@ -71,38 +72,33 @@ public class Key extends KeyAdapter {
 	public void keyReleased(KeyEvent e) {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:// ←キー
-			if(Left) {
+			if(Left && canKeyInput) {
 				Left = false;
-				leftTime = System.currentTimeMillis() - leftTime;
-				sendKeyData(1, leftTime);
+				gm.nw.sendStatus(-1 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_RIGHT:// →キー
-			if(Right) {
+			if(Right && canKeyInput) {
 				Right = false;
-				rightTime = System.currentTimeMillis() - rightTime;
-				sendKeyData(2, rightTime);
+				gm.nw.sendStatus(-2 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_DOWN:// ↓キー
-			if(Down) {
+			if(Down && canKeyInput) {
 				Down = false;
-				downTime = System.currentTimeMillis() - downTime;
-				sendKeyData(3, downTime);
+				gm.nw.sendStatus(-3 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_Z:// Zキー
-			if(TurnLeft) {
+			if(TurnLeft && canKeyInput) {
 				TurnLeft = false;
-				turnLeftTime = System.currentTimeMillis() - turnLeftTime;
-				sendKeyData(4, turnLeftTime);
+				gm.nw.sendStatus(-4 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_X:// Xキー
-			if(TurnRight) {
+			if(TurnRight && canKeyInput) {
 				TurnRight = false;
-				turnRightTime = System.currentTimeMillis() - turnRightTime;
-				sendKeyData(5, turnRightTime);
+				gm.nw.sendStatus(-5 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_ENTER:// Enterキー
@@ -111,7 +107,8 @@ public class Key extends KeyAdapter {
 		}
 	}
 	
-	private void sendKeyData(int key, long frame) {
-		gm.nw.sendStatus(key + ":" + frame);
+	// 入力の可否
+	public void canInput() {
+		canKeyInput = true;
 	}
 }

@@ -1,7 +1,5 @@
 import java.awt.*;
 import javax.swing.*;
-import java.applet.Applet;
-import java.applet.AudioClip;
 
 public class Puchu {
 	

@@ -30,7 +30,6 @@ public class Draw extends JPanel{
 	private BufferedImage[] imgs_van = new BufferedImage[10];
 	private JLabel lb;	//ラベル
 	private Field fd;
-	private Image buffer;
 	
 	private String chain_text;
 	private Font chain_font = new Font("Dialog",Font.BOLD,30);
@@ -76,7 +75,6 @@ public class Draw extends JPanel{
 	private Image img_meteor;
 	private AnimState send_state = AnimState.end;
 	private Meteor send_mode = Meteor.attack;
-	private int send_anim_time = 0;
 	private int send_anim_speed = 1;
 	private int send_anim_accel = 2;
 	private int send_obs_num = 0;
@@ -252,16 +250,6 @@ public class Draw extends JPanel{
 		send_obs_num = _generate_obs_num;
 		score_now = _score;
 	}
-	public void startVanishAnim(int _chain, int _generate_obs_num) {
-		is_vanish_delay = true;
-		is_vanish_delay_all = false;
-		is_chain_display = false;
-		chain_display_time = 0;
-		chain_text = _chain + "れんさ";
-		is_chain_get = true;
-		send_obs_num = _generate_obs_num;
-	}
-	
 	
 	//-- ぷちゅの消滅準備完了
 	private void nextVanishAnim() {
@@ -303,6 +291,7 @@ public class Draw extends JPanel{
 		damage_obs_num = _obs_num;
 	}
 	
+	//-- 予告おじゃま数の更新
 	private void setObsNum(int _update_obs_num) {
 		if ( obs_num + _update_obs_num < 0 ) { obs_change = 0; }
 		else { obs_change = obs_num + _update_obs_num; }
@@ -460,8 +449,8 @@ public class Draw extends JPanel{
 		}
 	}
 	
+	//-- おじゃま送信アニメーション状況更新
 	private void updateAttackAnim() {
-		send_anim_time++;
 		switch(send_mode) {
 		case attack:
 			updateSendAnim();
@@ -475,6 +464,7 @@ public class Draw extends JPanel{
 		}
 	}
 	
+	//-- おじゃま送り付け
 	private void updateSendAnim() {
 		switch(send_state) {
 		case state1:
@@ -484,6 +474,8 @@ public class Draw extends JPanel{
 			break;
 		}
 	}
+	
+	//-- おじゃま相殺
 	private void updateOffsetAnim() {
 		switch(send_state) {
 			case state1:
@@ -494,6 +486,8 @@ public class Draw extends JPanel{
 				break;
 		}
 	}
+	
+	//-- おじゃまカウンター
 	private void updateCounterAnim() {
 		switch(send_state) {
 		case state1:
@@ -510,6 +504,7 @@ public class Draw extends JPanel{
 		}	
 	}
 	
+	//-- おじゃま受信アニメーション状況更新
 	private void updateDamageAnim() {
 		switch(damage_state) {
 		case state1:
@@ -525,11 +520,11 @@ public class Draw extends JPanel{
 		}
 	}
 	
+	//-- ぴかっ更新アニメーション状況更新
 	private void updateObsUpdateAnim() {
 		obs_update_time++;
 		if ( obs_update_time > 12 ) { obs_update_time = 0; obs_update_state = AnimState.end; }
 	}
-	
 	
 	//-- スコアのフレーム毎更新
 	private void updateScoreValue() {
@@ -565,8 +560,6 @@ public class Draw extends JPanel{
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D img_2d = (Graphics2D) g;
-//		buffer = createImage(PanelW, PanelH);
-//		Graphics img_2d = buffer.getGraphics();
 		img_2d.drawImage(img_background, 0, 0, this);
 
 		if ( is_alive ) {
@@ -628,7 +621,6 @@ public class Draw extends JPanel{
 					if ( obs_num <= obs_width ) {
 						img_2d.drawImage(img_obs_notice, margin_w + AreaCenter+ img_obs_notice.getWidth(this)*(i-4), margin_h - Draw.Squares - 5, this);									
 					} else {
-//						img_2d.drawImage(img_obs_notice, margin_w + AreaCenter -img_obs_notice.getWidth(this)+ (int)(img_obs_notice.getWidth(this) * (i-(obs_num-1)/2.0) * ((obs_width*1.0) / (obs_num - 1))), margin_h - Draw.Squares - 5, this);									
 						img_2d.drawImage(img_obs_notice, (int)(margin_w + AreaCenter - img_obs_notice.getWidth(this)/2 + ((2.0*i)/(obs_num-1)-1)*((obs_width-1)*img_obs_notice.getWidth(this))/2), margin_h - Draw.Squares - 5, this);									
 					}
 				}
@@ -646,6 +638,7 @@ public class Draw extends JPanel{
 				img_2d.drawImage(img_meteor, send_image_x - Draw.Squares/2, send_image_y - Draw.Squares/2, this);
 			}
 			
+			// ピカッ描写
 			if ( obs_update_state != AnimState.end ) {
 				updateObsUpdateAnim();
 				img_2d.drawImage(imgs_obs_change[obs_update_time/3], margin_w,obs_center_y - 120, this);
@@ -682,7 +675,6 @@ public class Draw extends JPanel{
 				img_2d.drawImage(img_end, margin_w, end_image_height + margin_h, this);
 				break;
 			}
-		}	
-//		g.drawImage(buffer, 0, 0, this);		
+		}		
 	}
 }

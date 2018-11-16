@@ -7,7 +7,7 @@ public class Network extends Thread {
 	
 	public Mode programMode = Mode.SERVER;
 	public boolean isConnect = false;
-	public int index = 1; //操作中のぷちゅ
+	public int index = 0; //操作中のぷちゅ
 	
 	GameMain gm;
 	boolean isAlive = true;
@@ -130,11 +130,13 @@ public class Network extends Thread {
 	}
 	
 	// 相手のステータス取得
-	public void getRivalStatus(boolean key) {
+	public boolean getRivalStatus() {
 		String input;
+		boolean isField = false;
+		
 		try {
 			if(br.ready()) input = br.readLine();
-			else return;
+			else return isField;
 			System.out.println(input);
 		}catch(Exception e) {
 			System.out.println("nw get: "+e);
@@ -163,17 +165,19 @@ public class Network extends Thread {
 		// 操作対象が変わると送られてくる
 		case "NEXT":
 			getPuchuIndex();
-			gm.resetRivalInput();
 			break;
 		// フィールド全体の同期
 		case "FIELDSTART":
 			getRivalField();
+			isField = true;
 			break;
 		// キー入力
 		default:
-			if(key) gm.getRivalInput(input);
+			gm.getRivalInput(input);
 			break;
 		}
+		
+		return isField;
 	}
 	
 	// 初期ぷちゅペアリスト受信
