@@ -592,7 +592,7 @@ public class Draw extends JPanel{
 				}
 			}
 			// 操作中のぷちゅペア描写
-			if ( fd.now != null ) {
+			if ( fd.now != null && game == GameInfo.GAME_PLAYNOW) {
 				updatePuchuPairAnim(fd.now);
 				img_2d.drawImage(img_puchu[fd.now.puchu1.type], fd.now.puchu1.draw_x + margin_w, fd.now.puchu1.draw_y + margin_h, this);
 				img_2d.drawImage(img_puchu[fd.now.puchu2.type], fd.now.puchu2.draw_x + margin_w, fd.now.puchu2.draw_y + margin_h, this);				

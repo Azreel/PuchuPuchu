@@ -1,5 +1,7 @@
 import javax.swing.*;
 
+import java.applet.Applet;
+import java.applet.AudioClip;
 import java.awt.*;
 import java.net.URL;
 import java.text.DecimalFormat;
@@ -45,6 +47,8 @@ public class Overlay extends JPanel{
 		titleBtn.addActionListener(event -> {
 			paintMode = Mode.STOP;
 			gm.fadeIn(GameMain.Status.GAME_TITLE);
+			AudioClip pushSound = Applet.newAudioClip(getClass().getResource("selectmode.wav"));
+			pushSound.play();
 		});
 		
 		this.add(scoreLabel);
