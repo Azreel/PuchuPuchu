@@ -399,7 +399,7 @@ public class Field {
 				score = 9999999;
 			}
 			gm.sendObs(obs_count ,is_me);
-			draw.startVanishAnim(chain_count, obs_count, score);
+			draw.startVanishAnim(chain_count, obs_count , score, fallen_obs + unfallen_obs);
 			
 		}
 	}
@@ -615,8 +615,8 @@ public class Field {
 				break;
 			}
 		}
-		draw.setObsNum(-count);
 		fallen_obs -= count;
+		draw.setObsNum(fallen_obs + unfallen_obs);
 		draw.startDropAnim();
 	}
 	
@@ -627,7 +627,7 @@ public class Field {
 			unfallen_obs = 0;
 		} else {
 			unfallen_obs += count;
-			draw.startDamageAnim(count);
+			draw.startDamageAnim(fallen_obs + unfallen_obs);
 		}
 	}
 }

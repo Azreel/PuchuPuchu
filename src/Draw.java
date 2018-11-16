@@ -86,7 +86,6 @@ public class Draw extends JPanel{
 	private int damage_anim_speed = 0;
 	private int damage_anim_accel = 1;
 	private int damage_image_y = -200;
-	private int damage_obs_num = 0;
 	
 	private AnimState obs_state = AnimState.end;
 	private int obs_anim_time = 0;
@@ -241,7 +240,7 @@ public class Draw extends JPanel{
 	}
 	
 	//-- ぷちゅの消滅アニメーション開始
-	public void startVanishAnim(int _chain, int _generate_obs_num, int _score) {
+	public void startVanishAnim(int _chain, int _generate_obs_num, int _score, int _obs_num) {
 		is_vanish_delay = true;
 		is_vanish_delay_all = false;
 		is_chain_display = false;
@@ -249,6 +248,7 @@ public class Draw extends JPanel{
 		chain_text = _chain + "れんさ";
 		is_chain_get = true;
 		send_obs_num = _generate_obs_num;
+		obs_change = _obs_num;
 		score_now = _score;
 	}
 	
@@ -260,7 +260,7 @@ public class Draw extends JPanel{
 		is_vanish_anim = true;
 		is_chain_display = true;
 		chain_display_time = 0;
-		if ( send_obs_num > 0 ) { 
+		if ( send_obs_num > 0 ) {
 			startAttackAnim();
 		}
 		setScore(score_now);
@@ -281,7 +281,7 @@ public class Draw extends JPanel{
 		send_anim_speed = 0;
 		send_image_angle = Math.atan2(obs_center_x - send_image_x, obs_center_y - send_image_y );
 		if ( obs_num == 0 ) { send_mode = Meteor.attack; }
-		else if ( obs_num - send_obs_num < 0 ) { send_mode = Meteor.counter; }
+		else if ( obs_change == 0 ) { send_mode = Meteor.counter; }
 		else { send_mode = Meteor.offset; }
 	}
 	
@@ -291,13 +291,12 @@ public class Draw extends JPanel{
 		damage_anim_time = 0;
 		damage_anim_speed = 0;
 		damage_image_y = -200;
-		damage_obs_num = _obs_num;
+		obs_change = _obs_num;
 	}
 	
 	//-- 予告おじゃま数の更新
 	public void setObsNum(int _update_obs_num) {
-		if ( obs_num + _update_obs_num < 0 ) { obs_change = 0; }
-		else { obs_change = obs_num + _update_obs_num; }
+		obs_change = _update_obs_num;
 		obs_state = AnimState.state1;
 		obs_anim_time = 0;
 	}
@@ -484,7 +483,7 @@ public class Draw extends JPanel{
 		switch(send_state) {
 			case state1:
 				send_anim_speed += send_anim_accel;
-				if ( send_image_y - send_anim_speed < obs_center_y ) { send_state = AnimState.end; setObsNum(-send_obs_num); startObsUpdateAnim(); break;}
+				if ( send_image_y - send_anim_speed < obs_center_y ) { send_state = AnimState.end; setObsNum(obs_change); startObsUpdateAnim(); break;}
 				send_image_y += (int)(send_anim_speed*Math.cos(send_image_angle));
 				send_image_x += (int)(send_anim_speed*Math.sin(send_image_angle));
 				break;
@@ -496,7 +495,7 @@ public class Draw extends JPanel{
 		switch(send_state) {
 		case state1:
 			send_anim_speed += send_anim_accel;
-			if ( send_image_y - send_anim_speed < obs_center_y ) { send_state = AnimState.state2; setObsNum(-send_obs_num); startObsUpdateAnim(); break;}
+			if ( send_image_y - send_anim_speed < obs_center_y ) { send_state = AnimState.state2; setObsNum(obs_change); startObsUpdateAnim(); break;}
 			send_image_y += (int)(send_anim_speed*Math.cos(send_image_angle));
 			send_image_x += (int)(send_anim_speed*Math.sin(send_image_angle));
 			break;
@@ -519,7 +518,7 @@ public class Draw extends JPanel{
 			damage_anim_time++;
 			damage_anim_speed += damage_anim_accel;
 			damage_image_y += damage_anim_speed;
-			if ( damage_image_y + damage_anim_speed > obs_center_y ) { setObsNum(damage_obs_num); startObsUpdateAnim(); damage_state = AnimState.end; break;}
+			if ( damage_image_y + damage_anim_speed > obs_center_y ) { setObsNum(obs_change); startObsUpdateAnim(); damage_state = AnimState.end; break;}
 			break;
 		}
 	}
