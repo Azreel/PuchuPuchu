@@ -188,9 +188,8 @@ public class GameMain extends Thread {
 								nowKey = 0;
 							} else if(nowKey == 0) {
 								if(nw.getRivalStatus()) {
+									//フィールドデータを取り出したら次のインデックスも取り出す
 									nw.getRivalStatus();
-									//setRivalField(nextRivalField);
-									//haveRivalField = true;
 								}
 							}
 						} else { //自分のほうが早い
@@ -219,9 +218,7 @@ public class GameMain extends Thread {
 						if(!isRivalFinish && isUpdate) {
 							temp = rival.update();
 							if(temp != rivalIndex) {
-								if(oldIndex == -1 && temp != -1 && haveRivalField) {
-									//setRivalField(nextRivalField);
-									//haveRivalField = false;
+								if(oldIndex == -1 && temp != -1) {
 									resetInput(rival.key); //長押し解除
 								}
 								if(temp != -1) rivalIndex = temp;

@@ -115,7 +115,7 @@ public class Field {
 			now_x = ( now.puchu1.x ) / 40;
 			now_y = ( now.puchu1.y ) / 40 + 2;
 			
-			if ( now_y == 13 || cell[now_x][now_y+1].type != Puchu.Emp ) {
+			if ( now_y >= 13 || now_x >= 5 || cell[now_x][now_y+1].type != Puchu.Emp ) {
 				bottom_flag = true;
 				bottom_p1_flag = true;
 				bottom_p2_flag = true;
@@ -148,7 +148,7 @@ public class Field {
 			now_x = ( now.puchu1.x ) / 40;
 			now_y = ( now.puchu1.y ) / 40 + 2;
 			
-			if ( now_y == 13 ) {
+			if ( now_y >= 13 || now_x >= 5 ) {
 				bottom_flag = true;
 				bottom_p1_flag = true;
 				bottom_p2_flag = true;
@@ -178,7 +178,7 @@ public class Field {
 			now_x = ( now.puchu2.x ) / 40;
 			now_y = ( now.puchu2.y ) / 40 + 2;
 			
-			if ( now_y == 13 || cell[now_x][now_y+1].type != Puchu.Emp ) {
+			if ( now_y >= 13 || now_x >= 5 || cell[now_x][now_y+1].type != Puchu.Emp ) {
 				bottom_flag = true;
 				bottom_p1_flag = true;
 				bottom_p2_flag = true;
@@ -211,14 +211,14 @@ public class Field {
 			now_x = ( now.puchu1.x ) / 40;
 			now_y = ( now.puchu1.y ) / 40 + 2;
 			
-			if ( now_y == 13 ) {
+			if ( now_y >= 13 || now_x >= 5  ) {
 				bottom_flag = true;
 				bottom_p1_flag = true;
 				bottom_p2_flag = true;
 			} else if ( cell[now_x][now_y+1].type != Puchu.Emp ) {
 				bottom_p1_flag = true;
 				bottom_flag = true;
-			} else if ( cell[now_x-1][now_y+1].type != Puchu.Emp ) {
+			} else if ( now_x > 0 && cell[now_x-1][now_y+1].type != Puchu.Emp ) {
 				bottom_p2_flag = true;
 				bottom_flag = true;
 			}
