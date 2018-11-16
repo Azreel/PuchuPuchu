@@ -18,7 +18,7 @@ public class Field {
 	public Key key;
 	public AudioClip turn_sound;
 	public AudioClip slide_sound;
-	public int[] obs_puchu = new int[6];
+	public int obs_puchu = 0;
 	
 	public boolean bottom_flag = false; 	//当たり判定
 	public boolean moving_flag = false;		//移動できるかどうか
