@@ -57,7 +57,7 @@ public class Overlay extends JPanel{
 	
 	public void setBGM(URL path) {
 		bgm = new BGM(path);
-		bgm.start();
+		bgm.Play();
 		isPlay = true;
 	}
 	

@@ -34,8 +34,7 @@ public class GameMain extends Thread {
 	private int nowKey = 0;
 	private long nowKeyTime = -1;
 	private boolean isUpdate = true;
-	private boolean haveRivalField = false;
-	private int oldIndex = -1;
+	private int oldRivalIndex = -1;
 	private int stopCount;
 	
 	// コンストラクタ
@@ -86,8 +85,7 @@ public class GameMain extends Thread {
 						nowKey = 0;
 						nowKeyTime = -1;
 						isUpdate = true;
-						haveRivalField = false;
-						oldIndex = -1;
+						oldRivalIndex = -1;
 						nw.Close();
 					}
 					// ネットワーク開始
@@ -177,7 +175,7 @@ public class GameMain extends Thread {
 				} else {
 					int temp;
 					
-					// スタート同期済み
+					// スタート同期確認
 					if(canStart) {
 						// ネットワーク
 						if(nw.index >= rivalIndex) { //一致してるとき or 遅い場合
@@ -218,11 +216,9 @@ public class GameMain extends Thread {
 						if(!isRivalFinish && isUpdate) {
 							temp = rival.update();
 							if(temp != rivalIndex) {
-								if(oldIndex == -1 && temp != -1) {
-									resetInput(rival.key); //長押し解除
-								}
+								if(oldRivalIndex == -1 && temp != -1) resetInput(rival.key); //長押し解除
 								if(temp != -1) rivalIndex = temp;
-								oldIndex = temp;
+								oldRivalIndex = temp;
 							}
 						}
 						frameCount++;
