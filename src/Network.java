@@ -15,8 +15,6 @@ public class Network extends Thread {
 	Socket sc;
 	BufferedReader br;
 	PrintWriter pw;
-	//int sendCount = 0;
-	//int recvCount = 0;
 	
 	// コンストラクタ
 	Network(GameMain parent){
@@ -91,14 +89,16 @@ public class Network extends Thread {
 		try {
 			// サーバーを閉じる
 			if(ss != null) ss.close();
+			// クライアントモードに移行
 			programMode = Mode.CLIENT;
 			sc = new Socket(addr, Port);
             br = new BufferedReader(new InputStreamReader(sc.getInputStream()));
             pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(sc.getOutputStream())));
-            // サーバーからの返事があるまで30秒待機
+            // PING送信
             long start = System.currentTimeMillis();
             pw.println("PING");
             pw.flush();
+            // サーバーからの返事があるまで30秒待機
             while(true) {
             	if(System.currentTimeMillis() - start >= 30 * 1000) throw new SocketException();
             	if(br.readLine().equals("PONG")) break;
@@ -130,15 +130,17 @@ public class Network extends Thread {
 	}
 	
 	// 相手のステータス取得
-	public void getRivalStatus() {
+	public boolean getRivalStatus() {
 		String input;
+		boolean isField = false;
+		
 		try {
 			if(br.ready()) input = br.readLine();
-			else return;
+			else return isField;
 			System.out.println(input);
 		}catch(Exception e) {
 			System.out.println("nw get: "+e);
-			input = "END";
+			input = "DISCONNECT";
 		}
 		// コマンドによって分岐
 		switch(input) {
@@ -155,6 +157,11 @@ public class Network extends Thread {
 			gm.finishRival();
 			Close();
 			break;
+		// 強制切断発生
+		case "DISCONNECT":
+			gm.disconnect();
+			Close();
+			break;
 		// 初期ぷちゅペア受信開始
 		case "MAKESTART":
 			gm.makePuchuByServer(getPuchuList());
@@ -163,13 +170,19 @@ public class Network extends Thread {
 		// 操作対象が変わると送られてくる
 		case "NEXT":
 			getPuchuIndex();
-			//gm.resetRivalInput();
+			break;
+		// フィールド全体の同期
+		case "FIELDSTART":
+			getRivalField();
+			isField = true;
 			break;
 		// キー入力
 		default:
 			gm.getRivalInput(input);
 			break;
 		}
+		
+		return isField;
 	}
 	
 	// 初期ぷちゅペアリスト受信
@@ -210,6 +223,38 @@ public class Network extends Thread {
 		}
 	}
 	
+	// ライバルのフィールドを取得
+	private void getRivalField() {
+		int[][] cell = new int[6][14];
+		String temp;
+		String[] splited;
+		int column = 0;
+		
+		while(true) {
+			try {
+				temp = br.readLine();
+			}catch (Exception e) {
+				System.out.println("nw get: " + e);
+				return;
+			}
+			if(temp.equals("FIELDEND")) break;
+			if(column > 5) {
+				System.out.println("不正なデータ");
+				return;
+			}
+			splited = temp.split(",");
+			if(splited.length != 14) {
+				System.out.println("不正なデータ");
+				return;
+			}
+			for(int i = 0; i < 14; i++) {
+				cell[column][i] = Integer.parseInt(splited[i]);
+			}
+			column++;
+		}
+		gm.nextRivalField = cell;
+	}
+	
 	// 初期ぷちゅペアリスト送信
 	public void sendPuchu(String[] list) {
 		pw.println("MAKESTART");
@@ -231,6 +276,21 @@ public class Network extends Thread {
 	public void sendPuchuIndex(int index) {
 		pw.println("NEXT");
 		pw.println(Integer.toString(index));
+		pw.flush();
+	}
+	
+	// フィールド情報送信
+	public void sendField(Puchu[][] cell) {
+		String column = "";
+		pw.println("FIELDSTART");
+		for(int i = 0; i < 6; i++) {
+			for(int j = 0; j < 14; j++) {
+				column += cell[i][j].type + ",";
+			}
+			pw.println(column);
+			column = "";
+		}
+		pw.println("FIELDEND");
 		pw.flush();
 	}
 }

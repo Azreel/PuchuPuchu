@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.io.File;
+import java.nio.Buffer;
 import java.util.*;
 
 import javax.imageio.ImageIO;
@@ -12,6 +13,9 @@ import java.applet.AudioClip;
 public class Draw extends JPanel{
 	
 	public static final int Squares = 40;
+	public static final int WallLeft = 0, WallRight = Squares*6;
+	public static final int AreaCenter = (WallRight - WallLeft) / 2;
+	public static final int Ground = Squares*12;
 	private static final int margin_w = 60, margin_h = 110;
 	private static final int PanelW = 480;
 	private static final int PanelH = 640;
@@ -26,7 +30,6 @@ public class Draw extends JPanel{
 	private BufferedImage[] imgs_van = new BufferedImage[10];
 	private JLabel lb;	//ラベル
 	private Field fd;
-	private Image buffer;
 	
 	private String chain_text;
 	private Font chain_font = new Font("Dialog",Font.BOLD,30);
@@ -38,7 +41,10 @@ public class Draw extends JPanel{
 	private boolean is_chain_display = false;
 	
 	private Font score_font = new Font("Dialog", Font.BOLD, 40);
-	private Color score_color = Color.white;
+	private Color score_color = Color.black;
+	private int score_draw = 0, score_now = 0, score_update_value = 0;
+	private static final int score_update_span = 10;
+	private AnimState score_state = AnimState.end;
 	
 	private boolean is_alive = true;
 	private boolean is_drop_anim = false, is_drop_all = false;
@@ -46,7 +52,7 @@ public class Draw extends JPanel{
 	private boolean is_vanish_delay = false, is_vanish_delay_all = false;
 	private boolean is_vanish_anim = false, is_vanish_all = false;
 	
-	private static enum AnimState {state1, state2, state3, state4, state5, end };
+	private static enum AnimState {state1, state2, state3, state4, state5, state6, end };
 	
 	private Image img_ready, img_start;
 	private AnimState ready_state = AnimState.end;
@@ -69,17 +75,35 @@ public class Draw extends JPanel{
 	private Image img_meteor;
 	private AnimState send_state = AnimState.end;
 	private Meteor send_mode = Meteor.attack;
-	private int send_anim_time = 0;
 	private int send_anim_speed = 1;
-	private int send_anim_accel = 1;
+	private int send_anim_accel = 2;
 	private int send_obs_num = 0;
 	private int send_image_x = 0, send_image_y = 0;
 	private double send_image_angle = 0.0f;
 	
-	private int obs_num = 0;
+	private AnimState damage_state = AnimState.end;
+	private int damage_anim_time = 0;
+	private int damage_anim_speed = 0;
+	private int damage_anim_accel = 1;
+	private int damage_image_y = -200;
+	private int damage_obs_num = 0;
 	
-	//テスト
-	int score = 9999;
+	private AnimState obs_state = AnimState.end;
+	private int obs_anim_time = 0;
+	private int obs_num = 0;
+	private int obs_width_max = 0;
+	private int obs_width = 0;
+	private int obs_change = 0;
+	private int obs_center_x = margin_w + AreaCenter - Draw.Squares/2, obs_center_y = margin_h - Draw.Squares - 5;
+	private BufferedImage img_obs_change;
+	private BufferedImage[] imgs_obs_change = new BufferedImage[5];
+	
+	private AnimState obs_update_state = AnimState.end;
+	private int obs_update_time = 0;
+	
+	
+	
+	private AudioClip se_drop, se_delete;
 	
 	Draw() {	//nullプレイヤー用
 		this.setPreferredSize(new Dimension(PanelW, PanelH));
@@ -110,10 +134,15 @@ public class Draw extends JPanel{
 		is_alive = true;
 		fd = _fd;
 		initImages();
+		initSound();
+		obs_width_max = Draw.Squares*fd.cell.length/img_obs_notice.getWidth(this);
+		obs_width = obs_width_max;
 		
+		// 最大連鎖セット(下のfinishMoveAnimのところも有効化)
+//		int[][] _set= {{0,3,2,3,1,1,2,1,2,2,1,1,2,1},{0,6,3,5,3,2,3,2,4,3,3,2,3,2},{0,0,0,5,6,3,4,3,5,4,4,3,4,3},{0,1,6,1,6,4,5,4,6,5,5,4,5,4},{0,3,6,3,1,5,1,5,2,6,6,5,6,5},{0,1,2,2,3,2,1,6,1,2,2,1,1,6}};
 //		for ( int i = 0; i < fd.cell.length; i++ ) {
-//			for ( int j = 5; j < fd.cell[i].length; j++ ) {
-//				fd.cell[i][j].type = Puchu.Obs;
+//			for ( int j = 0; j < fd.cell[i].length; j++ ) {
+//				fd.cell[i][j].type = _set[i][j];
 //			}
 //		}
 	}
@@ -123,15 +152,26 @@ public class Draw extends JPanel{
 		for ( int i = 1; i <= 8; i++ ) {
 			img_puchu[i] = tk.getImage(getClass().getResource("puchu"+i+".png"));			
 		}
-		img_obs_notice = tk.getImage(getClass().getResource("puchu8_notice.png"));
+		img_meteor = tk.getImage(getClass().getResource("light.png"));
 		try {
+			img_obs_notice = ImageIO.read(getClass().getResource("puchu8_notice.png"));
+			img_obs_change = ImageIO.read(getClass().getResource("obs_notice_change_anim.png"));
 			img_van_anim = ImageIO.read(getClass().getResource("vanishingAnime.png"));
 			for ( int i = 0; i < 10; i++ ) {
 				imgs_van[i] = img_van_anim.getSubimage(i*Draw.Squares*2, 0, Draw.Squares*2, Draw.Squares*2);
-			}			
+			}
+			for ( int i = 0; i < 5; i++ ) {
+				imgs_obs_change[i] = img_obs_change.getSubimage(i*240, 0, 240,240);
+			}
 		} catch(Exception e) {
 			System.out.println(e);
 		}
+	}
+	
+	//-- よく発火するSEの初期化
+	private void initSound() {
+		se_delete = Applet.newAudioClip(getClass().getResource("delpuchu.wav"));
+		se_drop = Applet.newAudioClip(getClass().getResource("rakka.wav"));
 	}
 	
 	//-- SE発火
@@ -146,19 +186,24 @@ public class Draw extends JPanel{
 		ready_state = AnimState.state1;
 		img_ready = tk.getImage(getClass().getResource("ready.png"));
 		img_start = tk.getImage(getClass().getResource("start.png"));
-		soundIgnition("youi.wav");
+	}
+	
+	//-- 開幕ボイス発火
+	private void nextReadyVoice() {
+		ready_state = AnimState.state2;
+		soundIgnition("youi.wav");		
 	}
 	
 	//-- 開幕アニメーションスタート落下開始
 	private void nextReadyAnim() {
-		ready_state = AnimState.state4;
+		ready_state = AnimState.state5;
 		soundIgnition("Start.wav");
 	}
 	
 	//-- 開幕アニメーション終了
 	private void finishReadyAnim() {
 		game = GameInfo.GAME_PLAYNOW;
-		ready_state = AnimState.state5;
+		ready_state = AnimState.state6;
 		System.out.println("ゲーム開始");
 		soundIgnition("pahu.wav");
 		fd.game_start();
@@ -167,7 +212,7 @@ public class Draw extends JPanel{
 	//-- 落下アニメーション開始
 	public void startDropAnim() {
 		is_drop_anim = true;
-		soundIgnition("rakka.wav");
+		se_drop.play();
 	}
 	
 	//-- 落下アニメーション終了
@@ -187,26 +232,37 @@ public class Draw extends JPanel{
 		is_move_anim = false;
 		is_move_all = false;
 		fd.switch_next();
+		
+		//最大連鎖セット
+//		fd.next[0].puchu1.type = 6;
+//		fd.next[0].puchu2.type = 5;
+//		fd.switch_next();
 	}
 	
 	//-- ぷちゅの消滅アニメーション開始
-	public void startVanishAnim(int _chain, int _generate_obs_num) {
+	public void startVanishAnim(int _chain, int _generate_obs_num, int _score) {
 		is_vanish_delay = true;
 		is_vanish_delay_all = false;
+		is_chain_display = false;
+		chain_display_time = 0;
 		chain_text = _chain + "れんさ";
 		is_chain_get = true;
 		send_obs_num = _generate_obs_num;
+		score_now = _score;
 	}
 	
 	//-- ぷちゅの消滅準備完了
 	private void nextVanishAnim() {
-		soundIgnition("delpuchu.wav");
+		se_delete.play();
 		is_vanish_delay = false;
 		is_vanish_all = false;
 		is_vanish_anim = true;
 		is_chain_display = true;
 		chain_display_time = 0;
-//		startAttackAnim();
+		if ( send_obs_num > 0 ) { 
+			startAttackAnim();
+		}
+		setScore(score_now);
 	}
 	
 	//-- ぷちゅの消滅アニメーション終了
@@ -221,19 +277,36 @@ public class Draw extends JPanel{
 		send_state = AnimState.state1;
 		send_image_x = chain_x;
 		send_image_y = chain_y;
-//		send_image_angle = Math.atan2((send_image_x - send_center_x), (send_image_y - send_center_y));
-//		send_image_angle = Math.atan2(send_center_x - send_image_y, send_center_y - send_image_y );
+		send_anim_speed = 0;
+		send_image_angle = Math.atan2(obs_center_x - send_image_x, obs_center_y - send_image_y );
 		if ( obs_num == 0 ) { send_mode = Meteor.attack; }
 		else if ( obs_num - send_obs_num < 0 ) { send_mode = Meteor.counter; }
 		else { send_mode = Meteor.offset; }
 	}
 	
-	private void finishAttackAnim() {
-		
+	//-- おじゃま発射されるアニメーション開始
+	public void startDamageAnim(int _obs_num) {
+		damage_state = AnimState.state1;
+		damage_anim_time = 0;
+		damage_anim_speed = 0;
+		damage_image_y = -200;
+		damage_obs_num = _obs_num;
 	}
 	
-	private void setObsNum() {
-//		obs_num = fd.obs_num;
+	//-- 予告おじゃま数の更新
+	public void setObsNum(int _update_obs_num) {
+		if ( obs_num + _update_obs_num < 0 ) { obs_change = 0; }
+		else { obs_change = obs_num + _update_obs_num; }
+		obs_state = AnimState.state1;
+		obs_anim_time = 0;
+	}
+	
+	//-- スコアの更新
+	public void setScore(int _score) {
+		score_now = _score;
+		score_update_value = (score_now - score_draw)/score_update_span;
+		if ( score_update_value == 0 ) { score_update_value = 1; }
+		score_state = AnimState.state1;
 	}
 	
 	//-- 決着時のアニメーション開始
@@ -270,32 +343,43 @@ public class Draw extends JPanel{
 		fd.game_end();
 	}
 	
+	//-- おじゃま更新時のアニメーション開始
+	private void startObsUpdateAnim() {
+		obs_update_state = AnimState.state1;
+		obs_update_time = 0;
+	}
+	
 	//-- 開幕アニメーション状況更新
 	private void updateReadyAnim() {
 		switch(ready_state) {
 		case state1:
 			ready_anim_time++;
 			ready_image_height = -(int)(Math.pow((ready_anim_timing - ready_anim_time),2)/10);
-			if ( ready_anim_time > ready_anim_timing ) { ready_state = AnimState.state2; }
+			if ( ready_image_height > -margin_h ) { nextReadyVoice(); }
 			break;
 		case state2:
 			ready_anim_time++;
-			if ( ready_anim_time > start_anim_timing ) { ready_state = AnimState.state3; }
+			ready_image_height = -(int)(Math.pow((ready_anim_timing - ready_anim_time),2)/10);
+			if ( ready_anim_time > ready_anim_timing ) { ready_state = AnimState.state3; }
 			break;
 		case state3:
+			ready_anim_time++;
+			if ( ready_anim_time > start_anim_timing ) { ready_state = AnimState.state4; }
+			break;
+		case state4:
 			ready_anim_time++;
 			start_image_speed += start_image_accel;
 			start_image_height += start_image_speed/5;
 			if ( start_image_height > -80 && start_image_speed >0 ) { start_image_speed = (int)(start_image_speed * -0.7); nextReadyAnim(); }
 			break;
-		case state4:
+		case state5:
 			ready_anim_time++;
 			start_image_speed += start_image_accel;
 			start_image_height += start_image_speed/10;
 			ready_image_height += ready_image_speed;
 			if ( ready_anim_time > start_delay ) { finishReadyAnim(); }
 			break;
-		case state5:
+		case state6:
 			ready_anim_time++;
 			start_image_speed += start_image_accel;
 			start_image_height += start_image_speed/10;
@@ -344,8 +428,8 @@ public class Draw extends JPanel{
 			_puchu.vanishOutDelay();
 			if ( is_chain_get ) { // れんさテキスト表示のための座標取得(1個目の場所)
 				is_chain_get = false;
-				chain_x = _puchu.draw_x + 60;
-				chain_y = _puchu.draw_y + 60;
+				chain_x = _puchu.draw_x + margin_w;
+				chain_y = _puchu.draw_y + margin_h;
 			}
 		}
 		// 消滅アニメーション管理
@@ -367,8 +451,8 @@ public class Draw extends JPanel{
 		}
 	}
 	
+	//-- おじゃま送信アニメーション状況更新
 	private void updateAttackAnim() {
-		send_anim_time++;
 		switch(send_mode) {
 		case attack:
 			updateSendAnim();
@@ -382,27 +466,102 @@ public class Draw extends JPanel{
 		}
 	}
 	
+	//-- おじゃま送り付け
 	private void updateSendAnim() {
 		switch(send_state) {
 		case state1:
-			break;
-		case state2:
+			send_image_y -= send_anim_speed;
+			send_anim_speed += send_anim_accel;
+			if ( send_image_y < -100 ) { send_state = AnimState.end; }
 			break;
 		}
 	}
+	
+	//-- おじゃま相殺
 	private void updateOffsetAnim() {
-		
+		switch(send_state) {
+			case state1:
+				send_anim_speed += send_anim_accel;
+				if ( send_image_y - send_anim_speed < obs_center_y ) { send_state = AnimState.end; setObsNum(-send_obs_num); startObsUpdateAnim(); break;}
+				send_image_y += (int)(send_anim_speed*Math.cos(send_image_angle));
+				send_image_x += (int)(send_anim_speed*Math.sin(send_image_angle));
+				break;
+		}
 	}
+	
+	//-- おじゃまカウンター
 	private void updateCounterAnim() {
-		
+		switch(send_state) {
+		case state1:
+			send_anim_speed += send_anim_accel;
+			if ( send_image_y - send_anim_speed < obs_center_y ) { send_state = AnimState.state2; setObsNum(-send_obs_num); startObsUpdateAnim(); break;}
+			send_image_y += (int)(send_anim_speed*Math.cos(send_image_angle));
+			send_image_x += (int)(send_anim_speed*Math.sin(send_image_angle));
+			break;
+		case state2:
+			send_image_y -= send_anim_speed;
+			send_anim_speed += send_anim_accel;
+			if ( send_image_y < -100 ) { send_state = AnimState.end; }
+			break;
+		}	
+	}
+	
+	//-- おじゃま受信アニメーション状況更新
+	private void updateDamageAnim() {
+		switch(damage_state) {
+		case state1:
+			damage_anim_time++;
+			if ( damage_anim_time > 20 ) { damage_state = AnimState.state2; }
+			break;
+		case state2:
+			damage_anim_time++;
+			damage_anim_speed += damage_anim_accel;
+			damage_image_y += damage_anim_speed;
+			if ( damage_image_y + damage_anim_speed > obs_center_y ) { setObsNum(damage_obs_num); startObsUpdateAnim(); damage_state = AnimState.end; break;}
+			break;
+		}
+	}
+	
+	//-- ぴかっ更新アニメーション状況更新
+	private void updateObsUpdateAnim() {
+		obs_update_time++;
+		if ( obs_update_time > 12 ) { obs_update_time = 0; obs_update_state = AnimState.end; }
+	}
+	
+	//-- スコアのフレーム毎更新
+	private void updateScoreValue() {
+		if ( score_draw + score_update_value < score_now ) {
+			score_draw += score_update_value;
+		} else {
+			score_draw = score_now;
+			score_state = AnimState.end;
+		}
+	}
+	
+	//-- 予告おじゃまぷちゅの更新
+	private void updateObsNotice() {
+		switch(obs_state) {
+		case state1:
+			obs_anim_time++;
+			obs_width = obs_width_max - obs_anim_time;
+			if ( obs_width <= 1 ) { obs_state = AnimState.state2; obs_num = obs_change;}
+			break;
+		case state2:
+			obs_anim_time++;
+			if ( obs_anim_time > obs_width_max ) { obs_state = AnimState.state3; }
+			break;
+		case state3:
+			obs_anim_time++;
+			obs_width = obs_anim_time - obs_width_max;
+			if ( obs_width >= obs_width_max ) { obs_state = AnimState.end; }
+			break;
+		}
 	}
 	
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D img_2d = (Graphics2D) g;
-//		buffer = createImage(PanelW, PanelH);
-//		Graphics img_2d = buffer.getGraphics();
 		img_2d.drawImage(img_background, 0, 0, this);
 
 		if ( is_alive ) {
@@ -435,7 +594,7 @@ public class Draw extends JPanel{
 				}
 			}
 			// 操作中のぷちゅペア描写
-			if ( fd.now != null ) {
+			if ( fd.now != null && game == GameInfo.GAME_PLAYNOW) {
 				updatePuchuPairAnim(fd.now);
 				img_2d.drawImage(img_puchu[fd.now.puchu1.type], fd.now.puchu1.draw_x + margin_w, fd.now.puchu1.draw_y + margin_h, this);
 				img_2d.drawImage(img_puchu[fd.now.puchu2.type], fd.now.puchu2.draw_x + margin_w, fd.now.puchu2.draw_y + margin_h, this);				
@@ -458,24 +617,40 @@ public class Draw extends JPanel{
 		
 		if ( is_alive ) {
 			// 予告おじゃまぷちゅ描写
+			if ( obs_state != AnimState.end ) { updateObsNotice(); }
 			if ( obs_num != 0 ) {
 				for ( int i = obs_num-1; i >= 0; i-- ) {
-					if ( obs_num <= fd.cell.length ) {
-						img_2d.drawImage(img_obs_notice, margin_w + img_obs_notice.getWidth(this)*i, margin_h - Draw.Squares - 5, this);									
+					if ( obs_num <= obs_width ) {
+						img_2d.drawImage(img_obs_notice, margin_w + AreaCenter+ img_obs_notice.getWidth(this)*(i-4), margin_h - Draw.Squares - 5, this);									
 					} else {
-						img_2d.drawImage(img_obs_notice, margin_w + (int)(img_obs_notice.getWidth(this) * ((fd.cell.length - 1.0) / (obs_num-1)))*i, margin_h - Draw.Squares - 5, this);									
+						img_2d.drawImage(img_obs_notice, (int)(margin_w + AreaCenter - img_obs_notice.getWidth(this)/2 + ((2.0*i)/(obs_num-1)-1)*((obs_width-1)*img_obs_notice.getWidth(this))/2), margin_h - Draw.Squares - 5, this);									
 					}
 				}
 			}
+			
+			// おじゃまばびゅーん描写
+			if ( damage_state != AnimState.end ) {
+				updateDamageAnim();
+				img_2d.drawImage(img_meteor, obs_center_x - Draw.Squares/2, damage_image_y, this);
+			}
+			
+			// おじゃまびゅーん描写
 			if ( send_state != AnimState.end ) {
 				updateAttackAnim();
-				img_2d.drawImage(img_puchu[Puchu.Obs], send_image_x, send_image_y, this);
+				img_2d.drawImage(img_meteor, send_image_x - Draw.Squares/2, send_image_y - Draw.Squares/2, this);
+			}
+			
+			// ピカッ描写
+			if ( obs_update_state != AnimState.end ) {
+				updateObsUpdateAnim();
+				img_2d.drawImage(imgs_obs_change[obs_update_time/3], margin_w,obs_center_y - 120, this);
 			}
 			
 			// スコア表示
+			if ( score_state != AnimState.end ) { updateScoreValue(); }
 			img_2d.setColor(score_color);
 			img_2d.setFont(score_font);
-			img_2d.drawString(String.format("%07d", score ), margin_w+Draw.Squares*6+5, 500);
+			img_2d.drawString(String.format("%07d", score_draw ), margin_w+Draw.Squares*6+5, 500);
 			
 			// れんさテキスト描写
 			if ( is_chain_display ) {
@@ -502,7 +677,6 @@ public class Draw extends JPanel{
 				img_2d.drawImage(img_end, margin_w, end_image_height + margin_h, this);
 				break;
 			}
-		}	
-//		g.drawImage(buffer, 0, 0, this);		
+		}		
 	}
 }

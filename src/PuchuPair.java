@@ -17,6 +17,7 @@ public class PuchuPair {
 	public boolean is_match_position_move = true; // 移動に対して判定位置と描写位置がずれているか
 	private int turn_anim_time = 0;
 	private int slide_anim_dir = 0;					// 位置ずれの方向
+	private int slide_anim_time = 0;
 	private int move_anim_time = 0;
 	private int move_range_x = 0;
 	private int move_range_y = 0;
@@ -114,28 +115,45 @@ public class PuchuPair {
 			puchu1.y += 1;	puchu1.draw_y += 1;
 			puchu2.y += 1;	puchu2.draw_y += 1;			
 		}
+		if ( puchu1.y > Draw.Ground ) { puchu1.y = Draw.Ground; }
+		if ( puchu2.y > Draw.Ground ) { puchu2.y = Draw.Ground; }
 	}
 	
 	//-- ぷちゅの横移動処理
 	public void slideRight() {
+		slide_anim_time = 0;
+		puchu1.draw_x = puchu1.x;
+		puchu2.draw_x = puchu2.x;
 		puchu1.x += Draw.Squares;
 		puchu2.x += Draw.Squares;
+		if ( puchu1.x > Draw.WallRight ) { puchu1.x = Draw.WallRight; }
+		if ( puchu2.x > Draw.WallRight ) { puchu2.x = Draw.WallRight; }
 		is_match_position_slide = false;
 		slide_anim_dir = 1;
 	}
 	
 	public void slideLeft() {
+		slide_anim_time = 0;
+		puchu1.draw_x = puchu1.x;
+		puchu2.draw_x = puchu2.x;
 		puchu1.x -= Draw.Squares;
 		puchu2.x -= Draw.Squares;
+		if ( puchu1.x < Draw.WallLeft ) { puchu1.x = Draw.WallLeft; }
+		if ( puchu2.x < Draw.WallLeft ) { puchu2.x = Draw.WallLeft; }
 		is_match_position_slide = false;
 		slide_anim_dir = -1;
 	}
 	
 	//-- ぷちゅの横移動アニメーション
 	public void drawingSlide() {
+		slide_anim_time++;
 		puchu1.draw_x += slide_anim_speed * slide_anim_dir;
 		puchu2.draw_x += slide_anim_speed * slide_anim_dir;
-		if ( puchu1.draw_x == puchu1.x ) {
+		if ( puchu1.draw_x > Draw.WallRight ) { puchu1.draw_x = Draw.WallRight; }
+		if ( puchu2.draw_x > Draw.WallRight ) { puchu2.draw_x = Draw.WallRight; }
+		if ( puchu1.draw_x < Draw.WallLeft ) { puchu1.draw_x = Draw.WallLeft; }
+		if ( puchu2.draw_x < Draw.WallLeft ) { puchu2.draw_x = Draw.WallLeft; }
+		if ( slide_anim_time >= Draw.Squares/slide_anim_speed ) {
 			is_match_position_slide = true;
 		}
 	}

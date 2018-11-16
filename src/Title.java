@@ -3,6 +3,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.applet.Applet;
+import java.applet.AudioClip;
 
 public class Title extends JPanel{
 	final Toolkit tk = Toolkit.getDefaultToolkit();
@@ -34,6 +36,7 @@ public class Title extends JPanel{
         myIP = new JLabel(nw.getIPaddr());
         myIP.setBounds(225, 470, 400, 30);
         myIP.setFont(labelFont);
+        myIP.setForeground(Color.WHITE);
 		//1Pプレイ
 		soloBtn = new JButton("1Pプレイ");
 		soloBtn.setBounds(570, 450, 160, 60);
@@ -43,6 +46,7 @@ public class Title extends JPanel{
 		rival = new JLabel("相手のIPアドレス:");
 		rival.setBounds(225, 550, 300, 30);
 		rival.setFont(labelFont);
+		rival.setForeground(Color.WHITE);
 		rivalIP = new JTextField("0.0.0.0");
 		rivalIP.setBounds(400, 550, 160, 30);
 		rivalIP.setFont(labelFont);
@@ -63,6 +67,8 @@ public class Title extends JPanel{
 	private class SoloPlayBtn implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
 			setFade(GameMain.Status.GAME_SOLO);
+			AudioClip pushSound = Applet.newAudioClip(getClass().getResource("selectmode.wav"));
+			pushSound.play();
 		}
 	}
 	
@@ -71,6 +77,8 @@ public class Title extends JPanel{
 		public void actionPerformed(ActionEvent e) {
 			if(nw.Connect(rivalIP.getText())) {
 				setFade(GameMain.Status.GAME_DUO);
+				AudioClip pushSound = Applet.newAudioClip(getClass().getResource("selectmode.wav"));
+				pushSound.play();
 			} else {
 				JLabel label = new JLabel("接続に失敗しました");
 			    JOptionPane.showMessageDialog(gm.frame, label);

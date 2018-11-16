@@ -1,7 +1,5 @@
 import java.awt.*;
 import javax.swing.*;
-import java.applet.Applet;
-import java.applet.AudioClip;
 
 public class Puchu {
 	
@@ -24,8 +22,8 @@ public class Puchu {
 	private int bound_anim_count = 1; // バウンドアニメーションの回数
 	private static final int drop_anim_speed = 10;	// 落下アニメーションの落下速度
 	private static final int bound_anim_speed = 6; // バウンドアニメーションの速度(小さいほど早い)
-	private static final int max_van_time = 50; // 死に際ぷちゅの顔が表示される時間
-	private static final int max_van_time_after = 40; // 消滅アニメーション再生から終了判定をとるまでの時間
+	private static final int max_van_time = 20; // 死に際ぷちゅの顔が表示される時間
+	private static final int max_van_time_after = 30; // 消滅アニメーション再生から終了判定をとるまでの時間
 	private static final int max_end_flame = 200;
 	
 	
