@@ -106,7 +106,7 @@ public class Field {
 		next[1].setPosition(290, 50);
 		next[2].setPosition(315, 140);
 		moving_flag = true;
-		key.canInput();
+		key.canInput(true);
 	}
 	
 	//ぷちゅの当たり判定

@@ -175,31 +175,24 @@ public class GameMain extends Thread {
 					rival.draw.startReadyAnim();
 					frameCount = 0;
 				} else {
+					int temp;
+					
 					// スタート同期済み
 					if(canStart) {
 						// ネットワーク
 						if(nw.index >= rivalIndex) { //一致してるとき or 遅い場合
 							isUpdate = true;
 							stopCount = 0;
-							// キーデータあり
 							if(nowKey != 0 && nowKeyTime <= frameCount) {
 								setRivalInput(nowKey);
 								nowKey = 0;
-							}
-							// キーのフレームよりあとに進んだ場合に次のデータを取得
-							if(nowKey == 0 && nw.isConnect) {
+							} else if(nowKey == 0) {
 								if(nw.getRivalStatus()) {
-									nw.getRivalStatus(); //フィールドデータなら次のインデックスも取得する
+									nw.getRivalStatus();
 									haveRivalField = true;
 								}
-								// キーデータあり
-								if(nowKey != 0 && nowKeyTime <= frameCount) {
-									setRivalInput(nowKey);
-									nowKey = 0;
-								}
 							}
-						} else if (nw.index < rivalIndex) { //自分のほうが早い
-							// 座標更新を止める
+						} else { //自分のほうが早い
 							isUpdate = false;
 							stopCount++;
 							// 強制切断検出
@@ -207,15 +200,15 @@ public class GameMain extends Thread {
 							// 次のデータを取得
 							if(nw.isConnect) nw.getRivalStatus();
 						}
-						// 状態更新
-						int temp;
-						// 自分
+						// 自分の状態更新
 						if(!isMeFinish) {
 							temp = me.update();
 							if(temp != meIndex) {
 								if(meIndex == -1 && temp != -1) {
+									me.key.canInput(false);
 									nw.sendField(me.cell); //次のぷちゅが降り始めたらフィールド全体を送信
 									resetInput(me.key); //長押しを一旦解除
+									me.key.canInput(true);
 								}
 								meIndex = temp;
 								if(temp != -1) nw.sendPuchuIndex(meIndex);
@@ -379,7 +372,7 @@ public class GameMain extends Thread {
 	public void setRivalField(int[][] type) {
 		for(int i = 0; i < 6; i++) {
 			for(int j = 0; j < 14; j++) {
-				rival.cell[i][j].type = type[i][j];
+				rival.cell[i][j].setPuchu(type[i][j], i, j);
 			}
 		}
 	}

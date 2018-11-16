@@ -103,7 +103,7 @@ public class Key extends KeyAdapter {
 	}
 	
 	// 入力の可否
-	public void canInput() {
-		canKeyInput = true;
+	public void canInput(boolean flag) {
+		canKeyInput = flag;
 	}
 }
