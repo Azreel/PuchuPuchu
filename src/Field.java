@@ -561,8 +561,8 @@ public class Field {
 	
 	private void cal_obs() {
 		
-		obs_count = (sub_score + rn_score) / 70;
-		rn_score = (sub_score + rn_score) % 70;
+		obs_count = (sub_score + rn_score) / 90;
+		rn_score = (sub_score + rn_score) % 90;
 	
 	}
 	
