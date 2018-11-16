@@ -7,7 +7,7 @@ import java.applet.AudioClip;
 
 public class Field {
 	
-	private int score = 0;
+	public int score = 0;
 	private int sub_score = 0;
 	private int rn_score = 0;
 	public Puchu[][] cell = new Puchu[6][14];

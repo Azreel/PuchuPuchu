@@ -189,7 +189,8 @@ public class GameMain extends Thread {
 							} else if(nowKey == 0) {
 								if(nw.getRivalStatus()) {
 									nw.getRivalStatus();
-									haveRivalField = true;
+									//setRivalField(nextRivalField);
+									//haveRivalField = true;
 								}
 							}
 						} else { //自分のほうが早い
@@ -206,7 +207,7 @@ public class GameMain extends Thread {
 							if(temp != meIndex) {
 								if(meIndex == -1 && temp != -1) {
 									me.key.canInput(false);
-									nw.sendField(me.cell); //次のぷちゅが降り始めたらフィールド全体を送信
+									nw.sendField(me.cell, me.score, me.fallen_obs, me.unfallen_obs); //次のぷちゅが降り始めたらフィールド全体を送信
 									resetInput(me.key); //長押しを一旦解除
 									me.key.canInput(true);
 								}
@@ -219,8 +220,8 @@ public class GameMain extends Thread {
 							temp = rival.update();
 							if(temp != rivalIndex) {
 								if(oldIndex == -1 && temp != -1 && haveRivalField) {
-									setRivalField(nextRivalField);
-									haveRivalField = false;
+									//setRivalField(nextRivalField);
+									//haveRivalField = false;
 									resetInput(rival.key); //長押し解除
 								}
 								if(temp != -1) rivalIndex = temp;
@@ -369,7 +370,10 @@ public class GameMain extends Thread {
 	}
 	
 	// ライバルのフィールドを同期
-	public void setRivalField(int[][] type) {
+	public void setRivalField(int[][] type, int score, int fallenObs, int unfallenObs) {
+		rival.score = score;
+		rival.fallen_obs = fallenObs;
+		rival.unfallen_obs = unfallenObs;
 		for(int i = 0; i < 6; i++) {
 			for(int j = 0; j < 14; j++) {
 				rival.cell[i][j].setPuchu(type[i][j], i, j);

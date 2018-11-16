@@ -228,8 +228,16 @@ public class Network extends Thread {
 		int[][] cell = new int[6][14];
 		String temp;
 		String[] splited;
-		int column = 0;
+		int column = 0, score = 0, fallenObs = 0, unfallenObs = 0;
 		
+		try {
+			score = Integer.parseInt(br.readLine());
+			fallenObs = Integer.parseInt(br.readLine());
+			unfallenObs = Integer.parseInt(br.readLine());
+		} catch (Exception e) {
+			System.out.println("nw get: " + e);
+			return;
+		}
 		while(true) {
 			try {
 				temp = br.readLine();
@@ -252,7 +260,7 @@ public class Network extends Thread {
 			}
 			column++;
 		}
-		gm.nextRivalField = cell;
+		gm.setRivalField(cell, score, fallenObs, unfallenObs);
 	}
 	
 	// 初期ぷちゅペアリスト送信
@@ -280,9 +288,12 @@ public class Network extends Thread {
 	}
 	
 	// フィールド情報送信
-	public void sendField(Puchu[][] cell) {
+	public void sendField(Puchu[][] cell, int score, int fallenObs, int unfallenObs) {
 		String column = "";
 		pw.println("FIELDSTART");
+		pw.println(score);
+		pw.println(fallenObs);
+		pw.println(unfallenObs);
 		for(int i = 0; i < 6; i++) {
 			for(int j = 0; j < 14; j++) {
 				column += cell[i][j].type + ",";
