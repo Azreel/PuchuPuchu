@@ -47,7 +47,7 @@ public class Field {
 	private int chain_count = 0;	//連鎖数
 	private int switch_figure;
 	private int speed = 1;
-	private int[] comb_point = {0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512};
+	private int[] comb_point = {0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512, 544, 576, 608, 640, 672, 704, 736};
 	private int[] link_point = {0, 2, 3, 4, 5, 6, 7, 10};
 	private int[] color_point = {0, 3, 6, 12, 24, 48};
 	private int[] link_all = {9, 16, 18, 34, 36, 45, 50, 52};
@@ -330,13 +330,12 @@ public class Field {
 	public void drop_finish() {
 		
 		van_puchu = false;
-		fallen = false;
 		puchu_count = 0;
 		link_count = 0;
 		color_count = 0;
 		for ( int i = 5; i >= 0; i-- ) {
 			for ( int j = 13; j >= 2; j-- ) {
-				if ( cell[i][j].type != Puchu.Emp ) {
+				if ( cell[i][j].type != Puchu.Emp && cell[i][j].type != Puchu.Obs ) {
 					cell[i][j].combine_count = puchu_comb(i, j);
 				}
 			}
@@ -344,7 +343,7 @@ public class Field {
 
 		for ( int i = 5; i >= 0; i-- ) {
 			for ( int j = 13; j >= 2; j-- ) {
-				if ( cell[i][j].type != Puchu.Emp && cell[i][j].combine_count >= 3 ) {
+				if ( cell[i][j].type != Puchu.Emp && cell[i][j].type != Puchu.Obs && cell[i][j].combine_count >= 3 ) {
 					link_count += cell[i][j].combine_count;
 					van_puchu = true;
 					color_check[cell[i][j].type-1] = 1;
@@ -370,7 +369,7 @@ public class Field {
 			//System.out.println("score:" + score);
 			cal_obs();
 			//System.out.println("obs:" + obs_count);
-			if ( unfallen_obs + fallen_obs > 0 ) {
+			if ( unfallen_obs + fallen_obs > 0 ) {					//相殺処理
 				if ( obs_count >= unfallen_obs + fallen_obs ) {
 					obs_count = obs_count - (unfallen_obs + fallen_obs);
 					unfallen_obs = 0;
@@ -385,7 +384,12 @@ public class Field {
 					obs_count = 0;
 				}
 			}
+			if ( score <= 9999999 ) {
+				score = 9999999;
+			}
+			gm.sendObs(obs_count ,is_me);
 			draw.startVanishAnim(chain_count, obs_count, score);
+			
 		}
 	}
 	
@@ -555,40 +559,64 @@ public class Field {
 		chain_count = 0;
 		obs_count = 0;
 		
-		if ( fallen_obs > 0 ) {
+		gm.sendObs(0, is_me);
+		if ( fallen_obs > 0 && fallen == false ) {
 			obs_fall();
+			return;
 		}
 		if ( cell[2][2].type != Puchu.Emp ) {
 			gm.finishGame(is_me);
 			draw.startEndAnim(Draw.GameInfo.GAME_LOSE);
+		} else {
+			fallen = false;
+			switch_start();			
 		}
-		switch_start();
 	}
 	
 	private void obs_fall() {
 		
 		int line = 0;
+		int count = 0;
+		boolean obs_flag = false;
 		fallen = true;
 		
-		if ( obs_count % 6 == 0 ) {	//1列降ってくる場合
-			line = obs_count / 6;
-		} else {
-			line = obs_count / 6 + 1;
-		}
-		
-		for ( int i = 0; i < line; i++ ) {
+		while( count < fallen_obs && count < 30 ) {
+			obs_flag = false;
 			for ( int j = 0; j < 6; j++ ) {
-				for ( int k = 0; k < 14; k++ ) {
-					if ( cell[j][k].type != Puchu.Emp ) {
+				if ( count >= fallen_obs ) {
+					break;
+				}
+				for ( int k = 13; k >= 0; k-- ) {
+					if ( cell[j][k].type == Puchu.Emp ) {
+						
 						if ( k != 0 ) {
-							cell[j][k-1].dropDownObs(i+1);
+							cell[j][k].dropDownObs(count/6+1);
 						} else {
-							cell[j][0].dropDownObs(line);
+							cell[j][0].dropDownObs(count/6+1);
 						}
+						obs_flag = true;
+						count++;
+						break;
 					}
 				}
 			}
+			if ( obs_flag == false ) {
+				break;
+			}
 		}
+		draw.setObsNum(-count);
+		fallen_obs -= count;
+		draw.startDropAnim();
+	}
+	
+	public void receive_obs(int count) {
 		
+		if ( count == 0 ) {
+			fallen_obs += unfallen_obs;
+			unfallen_obs = 0;
+		} else {
+			unfallen_obs += count;
+			draw.startDamageAnim(count);
+		}
 	}
 }
