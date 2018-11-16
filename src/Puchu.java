@@ -111,7 +111,7 @@ public class Puchu {
 	public void setPuchu(int _type, int _i, int _j) {
 		type = _type;
 		x = draw_x = _i*Draw.Squares;
-		y = draw_y = _j*Draw.Squares;
+		y = draw_y = (_j - 2)*Draw.Squares;
 		is_match_position_drop = true;
 		
 	}
