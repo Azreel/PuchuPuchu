@@ -107,4 +107,12 @@ public class Puchu {
 		int dir = (_is_winner)?1:-1;
 		draw_y -= dir * (int)(Math.pow(_flame , 2)/(max_end_flame*1.0));
 	}
+	
+	public void setPuchu(int _type, int _i, int _j) {
+		type = _type;
+		x = draw_x = _i*Draw.Squares;
+		y = draw_y = _j*Draw.Squares;
+		is_match_position_drop = true;
+		
+	}
 }

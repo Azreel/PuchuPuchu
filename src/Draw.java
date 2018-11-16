@@ -103,7 +103,7 @@ public class Draw extends JPanel{
 	
 	
 	
-	private AudioClip se_drop, se_delete;
+	private AudioClip se_drop, se_delete, se_obs_update;
 	
 	Draw() {	//nullプレイヤー用
 		this.setPreferredSize(new Dimension(PanelW, PanelH));
@@ -172,6 +172,7 @@ public class Draw extends JPanel{
 	private void initSound() {
 		se_delete = Applet.newAudioClip(getClass().getResource("delpuchu.wav"));
 		se_drop = Applet.newAudioClip(getClass().getResource("rakka.wav"));
+		se_obs_update = Applet.newAudioClip(getClass().getResource("ojamaup.wav"));
 	}
 	
 	//-- SE発火
@@ -346,6 +347,7 @@ public class Draw extends JPanel{
 	//-- おじゃま更新時のアニメーション開始
 	private void startObsUpdateAnim() {
 		obs_update_state = AnimState.state1;
+		se_obs_update.play();
 		obs_update_time = 0;
 	}
 	
