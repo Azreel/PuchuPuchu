@@ -6,44 +6,53 @@ public class Key extends KeyAdapter {
 	public boolean Left;
 	public boolean Right;
 	public boolean Down;
-	public boolean TurnRight;
 	public boolean TurnLeft;
+	public boolean TurnRight;
 	public boolean Enter;
 	
-	private int KeyData = 0; //送信用
-	private int oldKey = 0;
-	private Network nw;
+	private GameMain gm;
+	private boolean canKeyInput = false;
 
-	Key(Network parent){
-		nw = parent;
+	Key(GameMain _gm){
+		gm = _gm;
 	}
 	
 	// キーボードが押された時の処理(文字)
 	public void keyTyped(KeyEvent e) {
 	}
 
-	// キーボードが押された時の処理
+	// キーボードが押された時の処理(連続で入力あり)
 	public void keyPressed(KeyEvent e) {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:// ←キー
-			Left = true;
-			sendKeyData(1);
+			if(!Left && canKeyInput) {
+				Left = true;
+				gm.nw.sendStatus(1 + ":" + gm.frameCount);
+			}
 			break;
 		case KeyEvent.VK_RIGHT:// →キー
-			Right = true;
-			sendKeyData(2);
+			if(!Right && canKeyInput) {
+				Right = true;
+				gm.nw.sendStatus(2 + ":" + gm.frameCount);
+			}
 			break;
 		case KeyEvent.VK_DOWN:// ↓キー
-			Down = true;
-			sendKeyData(3);
+			if(!Down && canKeyInput) {
+				Down = true;
+				gm.nw.sendStatus(3 + ":" + gm.frameCount);
+			}
 			break;
 		case KeyEvent.VK_Z:// Zキー
-			TurnLeft = true;
-			sendKeyData(4);
+			if(!TurnLeft && canKeyInput) {
+				TurnLeft = true;
+				gm.nw.sendStatus(4 + ":" + gm.frameCount);
+			}
 			break;
 		case KeyEvent.VK_X:// Xキー
-			TurnRight = true;
-			sendKeyData(5);
+			if(!TurnRight && canKeyInput) {
+				TurnRight = true;
+				gm.nw.sendStatus(5 + ":" + gm.frameCount);
+			}
 			break;
 		case KeyEvent.VK_Q:// Qキー
 			System.exit(0);
@@ -58,24 +67,34 @@ public class Key extends KeyAdapter {
 	public void keyReleased(KeyEvent e) {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:// ←キー
-			Left = false;
-			sendKeyData(-1);
+			if(Left && canKeyInput) {
+				Left = false;
+				gm.nw.sendStatus(-1 + ":" + gm.frameCount);
+			}
 			break;
 		case KeyEvent.VK_RIGHT:// →キー
-			Right = false;
-			sendKeyData(-2);
+			if(Right && canKeyInput) {
+				Right = false;
+				gm.nw.sendStatus(-2 + ":" + gm.frameCount);
+			}
 			break;
 		case KeyEvent.VK_DOWN:// ↓キー
-			Down = false;
-			sendKeyData(-3);
+			if(Down && canKeyInput) {
+				Down = false;
+				gm.nw.sendStatus(-3 + ":" + gm.frameCount);
+			}
 			break;
 		case KeyEvent.VK_Z:// Zキー
-			TurnLeft = false;
-			sendKeyData(-4);
+			if(TurnLeft && canKeyInput) {
+				TurnLeft = false;
+				gm.nw.sendStatus(-4 + ":" + gm.frameCount);
+			}
 			break;
 		case KeyEvent.VK_X:// Xキー
-			TurnRight = false;
-			sendKeyData(-5);
+			if(TurnRight && canKeyInput) {
+				TurnRight = false;
+				gm.nw.sendStatus(-5 + ":" + gm.frameCount);
+			}
 			break;
 		case KeyEvent.VK_ENTER:// Enterキー
 			Enter = false;
@@ -83,10 +102,8 @@ public class Key extends KeyAdapter {
 		}
 	}
 	
-	private void sendKeyData(int key) {
-		nw.sendStatus(Integer.toString(key));
-		if(key != oldKey) {
-			oldKey = key;
-		}
+	// 入力の可否
+	public void canInput(boolean flag) {
+		canKeyInput = flag;
 	}
 }
