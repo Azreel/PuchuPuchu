@@ -310,6 +310,7 @@ public class Draw extends JPanel{
 	//-- 決着時のアニメーション開始
 	public void startEndAnim(GameInfo _game) {
 		game = _game;
+		fd.now.puchu1.type = Puchu.Emp; fd.now.puchu2.type = Puchu.Emp;
 		if ( _game == GameInfo.GAME_WIN ) { img_end = tk.getImage(getClass().getResource("yatta.png")); soundIgnition("Ascension.wav");}
 		if ( _game == GameInfo.GAME_LOSE ) { img_end = tk.getImage(getClass().getResource("patankyu.png")); soundIgnition("lose.wav"); }
 		end_state = AnimState.state1;
