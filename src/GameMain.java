@@ -63,7 +63,7 @@ public class GameMain extends Thread {
 		while(true) {
 			// 60fps保つ
 			try {
-				if(loopDelay > 16) sleep(MSPF);
+				if(loopDelay > MSPF) sleep(MSPF);
 				else if(loopDelay > 0) sleep(loopDelay);
 			}catch(Exception e) {}
 			// ゲーム全体の管理
@@ -203,7 +203,7 @@ public class GameMain extends Thread {
 							isUpdate = false;
 							stopCount++;
 							// 強制切断検出
-							if(stopCount >= 100 && !isRivalFinish) disconnect();
+							if(stopCount >= 500 && !isRivalFinish) disconnect();
 							// 次のデータを取得
 							if(nw.isConnect) nw.getRivalStatus();
 						}
@@ -263,14 +263,17 @@ public class GameMain extends Thread {
 		return ppList;
 	}
 	
-	// ゲーム終了の検知
+	// ゲームオーバーの検知
 	public void finishGame(boolean isMe) {
 		isMeFinish = true;
 		isRivalFinish = true;
 		if(gameStatus == Status.GAME_DUO) {
-			if(isMe) rival.win();
-			else me.win();
-			if(isMe) nw.sendStatus("END");
+			if(isMe) {
+				rival.win();
+				nw.sendStatus("END");
+			} else {
+				me.win();
+			}
 			nw.Close();
 		}
 	}
@@ -319,7 +322,7 @@ public class GameMain extends Thread {
 		}
 	}
 	
-	// ライバルのキー入力を反映
+	// ライバルのキー入力を取得
 	public void getRivalInput(String key) {
 		String[] keyData = key.split(":");
 
@@ -333,7 +336,7 @@ public class GameMain extends Thread {
 		}
 	}
 	
-	// ライバルのキーをセット
+	// ライバルのキーを反映
 	private void setRivalInput(int key) {
 		boolean isPress = true;
 		
@@ -395,7 +398,9 @@ public class GameMain extends Thread {
 		nw.Close();
 	}
 	
-	// プログラム実行本体
+	//--------------------
+	//    プログラム実行本体
+	//--------------------
 	public static void main(String[] args) {
 		GameMain gm = new GameMain();
 		gm.start();

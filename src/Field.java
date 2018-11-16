@@ -19,7 +19,7 @@ public class Field {
 	public AudioClip turn_sound;
 	public AudioClip slide_sound;
 	public int unfallen_obs = 0;	//落ちてこないお邪魔ぷちゅ
-	public int fallen_obs = 0;		//落ちてくるお邪魔ぷちゅ
+	public int fallen_obs = 5;		//落ちてくるお邪魔ぷちゅ
 	
 	public boolean bottom_flag = false; 	//当たり判定
 	public boolean moving_flag = false;		//移動できるかどうか
@@ -348,7 +348,18 @@ public class Field {
 					van_puchu = true;
 					color_check[cell[i][j].type-1] = 1;
 					puchu_count++;
+					if ( i < 5 && cell[i+1][j].type == Puchu.Obs ) {
+						cell[i+1][j].vanishOut();
+					} else if ( i > 0 && cell[i-1][j].type == Puchu.Obs ) {
+						cell[i-1][j].vanishOut();
+					} else if ( j > 0 && cell[i][j-1].type == Puchu.Obs ) {
+						cell[i][j-1].vanishOut();
+					}
+					
 					cell[i][j].vanishOut();
+					if ( j < 13 && cell[i][j+1].type == Puchu.Obs ) {
+						cell[i][j+1].vanishOut();
+					}
 				}
 			}
 		}
