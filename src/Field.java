@@ -343,7 +343,7 @@ public class Field {
 
 		for ( int i = 5; i >= 0; i-- ) {
 			for ( int j = 13; j >= 2; j-- ) {
-				if ( cell[i][j].type != Puchu.Emp && cell[i][j].type != Puchu.Obs && cell[i][j].combine_count >= 3 ) {
+				if ( cell[i][j].type != Puchu.Emp && cell[i][j].type != Puchu.Obs && cell[i][j].type < Puchu.Van && cell[i][j].combine_count >= 3 ) {
 					link_count += cell[i][j].combine_count;
 					van_puchu = true;
 					color_check[cell[i][j].type-1] = 1;
