@@ -207,7 +207,7 @@ public class GameMain extends Thread {
 							if(temp != meIndex && temp != -1) {
 								meIndex = temp;
 								me.key.canKeyInput = false;
-								nw.sendField(me.cell, me.score, me.fallen_obs, me.unfallen_obs); //次のぷちゅになったらフィールド全体を送信
+								nw.sendField(me.cell, me.score, rival.fallen_obs, rival.unfallen_obs); //次のぷちゅになったらフィールド全体を送信
 								me.key.canKeyInput = true;
 								nw.sendPuchuIndex(meIndex);
 								resetInput(me.key); //長押し解除
@@ -365,8 +365,8 @@ public class GameMain extends Thread {
 	// ライバルのフィールドを同期
 	public void setRivalField(int[][] type, int score, int fallenObs, int unfallenObs) {
 		rival.score = score;
-		rival.fallen_obs = fallenObs;
-		rival.unfallen_obs = unfallenObs;
+		me.fallen_obs = fallenObs;
+		me.unfallen_obs = unfallenObs;
 		for(int i = 0; i < 6; i++) {
 			for(int j = 0; j < 14; j++) {
 				rival.cell[i][j].setPuchu(type[i][j], i, j);
