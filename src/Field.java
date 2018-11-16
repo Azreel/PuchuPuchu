@@ -19,7 +19,7 @@ public class Field {
 	public AudioClip turn_sound;
 	public AudioClip slide_sound;
 	public int unfallen_obs = 0;	//落ちてこないお邪魔ぷちゅ
-	public int fallen_obs = 5;		//落ちてくるお邪魔ぷちゅ
+	public int fallen_obs = 0;		//落ちてくるお邪魔ぷちゅ
 	
 	public boolean bottom_flag = false; 	//当たり判定
 	public boolean moving_flag = false;		//移動できるかどうか
