@@ -94,8 +94,8 @@ public class GameMain extends Thread {
 					frame.add(title);
 					frame.revalidate();
 					//BGM
-					//overlay.setBGM(getClass().getResource("Title.wav"));
-					overlay.setBGM(getClass().getResource("Title2.wav"));
+					overlay.setBGM(getClass().getResource("Title.wav"));
+					//overlay.setBGM(getClass().getResource("Title2.wav"));
 				} else {
 					if(isPaint) title.repaint();
 					overlay.repaint();
@@ -246,14 +246,7 @@ public class GameMain extends Thread {
 		overlay.FadeIn();
 	}
 	
-	// フェードアウト(点滅します)
-	public void fadeOut() {
-		nextStatus = gameStatus;
-		isOverlay = true;
-		overlay.FadeOut();
-	}
-	
-	// フェード系終了
+	// フェードイン終了
 	public void fadeEnd() {
 		gameStatus = nextStatus;
 		isOverlay = false;

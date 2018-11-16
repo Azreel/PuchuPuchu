@@ -10,7 +10,7 @@ public class Overlay extends JPanel{
 	final Font btnFont = new Font(Font.DIALOG, Font.PLAIN, 24);
 	final Font labelFont = new Font(Font.DIALOG, Font.PLAIN, 40);
 	
-	static enum Mode {STOP, FADEIN, FADEOUT, PAUSE, RESULT};
+	static enum Mode {STOP, FADEIN, RESULT};
 	Mode paintMode = Mode.STOP;
 	float fadeAlpha;
 	GameMain gm;
@@ -27,12 +27,6 @@ public class Overlay extends JPanel{
 		this.removeAll();
 		paintMode = Mode.FADEIN;
 		fadeAlpha = 0.0f;
-	}
-	
-	public void FadeOut() {
-		this.removeAll();
-		paintMode = Mode.FADEOUT;
-		fadeAlpha = 1.0f;
 	}
 	
 	public void Result(int score) {
@@ -89,15 +83,6 @@ public class Overlay extends JPanel{
             	paintMode = Mode.STOP;
             	gm.fadeEnd();
             	if(isPlay) stopBGM();
-            }
-        	break;
-        case FADEOUT:
-        	g2D.setColor(new Color(0,0,0,(int)((fadeAlpha >= 0.0f ? fadeAlpha : 0.0f)*255)));
-            g2D.fillRect(0, 0, w, h);
-            fadeAlpha -= 1.0f / fadeSpeed;
-            if(fadeAlpha <= 0.0f) {
-            	paintMode = Mode.STOP;
-            	if(isPlay) gm.fadeEnd();
             }
         	break;
         case RESULT:

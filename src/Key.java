@@ -11,11 +11,6 @@ public class Key extends KeyAdapter {
 	public boolean Enter;
 	
 	private GameMain gm;
-	private long leftTime;
-	private long rightTime;
-	private long downTime;
-	private long turnLeftTime;
-	private long turnRightTime;
 	private boolean canKeyInput = false;
 
 	Key(GameMain _gm){

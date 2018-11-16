@@ -15,8 +15,6 @@ public class Network extends Thread {
 	Socket sc;
 	BufferedReader br;
 	PrintWriter pw;
-	//int sendCount = 0;
-	//int recvCount = 0;
 	
 	// コンストラクタ
 	Network(GameMain parent){
@@ -91,14 +89,16 @@ public class Network extends Thread {
 		try {
 			// サーバーを閉じる
 			if(ss != null) ss.close();
+			// クライアントモードに移行
 			programMode = Mode.CLIENT;
 			sc = new Socket(addr, Port);
             br = new BufferedReader(new InputStreamReader(sc.getInputStream()));
             pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(sc.getOutputStream())));
-            // サーバーからの返事があるまで30秒待機
+            // PING送信
             long start = System.currentTimeMillis();
             pw.println("PING");
             pw.flush();
+            // サーバーからの返事があるまで30秒待機
             while(true) {
             	if(System.currentTimeMillis() - start >= 30 * 1000) throw new SocketException();
             	if(br.readLine().equals("PONG")) break;
