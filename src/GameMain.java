@@ -4,14 +4,16 @@ import java.util.Random;
 import javax.swing.*;
 
 public class GameMain extends Thread {
+	// 画面サイズ
 	final int ScreenW = 960;
 	final int ScreenH = 640;
+	// 1フレームの時間
 	final long MSPF = 1000 / 60; //MilliSecond Per Frame
 	
 	public static enum Status { GAME_TITLE, GAME_SOLO, GAME_DUO };
-	public Network nw;
 	public static final int PPSIZE = 200;
 	public final JFrame frame = new JFrame();
+	public Network nw;
 	public boolean canStart = false;
 	public int rivalIndex = 0;
 	public long frameCount;
@@ -77,10 +79,14 @@ public class GameMain extends Thread {
 						frame.remove(rival.draw);
 						me = null;
 						rival = null;
-						canStart = false;
+						meIndex = 0;
 						isMeFinish = false;
 						isRivalFinish = false;
+						nowKey = 0;
+						nowKeyTime = -1;
+						isUpdate = true;
 						haveRivalField = false;
+						oldIndex = -1;
 						nw.Close();
 					}
 					// ネットワーク開始
@@ -253,21 +259,20 @@ public class GameMain extends Thread {
 	}
 	
 	// リザルトの表示
-	public void resultDisp(int score) {
-		isOverlay = true;
-		overlay.Result(score);
+	public void resultDisp(int score, boolean isMe) {
+		if(isMe) {
+			isOverlay = true;
+			overlay.Result(score);
+		}
 	}
 	
 	// ゲーム終了の検知
 	public void finishGame(boolean isMe) {
-		if(isMe) {
-			isMeFinish = true;
-			// rival.Win()
-		} else {
-			isRivalFinish = true;
-			// me.Win()
-		}
+		isMeFinish = true;
+		isRivalFinish = true;
 		if(gameStatus == Status.GAME_DUO) {
+			if(isMe) rival.win();
+			else me.win();
 			if(isMe) nw.sendStatus("END");
 			nw.Close();
 		}

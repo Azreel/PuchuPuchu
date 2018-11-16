@@ -310,7 +310,6 @@ public class Draw extends JPanel{
 	//-- 決着時のアニメーション開始
 	public void startEndAnim(GameInfo _game) {
 		game = _game;
-		fd.now.puchu1.type = Puchu.Emp; fd.now.puchu2.type = Puchu.Emp;
 		if ( _game == GameInfo.GAME_WIN ) { img_end = tk.getImage(getClass().getResource("yatta.png")); soundIgnition("Ascension.wav");}
 		if ( _game == GameInfo.GAME_LOSE ) { img_end = tk.getImage(getClass().getResource("patankyu.png")); soundIgnition("lose.wav"); }
 		end_state = AnimState.state1;
@@ -593,7 +592,7 @@ public class Draw extends JPanel{
 				}
 			}
 			// 操作中のぷちゅペア描写
-			if ( fd.now != null ) {
+			if ( fd.now != null && game == GameInfo.GAME_PLAYNOW) {
 				updatePuchuPairAnim(fd.now);
 				img_2d.drawImage(img_puchu[fd.now.puchu1.type], fd.now.puchu1.draw_x + margin_w, fd.now.puchu1.draw_y + margin_h, this);
 				img_2d.drawImage(img_puchu[fd.now.puchu2.type], fd.now.puchu2.draw_x + margin_w, fd.now.puchu2.draw_y + margin_h, this);				
