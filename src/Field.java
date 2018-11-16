@@ -352,13 +352,7 @@ public class Field {
 		}
 
 		if ( van_puchu == false ) {		//ぷちゅが消えないとき
-			chain_count = 0;
-			obs_count = 0;
-			if ( cell[2][2].type != Puchu.Emp ) {
-				gm.finishGame(is_me);
-				draw.startEndAnim(Draw.GameInfo.GAME_LOSE);
-			}
-			switch_start();
+			chain_reset();
 		} else{							//ぷちゅが消えるとき
 			cal_color();
 			cal_link();
@@ -460,6 +454,12 @@ public class Field {
 		if ( is_drop ) {
 			draw.startDropAnim();
 		} else {
+			chain_count = 0;
+			obs_count = 0;
+			if ( cell[2][2].type != Puchu.Emp ) {
+				gm.finishGame(is_me);
+				draw.startEndAnim(Draw.GameInfo.GAME_LOSE);
+			}
 			switch_start();
 		}
 	}
@@ -468,12 +468,11 @@ public class Field {
 		gm.resultDisp(score);
 	}
 	
-	public void p1_defeat() {
+	public void win() {
 		
-	}
-	
-	public void p2_defeat() {
+		moving_flag = false;		//移動できるかどうか
 
+		draw.startEndAnim(Draw.GameInfo.GAME_WIN);
 	}
 	
 	public void game_start() {
@@ -528,6 +527,16 @@ public class Field {
 		obs_count = (sub_score + rn_score) / 70;
 		rn_score = (sub_score + rn_score) % 70;
 	
+	}
+	
+	private void chain_reset() {
+		chain_count = 0;
+		obs_count = 0;
+		if ( cell[2][2].type != Puchu.Emp ) {
+			gm.finishGame(is_me);
+			draw.startEndAnim(Draw.GameInfo.GAME_LOSE);
+		}
+		switch_start();
 	}
 	
 }
