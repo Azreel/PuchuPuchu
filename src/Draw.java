@@ -260,7 +260,7 @@ public class Draw extends JPanel{
 		is_vanish_anim = true;
 		is_chain_display = true;
 		chain_display_time = 0;
-		if ( send_obs_num > 0 ) {
+		if ( send_obs_num > 0 || obs_num > 0) {
 			startAttackAnim();
 		}
 		setScore(score_now);
