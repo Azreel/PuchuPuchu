@@ -247,7 +247,7 @@ public class Network extends Thread {
 			}
 			column++;
 		}
-		gm.setRivalField(cell);
+		gm.nextRivalField = cell;
 	}
 	
 	// 初期ぷちゅペアリスト送信

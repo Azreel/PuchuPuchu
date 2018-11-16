@@ -56,6 +56,7 @@ public class Field {
 	private int puchu_count = 0;	//消えるぷちゅの個数
 	private int link_count = 0;		//消えるぷちゅの連結数
 	private int color_count = 0;	//消えるぷちゅの種類
+	private int puchu_index = 0;
 	
 	public Field(GameMain game, int[][] player, boolean me) {			//nullプレイヤー用
 		
@@ -88,7 +89,7 @@ public class Field {
 	
 	public void switch_next() {	//ぷちゅの更新
 		now = next[0];
-		puchu_count++;
+		puchu_index++;
 		
 		for ( int i = 0; i < 2; i++ ) {
 			next[i] = next[i+1];	//次のぷちゅの更新
@@ -103,6 +104,7 @@ public class Field {
 		next[1].setPosition(290, 50);
 		next[2].setPosition(315, 140);
 		moving_flag = true;
+		key.canInput();
 	}
 	
 	//ぷちゅの当たり判定
@@ -268,14 +270,14 @@ public class Field {
 	public int update() {			//連続処理
 		
 		int drop_pos = 0;
-		int puchu_index = -1;
+		int return_index = -1;
 		
 		if ( moving_flag == true ) {
 			judge_key();
 			hit_puchu();
 			if ( bottom_flag != true ) {
 				now.fallDown(speed);
-				puchu_index = puchu_count;
+				return_index = puchu_index;
 			} else {
 				if ( bottom_p1_flag == false ) {
 					drop_pos = drop_p1_pos();
@@ -303,7 +305,7 @@ public class Field {
 				bottom_p2_flag = false;
 			}
 		}
-		return puchu_index;
+		return return_index;
 	}
 	
 	//ぷちゅの種類のコピー
@@ -475,7 +477,7 @@ public class Field {
 	}
 	
 	public void game_start() {
-		key.canInput();
+		
 		switch_start();
 	}
 	

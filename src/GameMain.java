@@ -15,6 +15,7 @@ public class GameMain extends Thread {
 	public boolean canStart = false;
 	public int rivalIndex = 0;
 	public long frameCount;
+	public int[][] nextRivalField;
 	
 	private Status gameStatus = Status.GAME_TITLE;
 	private Status nextStatus;
@@ -31,6 +32,8 @@ public class GameMain extends Thread {
 	private int nowKey = 0;
 	private long nowKeyTime = -1;
 	private boolean isUpdate = true;
+	private boolean haveRivalField = false;
+	private int oldIndex = -1;
 	
 	// コンストラクタ
 	GameMain(){
@@ -77,6 +80,7 @@ public class GameMain extends Thread {
 						canStart = false;
 						isMeFinish = false;
 						isRivalFinish = false;
+						haveRivalField = false;
 						nw.Close();
 					}
 					// ネットワーク開始
@@ -164,30 +168,34 @@ public class GameMain extends Thread {
 					rival.draw.startReadyAnim();
 					frameCount = 0;
 				} else {
-					if(nw.index == rivalIndex) { //一致してるとき
-						isUpdate = true;
-						// キーデータあり
-						if(nowKey != 0 && nowKeyTime == frameCount) {
-							resetInput(rival.key);
-							setRivalInput(nowKey);
-							nowKey = 0;
-						}
-						// キーのフレームよりあとに進んだ場合に次のデータを取得
-						if(nowKeyTime < frameCount && nw.isConnect) {
-							boolean isField = nw.getRivalStatus();
-							if(isField) nw.getRivalStatus(); //フィールドデータなら次のインデックスも取得する
-						}
-					} else if(nw.index < rivalIndex) { //自分のほうが早い
-						// 座標更新を止める
-						isUpdate = false;
-						// 次のデータを取得
-						if(nw.isConnect) nw.getRivalStatus();
-					} else { //自分のほうが遅い
-						isUpdate = true;
-						// 
-					}
 					// スタート同期済み
 					if(canStart) {
+						// ネットワーク
+						if(nw.index >= rivalIndex) { //一致してるとき or 遅い場合
+							isUpdate = true;
+							// キーデータあり
+							if(nowKey != 0 && nowKeyTime == frameCount) {
+								setRivalInput(nowKey);
+								nowKey = 0;
+							}
+							// キーのフレームよりあとに進んだ場合に次のデータを取得
+							if(nowKey == 0 && nw.isConnect) {
+								if(nw.getRivalStatus()) {
+									nw.getRivalStatus(); //フィールドデータなら次のインデックスも取得する
+									haveRivalField = true;
+								}
+								// キーデータあり
+								if(nowKey != 0 && nowKeyTime == frameCount) {
+									setRivalInput(nowKey);
+									nowKey = 0;
+								}
+							}
+						} else if(nw.index < rivalIndex) { //自分のほうが早い
+							// 座標更新を止める
+							isUpdate = false;
+							// 次のデータを取得
+							if(nw.isConnect) nw.getRivalStatus();
+						}
 						// 状態更新
 						int temp;
 						if(!isMeFinish) {
@@ -205,9 +213,17 @@ public class GameMain extends Thread {
 						if(!isRivalFinish && isUpdate) {
 							// ライバル
 							temp = rival.update();
-							if(temp != -1) rivalIndex = temp;
-							frameCount++;
+							if(temp != rivalIndex) {
+								if(oldIndex == -1 && temp != -1 && haveRivalField) {
+									setRivalField(nextRivalField);
+									haveRivalField = false;
+									resetInput(rival.key); //長押し解除
+								}
+								if(temp != -1) rivalIndex = temp;
+								oldIndex = temp;
+							}
 						}
+						frameCount++;
 						// 画面描画
 						if(isPaint) {
 							me.draw.repaint();
