@@ -15,7 +15,7 @@ public class GameMain extends Thread {
 	public final JFrame frame = new JFrame();
 	public Network nw;
 	public boolean canStart = false;
-	public int rivalIndex = 0;
+	public int rivalIndex = 1;
 	public long frameCount;
 	public int[][] nextRivalField;
 	
@@ -79,6 +79,8 @@ public class GameMain extends Thread {
 						frame.remove(rival.draw);
 						me = null;
 						rival = null;
+						canStart = false;
+						rivalIndex = 1;
 						meIndex = 0;
 						isMeFinish = false;
 						isRivalFinish = false;
@@ -176,11 +178,11 @@ public class GameMain extends Thread {
 				} else {
 					// スタート同期済み
 					if(canStart) {
+						isUpdate = true;
 						// ネットワーク
 						if(nw.index >= rivalIndex) { //一致してるとき or 遅い場合
-							isUpdate = true;
 							// キーデータあり
-							if(nowKey != 0 && nowKeyTime == frameCount) {
+							if(nowKey != 0 && nowKeyTime <= frameCount) {
 								setRivalInput(nowKey);
 								nowKey = 0;
 							}
@@ -191,12 +193,12 @@ public class GameMain extends Thread {
 									haveRivalField = true;
 								}
 								// キーデータあり
-								if(nowKey != 0 && nowKeyTime == frameCount) {
+								if(nowKey != 0 && nowKeyTime <= frameCount) {
 									setRivalInput(nowKey);
 									nowKey = 0;
 								}
 							}
-						} else if(nw.index < rivalIndex) { //自分のほうが早い
+						} else if (nw.index < rivalIndex) { //自分のほうが早い
 							// 座標更新を止める
 							isUpdate = false;
 							// 次のデータを取得
@@ -204,8 +206,8 @@ public class GameMain extends Thread {
 						}
 						// 状態更新
 						int temp;
+						// 自分
 						if(!isMeFinish) {
-							// 自分
 							temp = me.update();
 							if(temp != meIndex) {
 								if(meIndex == -1 && temp != -1) {
@@ -216,8 +218,8 @@ public class GameMain extends Thread {
 								if(temp != -1) nw.sendPuchuIndex(meIndex);
 							}
 						}
+						// ライバル
 						if(!isRivalFinish && isUpdate) {
-							// ライバル
 							temp = rival.update();
 							if(temp != rivalIndex) {
 								if(oldIndex == -1 && temp != -1 && haveRivalField) {
@@ -371,6 +373,12 @@ public class GameMain extends Thread {
 	// ライバルの負けを検知
 	public void finishRival() {
 		nw.Close();
+	}
+	
+	// ライバルの切断を検知
+	public void disconnect() {
+		
+		me.win();
 	}
 	
 	// プログラム実行本体

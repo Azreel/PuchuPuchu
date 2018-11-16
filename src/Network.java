@@ -140,7 +140,7 @@ public class Network extends Thread {
 			System.out.println(input);
 		}catch(Exception e) {
 			System.out.println("nw get: "+e);
-			input = "END";
+			input = "DISCONNECT";
 		}
 		// コマンドによって分岐
 		switch(input) {
@@ -155,6 +155,11 @@ public class Network extends Thread {
 		case "END":
 			gm.canStart = true; // 無理やりスタート
 			gm.finishRival();
+			Close();
+			break;
+		// 強制切断発生
+		case "DISCONNECT":
+			gm.disconnect();
 			Close();
 			break;
 		// 初期ぷちゅペア受信開始
