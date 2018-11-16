@@ -155,7 +155,7 @@ public class Field {
 			} else if ( cell[now_x][now_y+1].type != Puchu.Emp ) {
 				bottom_p1_flag = true;
 				bottom_flag = true;
-			} else if ( cell[now_x+1][now_y+1].type != Puchu.Emp ) {
+			} else if ( now_x < 5 && cell[now_x+1][now_y+1].type != Puchu.Emp ) {
 				bottom_p2_flag = true;
 				bottom_flag = true;
 			}
