@@ -259,7 +259,9 @@ public class Draw extends JPanel{
 		is_vanish_anim = true;
 		is_chain_display = true;
 		chain_display_time = 0;
-		startAttackAnim();
+		if ( send_obs_num > 0 ) { 
+			startAttackAnim();
+		}
 		setScore(score_now);
 	}
 	
@@ -615,8 +617,8 @@ public class Draw extends JPanel{
 		
 		if ( is_alive ) {
 			// 予告おじゃまぷちゅ描写
+			if ( obs_state != AnimState.end ) { updateObsNotice(); }
 			if ( obs_num != 0 ) {
-				if ( obs_state != AnimState.end ) { updateObsNotice(); }
 				for ( int i = obs_num-1; i >= 0; i-- ) {
 					if ( obs_num <= obs_width ) {
 						img_2d.drawImage(img_obs_notice, margin_w + AreaCenter+ img_obs_notice.getWidth(this)*(i-4), margin_h - Draw.Squares - 5, this);									
