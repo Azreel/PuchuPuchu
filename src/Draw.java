@@ -292,7 +292,7 @@ public class Draw extends JPanel{
 	}
 	
 	//-- 予告おじゃま数の更新
-	private void setObsNum(int _update_obs_num) {
+	public void setObsNum(int _update_obs_num) {
 		if ( obs_num + _update_obs_num < 0 ) { obs_change = 0; }
 		else { obs_change = obs_num + _update_obs_num; }
 		obs_state = AnimState.state1;
