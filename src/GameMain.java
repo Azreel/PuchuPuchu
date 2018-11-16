@@ -13,7 +13,7 @@ public class GameMain extends Thread {
 	public static final int PPSIZE = 200;
 	public final JFrame frame = new JFrame();
 	public boolean canStart = false;
-	public int rivalIndex = 1;
+	public int rivalIndex = 0;
 	public long frameCount;
 	
 	private Status gameStatus = Status.GAME_TITLE;
@@ -29,7 +29,7 @@ public class GameMain extends Thread {
 	private boolean isMeFinish = false;
 	private boolean isRivalFinish = false;
 	private int nowKey = 0;
-	private long nowKeyTime = 0;
+	private long nowKeyTime = -1;
 	private boolean isUpdate = true;
 	
 	// コンストラクタ
@@ -58,7 +58,8 @@ public class GameMain extends Thread {
 		while(true) {
 			// 60fps保つ
 			try {
-				if(loopDelay > 0) sleep(loopDelay);
+				if(loopDelay > 16) sleep(MSPF);
+				else if(loopDelay > 0) sleep(loopDelay);
 			}catch(Exception e) {}
 			isPaint = !isOverlay;
 			// ゲーム全体の管理
@@ -110,9 +111,8 @@ public class GameMain extends Thread {
 					me = new Field(this, ppInit, true);
 					me.draw.setBounds(0, 0, ScreenW/2, ScreenH);
 					// nullプレイヤーフィールド
-					rival = new Field(this, ppInit, false); //debug
+					rival = new Field(this, null, false);
 					rival.draw.setBounds(ScreenW/2, 0, ScreenW/2, ScreenH);
-					rival.key = me.key; //debug
 					// フレームに追加
 					frame.add(me.draw);
 					frame.add(rival.draw);
@@ -122,11 +122,9 @@ public class GameMain extends Thread {
 					overlay.setBGM(getClass().getResource("gamemusic.wav"));
 					// スタートアニメーション
 					me.draw.startReadyAnim();
-					rival.draw.startReadyAnim();//debug
 				} else {
 					// 状態更新
 					if(!isMeFinish) me.update();
-					rival.update();//debug
 					// 画面描画
 					if(isPaint) {
 						me.draw.repaint();
@@ -144,7 +142,7 @@ public class GameMain extends Thread {
 					title = null;
 					// ぷちゅ生成
 					if(nw.programMode == Network.Mode.SERVER) nw.sendPuchu(makePuchu());
-					else while(!canStart) { nw.getRivalStatus(false); }
+					else while(!canStart) { nw.getRivalStatus(); }
 					// プレイヤーフィールド
 					me = new Field(this, ppInit, true);
 					me.draw.setBounds(0, 0, ScreenW/2, ScreenH);
@@ -158,7 +156,7 @@ public class GameMain extends Thread {
 					me.draw.requestFocus();
 					// 準備完了
 					nw.sendStatus("START");
-					while(!canStart) { nw.getRivalStatus(false); }
+					while(!canStart) { nw.getRivalStatus(); }
 					// BGM
 					overlay.setBGM(getClass().getResource("gamemusic.wav"));
 					// スタートアニメーション
@@ -166,21 +164,27 @@ public class GameMain extends Thread {
 					rival.draw.startReadyAnim();
 					frameCount = 0;
 				} else {
-					if(nowKeyTime >= frameCount && nw.index == rivalIndex) { // キーのフレームと自分のフレームが一致したとき
-						if(nowKey != 0) setRivalInput(nowKey);
-//						nowKey = 0;
-//						nowKeyTime = 0;
-//						if(nw.isConnect) nw.getRivalStatus(true); // 次のキーに行く
-//						isUpdate = true;
-					} else if(nowKeyTime < frameCount || nw.index < rivalIndex) { // 自分のフレームのほうが早いときorインデックスが完全にずれたとき
-						if(nw.isConnect) nw.getRivalStatus(true);
-//						if(nowKey < 0) setRivalInput(nowKey); // 離したキー情報のみ無理やり反映
-//						nowKey = 0;
-//						nowKeyTime = 0;
-//						isUpdate = false;
-					} else { // 何も無いとき
-						if(nw.isConnect) nw.getRivalStatus(true); // 次のデータ取り出し
-						//isUpdate = true;
+					if(nw.index == rivalIndex) { //一致してるとき
+						isUpdate = true;
+						// キーデータあり
+						if(nowKey != 0 && nowKeyTime == frameCount) {
+							resetInput(rival.key);
+							setRivalInput(nowKey);
+							nowKey = 0;
+						}
+						// キーのフレームよりあとに進んだ場合に次のデータを取得
+						if(nowKeyTime < frameCount && nw.isConnect) {
+							boolean isField = nw.getRivalStatus();
+							if(isField) nw.getRivalStatus(); //フィールドデータなら次のインデックスも取得する
+						}
+					} else if(nw.index < rivalIndex) { //自分のほうが早い
+						// 座標更新を止める
+						isUpdate = false;
+						// 次のデータを取得
+						if(nw.isConnect) nw.getRivalStatus();
+					} else { //自分のほうが遅い
+						isUpdate = true;
+						// 
 					}
 					// スタート同期済み
 					if(canStart) {
@@ -195,19 +199,19 @@ public class GameMain extends Thread {
 									resetInput(me.key); //長押しを一旦解除
 								}
 								meIndex = temp;
-								if(meIndex != -1) nw.sendPuchuIndex(meIndex);
+								if(temp != -1) nw.sendPuchuIndex(meIndex);
 							}
 						}
 						if(!isRivalFinish && isUpdate) {
 							// ライバル
 							temp = rival.update();
 							if(temp != -1) rivalIndex = temp;
+							frameCount++;
 						}
 						// 画面描画
 						if(isPaint) {
 							me.draw.repaint();
 							rival.draw.repaint();
-							frameCount++;
 						} else {
 							overlay.repaint();
 						}
