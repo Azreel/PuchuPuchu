@@ -9,9 +9,9 @@ public class Key extends KeyAdapter {
 	public boolean TurnLeft;
 	public boolean TurnRight;
 	public boolean Enter;
+	public boolean canKeyInput = false;
 	
 	private GameMain gm;
-	private boolean canKeyInput = false;
 
 	Key(GameMain _gm){
 		gm = _gm;
@@ -100,10 +100,5 @@ public class Key extends KeyAdapter {
 			Enter = false;
 			break;
 		}
-	}
-	
-	// 入力の可否
-	public void canInput(boolean flag) {
-		canKeyInput = flag;
 	}
 }

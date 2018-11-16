@@ -196,29 +196,29 @@ public class GameMain extends Thread {
 							// 強制切断検出
 							if(stopCount >= 500 && !isRivalFinish) disconnect();
 							// 次のデータを取得
-							if(nw.isConnect) nw.getRivalStatus();
+							if(nw.isConnect && nw.getRivalStatus()) {
+								//フィールドデータを取り出したら次のインデックスも取り出す
+								nw.getRivalStatus();
+							}
 						}
 						// 自分の状態更新
 						if(!isMeFinish) {
 							temp = me.update();
-							if(temp != meIndex) {
-								if(meIndex == -1 && temp != -1) {
-									me.key.canInput(false);
-									nw.sendField(me.cell, me.score, me.fallen_obs, me.unfallen_obs); //次のぷちゅが降り始めたらフィールド全体を送信
-									resetInput(me.key); //長押しを一旦解除
-									me.key.canInput(true);
-								}
+							if(temp != meIndex && temp != -1) {
 								meIndex = temp;
-								if(temp != -1) nw.sendPuchuIndex(meIndex);
+								me.key.canKeyInput = false;
+								nw.sendField(me.cell, me.score, me.fallen_obs, me.unfallen_obs); //次のぷちゅになったらフィールド全体を送信
+								me.key.canKeyInput = true;
+								nw.sendPuchuIndex(meIndex);
+								resetInput(me.key); //長押し解除
 							}
 						}
-						// ライバル
+						// ライバルの状態更新
 						if(!isRivalFinish && isUpdate) {
 							temp = rival.update();
-							if(temp != rivalIndex) {
-								if(oldRivalIndex == -1 && temp != -1) resetInput(rival.key); //長押し解除
-								if(temp != -1) rivalIndex = temp;
-								oldRivalIndex = temp;
+							if(temp != rivalIndex && temp != -1) {
+								rivalIndex = temp;
+								resetInput(rival.key); //長押し解除
 							}
 						}
 						frameCount++;
