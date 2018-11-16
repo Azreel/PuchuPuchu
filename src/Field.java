@@ -571,10 +571,10 @@ public class Field {
 		obs_count = 0;
 		
 		gm.sendObs(0, is_me);
-		/*if ( fallen_obs > 0 && fallen == false ) {
+		if ( fallen_obs > 0 && fallen == false ) {
 			obs_fall();
 			return;
-		}*/
+		}
 		if ( cell[2][2].type != Puchu.Emp ) {
 			gm.finishGame(is_me);
 			draw.startEndAnim(Draw.GameInfo.GAME_LOSE);
