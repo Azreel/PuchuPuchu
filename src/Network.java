@@ -137,7 +137,7 @@ public class Network extends Thread {
 		try {
 			if(br.ready()) input = br.readLine();
 			else return isField;
-			//System.out.println(input);
+			System.out.println(input);
 		}catch(Exception e) {
 			System.out.println("nw get: "+e);
 			input = "DISCONNECT";
@@ -217,7 +217,7 @@ public class Network extends Thread {
 	private void getPuchuIndex(){
 		try {
 			index = Integer.parseInt(br.readLine());
-			//System.out.println(index);
+			System.out.println(index);
 		} catch(Exception e) {
 			System.out.println("nw get: " + e);
 		}
