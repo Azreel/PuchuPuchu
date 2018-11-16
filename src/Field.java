@@ -384,7 +384,7 @@ public class Field {
 					obs_count = 0;
 				}
 			}
-			if ( score <= 9999999 ) {
+			if ( score >= 9999999 ) {
 				score = 9999999;
 			}
 			gm.sendObs(obs_count ,is_me);
@@ -498,7 +498,7 @@ public class Field {
 	}
 	
 	public void defeat() {
-		
+		draw.startEndAnim(Draw.GameInfo.GAME_LOSE);
 	}
 	
 	public void game_start() {
