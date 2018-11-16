@@ -18,7 +18,8 @@ public class Field {
 	public Key key;
 	public AudioClip turn_sound;
 	public AudioClip slide_sound;
-	public int obs_puchu = 0;
+	public int unfallen_obs = 0;	//落ちてこないお邪魔ぷちゅ
+	public int fallen_obs = 0;		//落ちてくるお邪魔ぷちゅ
 	
 	public boolean bottom_flag = false; 	//当たり判定
 	public boolean moving_flag = false;		//移動できるかどうか
@@ -32,6 +33,7 @@ public class Field {
 	private boolean van_puchu = false;
 	private boolean is_drop = false;
 	private boolean is_me = true;
+	private boolean fallen = false;
 	
 	private int now_x = 0;
 	private int now_y = 0;
@@ -56,7 +58,7 @@ public class Field {
 	private int puchu_count = 0;	//消えるぷちゅの個数
 	private int link_count = 0;		//消えるぷちゅの連結数
 	private int color_count = 0;	//消えるぷちゅの種類
-	private int puchu_index = 0;
+	private int puchu_index = 0;	//降った総数
 	
 	public Field(GameMain game, int[][] player, boolean me) {			//nullプレイヤー用
 		
@@ -328,6 +330,7 @@ public class Field {
 	public void drop_finish() {
 		
 		van_puchu = false;
+		fallen = false;
 		puchu_count = 0;
 		link_count = 0;
 		color_count = 0;
@@ -367,6 +370,21 @@ public class Field {
 			//System.out.println("score:" + score);
 			cal_obs();
 			//System.out.println("obs:" + obs_count);
+			if ( unfallen_obs + fallen_obs > 0 ) {
+				if ( obs_count >= unfallen_obs + fallen_obs ) {
+					obs_count = obs_count - (unfallen_obs + fallen_obs);
+					unfallen_obs = 0;
+					fallen_obs = 0;
+				} else if ( obs_count >= fallen_obs ) {
+					obs_count = obs_count - fallen_obs;
+					fallen_obs = 0;
+					unfallen_obs = unfallen_obs - obs_count;
+					obs_count = 0;
+				} else {
+					fallen_obs = fallen_obs - obs_count;
+					obs_count = 0;
+				}
+			}
 			draw.startVanishAnim(chain_count, obs_count, score);
 		}
 	}
@@ -475,6 +493,10 @@ public class Field {
 		draw.startEndAnim(Draw.GameInfo.GAME_WIN);
 	}
 	
+	public void defeat() {
+		
+	}
+	
 	public void game_start() {
 		
 		switch_start();
@@ -532,6 +554,10 @@ public class Field {
 	private void chain_reset() {
 		chain_count = 0;
 		obs_count = 0;
+		
+		if ( fallen_obs > 0 ) {
+			obs_fall();
+		}
 		if ( cell[2][2].type != Puchu.Emp ) {
 			gm.finishGame(is_me);
 			draw.startEndAnim(Draw.GameInfo.GAME_LOSE);
@@ -539,4 +565,30 @@ public class Field {
 		switch_start();
 	}
 	
+	private void obs_fall() {
+		
+		int line = 0;
+		fallen = true;
+		
+		if ( obs_count % 6 == 0 ) {	//1列降ってくる場合
+			line = obs_count / 6;
+		} else {
+			line = obs_count / 6 + 1;
+		}
+		
+		for ( int i = 0; i < line; i++ ) {
+			for ( int j = 0; j < 6; j++ ) {
+				for ( int k = 0; k < 14; k++ ) {
+					if ( cell[j][k].type != Puchu.Emp ) {
+						if ( k != 0 ) {
+							cell[j][k-1].dropDownObs(i+1);
+						} else {
+							cell[j][0].dropDownObs(line);
+						}
+					}
+				}
+			}
+		}
+		
+	}
 }
