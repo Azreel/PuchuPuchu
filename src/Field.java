@@ -17,6 +17,7 @@ public class Field {
 	public Draw draw;
 	public Key key;
 	public AudioClip turn_sound;
+	public AudioClip slide_sound;
 	public int[] obs_puchu = new int[6];
 	
 	public boolean bottom_flag = false; 	//当たり判定
@@ -67,6 +68,7 @@ public class Field {
 			init_player(player);
 			create_puchu(player);
 			turn_sound = Applet.newAudioClip(getClass().getResource("ojama.wav"));
+			slide_sound = Applet.newAudioClip(getClass().getResource("slide.wav"));
 			draw.addKeyListener(key);
 		} else {
 			draw = new Draw();
@@ -380,12 +382,14 @@ public class Field {
 	//key操作関係
 	public void judge_key() {
 		if ( key.Left == true && slide_left_flag ) {
+			slide_sound.play();
 			now.slideLeft();
 			slide_left_flag = false;
 		} else if ( key.Left == false ) {
 			slide_left_flag = true;
 		}
 		if ( key.Right == true && slide_right_flag ) {
+			slide_sound.play();
 			now.slideRight();
 			slide_right_flag = false;
 		} else if ( key.Right == false ) {
@@ -471,6 +475,7 @@ public class Field {
 	}
 	
 	public void game_start() {
+		key.canInput();
 		switch_start();
 	}
 	

@@ -34,6 +34,7 @@ public class Title extends JPanel{
         myIP = new JLabel(nw.getIPaddr());
         myIP.setBounds(225, 470, 400, 30);
         myIP.setFont(labelFont);
+        myIP.setForeground(Color.WHITE);
 		//1Pプレイ
 		soloBtn = new JButton("1Pプレイ");
 		soloBtn.setBounds(570, 450, 160, 60);
@@ -43,6 +44,7 @@ public class Title extends JPanel{
 		rival = new JLabel("相手のIPアドレス:");
 		rival.setBounds(225, 550, 300, 30);
 		rival.setFont(labelFont);
+		rival.setForeground(Color.WHITE);
 		rivalIP = new JTextField("0.0.0.0");
 		rivalIP.setBounds(400, 550, 160, 30);
 		rivalIP.setFont(labelFont);
