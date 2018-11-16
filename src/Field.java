@@ -465,7 +465,7 @@ public class Field {
 	}
 	
 	public void game_end() {
-		gm.resultDisp(score);
+		gm.resultDisp(score, is_me);
 	}
 	
 	public void win() {
