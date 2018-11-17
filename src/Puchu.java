@@ -1,6 +1,3 @@
-import java.awt.*;
-import javax.swing.*;
-
 public class Puchu {
 	
 	public static final int Emp = 0, Pat1 = 1, Pat2 = 2, Pat3 = 3, Pat4 = 4, Pat5 = 5, Pat6 = 6, Van = 7, Obs = 8, Vanishing = 9;

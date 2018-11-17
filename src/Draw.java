@@ -1,14 +1,7 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-import java.io.File;
-import java.nio.Buffer;
-import java.util.*;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.applet.Applet;
-import java.applet.AudioClip;
 
 public class Draw extends JPanel{
 	
@@ -100,7 +93,7 @@ public class Draw extends JPanel{
 	private AnimState obs_update_state = AnimState.end;
 	private int obs_update_time = 0;
 	
-	private AudioClip se_drop, se_drop_obs, se_delete, se_obs_update;
+	private Sound se_drop, se_drop_obs, se_delete, se_obs_update;
 	
 	Draw() {	//nullプレイヤー用
 		this.setPreferredSize(new Dimension(PanelW, PanelH));
@@ -167,15 +160,15 @@ public class Draw extends JPanel{
 	
 	//-- よく発火するSEの初期化
 	private void initSound() {
-		se_delete = Applet.newAudioClip(getClass().getResource("delpuchu.wav"));
-		se_drop = Applet.newAudioClip(getClass().getResource("rakka.wav"));
-		se_drop_obs = Applet.newAudioClip(getClass().getResource("lose.wav"));
-		se_obs_update = Applet.newAudioClip(getClass().getResource("ojamaup.wav"));
+		se_delete = new Sound(getClass().getResource("delpuchu.wav"));
+		se_drop = new Sound(getClass().getResource("rakka.wav"));
+		se_drop_obs = new Sound(getClass().getResource("lose.wav"));
+		se_obs_update = new Sound(getClass().getResource("ojamaup.wav"));
 	}
 	
 	//-- SE発火
 	private void soundIgnition(String _wav) {
-		AudioClip _se = Applet.newAudioClip(getClass().getResource(_wav));
+		Sound _se = new Sound(getClass().getResource(_wav));
 		_se.play();
 	}
 	
@@ -390,6 +383,7 @@ public class Draw extends JPanel{
 			start_image_height += start_image_speed/10;
 			if ( ready_anim_time > 300 ) { ready_state = AnimState.end; }
 			break;
+		default:
 		}
 	}
 	
@@ -417,6 +411,7 @@ public class Draw extends JPanel{
 			end_anim_time++;
 			if ( end_anim_time > end_time ) { finishEndAnim(); }
 			break;
+		default:
 		}
 	}
 	
@@ -479,6 +474,7 @@ public class Draw extends JPanel{
 			send_anim_speed += send_anim_accel;
 			if ( send_image_y < -100 ) { send_state = AnimState.end; }
 			break;
+		default:
 		}
 	}
 	
@@ -491,6 +487,7 @@ public class Draw extends JPanel{
 				send_image_y += (int)(send_anim_speed*Math.cos(send_image_angle));
 				send_image_x += (int)(send_anim_speed*Math.sin(send_image_angle));
 				break;
+			default:
 		}
 	}
 	
@@ -508,6 +505,7 @@ public class Draw extends JPanel{
 			send_anim_speed += send_anim_accel;
 			if ( send_image_y < -100 ) { send_state = AnimState.end; }
 			break;
+		default:
 		}	
 	}
 	
@@ -524,6 +522,7 @@ public class Draw extends JPanel{
 			damage_image_y += damage_anim_speed;
 			if ( damage_image_y + damage_anim_speed > obs_center_y ) { setObsNum(obs_change); startObsUpdateAnim(); damage_state = AnimState.end; break;}
 			break;
+		default:
 		}
 	}
 	
@@ -560,6 +559,7 @@ public class Draw extends JPanel{
 			obs_width = obs_anim_time - obs_width_max;
 			if ( obs_width >= obs_width_max ) { obs_state = AnimState.end; }
 			break;
+		default:
 		}
 	}
 	
@@ -591,6 +591,7 @@ public class Draw extends JPanel{
 					case GAME_LOSE: // 敗北時の盤面更新
 						fd.cell[i][j].endGameAnim(false, end_anim_time - i*end_anim_delay);
 						break;
+					default:
 					}
 					if ( fd.cell[i][j].type == Puchu.Vanishing ) {
 						img_2d.drawImage(imgs_van[fd.cell[i][j].van_flame_count], fd.cell[i][j].draw_x + margin_w - Draw.Squares/2, fd.cell[i][j].draw_y + margin_h - Draw.Squares/2, this);
