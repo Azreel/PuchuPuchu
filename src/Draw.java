@@ -100,9 +100,7 @@ public class Draw extends JPanel{
 	private AnimState obs_update_state = AnimState.end;
 	private int obs_update_time = 0;
 	
-	
-	
-	private AudioClip se_drop, se_delete, se_obs_update;
+	private AudioClip se_drop, se_drop_obs, se_delete, se_obs_update;
 	
 	Draw() {	//nullプレイヤー用
 		this.setPreferredSize(new Dimension(PanelW, PanelH));
@@ -171,6 +169,7 @@ public class Draw extends JPanel{
 	private void initSound() {
 		se_delete = Applet.newAudioClip(getClass().getResource("delpuchu.wav"));
 		se_drop = Applet.newAudioClip(getClass().getResource("rakka.wav"));
+		se_drop_obs = Applet.newAudioClip(getClass().getResource("lose.wav"));
 		se_obs_update = Applet.newAudioClip(getClass().getResource("ojamaup.wav"));
 	}
 	
@@ -215,6 +214,11 @@ public class Draw extends JPanel{
 		se_drop.play();
 	}
 	
+	public void startDropObsAnim() {
+		is_drop_anim = true;
+		se_drop_obs.play();
+	}
+	
 	//-- 落下アニメーション終了
 	private void finishDropAnim() {
 		is_drop_anim = false;
@@ -234,7 +238,7 @@ public class Draw extends JPanel{
 		fd.switch_next();
 		
 		//最大連鎖セット
-//		fd.next[0].puchu1.type = 6;
+//		fd.next[0].puchu1.type = 5;
 //		fd.next[0].puchu2.type = 5;
 //		fd.switch_next();
 	}

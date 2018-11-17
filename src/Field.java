@@ -155,7 +155,7 @@ public class Field {
 			} else if ( cell[now_x][now_y+1].type != Puchu.Emp ) {
 				bottom_p1_flag = true;
 				bottom_flag = true;
-			} else if ( cell[now_x+1][now_y+1].type != Puchu.Emp ) {
+			} else if ( now_x < 5 && cell[now_x+1][now_y+1].type != Puchu.Emp ) {
 				bottom_p2_flag = true;
 				bottom_flag = true;
 			}
@@ -285,19 +285,19 @@ public class Field {
 					drop_pos = drop_p1_pos();
 					cell[now.puchu1.x/40][now.puchu1.y/40+2+drop_pos].copyPuchu(now.puchu1);
 					cell[now.puchu2.x/40][now.puchu2.y/40+2].copyPuchu(now.puchu2);
-					cell[now.puchu1.x/40][now.puchu1.y/40+2+drop_pos].dropDown(now.puchu1.y/40+2+drop_pos);
-					cell[now.puchu2.x/40][now.puchu2.y/40+2].dropDown(now.puchu2.y/40+2);
+					cell[now.puchu1.x/40][now.puchu1.y/40+2+drop_pos].dropDown();
+					cell[now.puchu2.x/40][now.puchu2.y/40+2].dropDown();
 				} else if ( bottom_p2_flag == false ) {
 					drop_pos = drop_p2_pos();
 					cell[now.puchu1.x/40][now.puchu1.y/40+2].copyPuchu(now.puchu1);
 					cell[now.puchu2.x/40][now.puchu2.y/40+2+drop_pos].copyPuchu(now.puchu2);
-					cell[now.puchu1.x/40][now.puchu1.y/40+2].dropDown(now.puchu1.y/40+2);
-					cell[now.puchu2.x/40][now.puchu2.y/40+2+drop_pos].dropDown(now.puchu2.y/40+2+drop_pos);
+					cell[now.puchu1.x/40][now.puchu1.y/40+2].dropDown();
+					cell[now.puchu2.x/40][now.puchu2.y/40+2+drop_pos].dropDown();
 				} else {
 					cell[now.puchu1.x/40][now.puchu1.y/40+2].copyPuchu(now.puchu1);
 					cell[now.puchu2.x/40][now.puchu2.y/40+2].copyPuchu(now.puchu2);
-					cell[now.puchu1.x/40][now.puchu1.y/40+2].dropDown(now.puchu1.y/40+2);
-					cell[now.puchu2.x/40][now.puchu2.y/40+2].dropDown(now.puchu2.y/40+2);
+					cell[now.puchu1.x/40][now.puchu1.y/40+2].dropDown();
+					cell[now.puchu2.x/40][now.puchu2.y/40+2].dropDown();
 				}
 				now = null;
 				draw.startDropAnim();
@@ -343,7 +343,7 @@ public class Field {
 
 		for ( int i = 5; i >= 0; i-- ) {
 			for ( int j = 13; j >= 2; j-- ) {
-				if ( cell[i][j].type != Puchu.Emp && cell[i][j].type != Puchu.Obs && cell[i][j].combine_count >= 3 ) {
+				if ( cell[i][j].type != Puchu.Emp && cell[i][j].type != Puchu.Obs && cell[i][j].type < Puchu.Van && cell[i][j].combine_count >= 3 ) {
 					link_count += cell[i][j].combine_count;
 					van_puchu = true;
 					color_check[cell[i][j].type-1] = 1;
@@ -477,10 +477,9 @@ public class Field {
 						k++;
 					}
 					cell[i][j+k].copyPuchu(cell[i][j]);
-					cell[i][j+k].dropDown(j+k);
+					cell[i][j+k].dropDown();
 					is_drop = true;
-//					cell[i][j].type = Puchu.Emp;
-					cell[i][j] = new Puchu(Puchu.Emp, i*Draw.Squares, j*Draw.Squares);
+					cell[i][j].setPuchu(Puchu.Emp, i, j);
 				}
 			}
 		}
@@ -599,7 +598,7 @@ public class Field {
 				}
 				for ( int k = 13; k >= 0; k-- ) {
 					if ( cell[j][k].type == Puchu.Emp ) {
-						
+						if ( cell[j][k].y != (k-2)*Draw.Squares) { System.out.println(j+" : "+k+" :違うぞぉおおおおお");}
 						if ( k != 0 ) {
 							cell[j][k].dropDownObs(count/6+1);
 						} else {
@@ -617,7 +616,7 @@ public class Field {
 		}
 		fallen_obs -= count;
 		draw.setObsNum(fallen_obs + unfallen_obs);
-		draw.startDropAnim();
+		draw.startDropObsAnim();
 	}
 	
 	public void receive_obs(int count) {
