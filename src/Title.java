@@ -3,8 +3,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.applet.Applet;
-import java.applet.AudioClip;
 
 public class Title extends JPanel{
 	final Toolkit tk = Toolkit.getDefaultToolkit();
@@ -68,7 +66,7 @@ public class Title extends JPanel{
 	private class SoloPlayBtn implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
 			setFade(GameMain.Status.GAME_SOLO);
-			AudioClip pushSound = Applet.newAudioClip(getClass().getResource("selectmode.wav"));
+			Sound pushSound = new Sound(getClass().getResource("selectmode.wav"));
 			pushSound.play();
 		}
 	}
@@ -79,7 +77,7 @@ public class Title extends JPanel{
 			if(nw.Connect(rivalIP.getText())) {
 				gm.rivalIP = rivalIP.getText();
 				setFade(GameMain.Status.GAME_DUO);
-				AudioClip pushSound = Applet.newAudioClip(getClass().getResource("selectmode.wav"));
+				Sound pushSound = new Sound(getClass().getResource("selectmode.wav"));
 				pushSound.play();
 			} else {
 				JLabel label = new JLabel("<html>接続に失敗しました<br>IPアドレスを確認してください<html>");

@@ -1,10 +1,3 @@
-import java.awt.*;
-import java.util.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.applet.Applet;
-import java.applet.AudioClip;
-
 public class Field {
 	
 	public int score = 0;
@@ -16,8 +9,8 @@ public class Field {
 	public PuchuPair[] next = new PuchuPair[3];
 	public Draw draw;
 	public Key key;
-	public AudioClip turn_sound;
-	public AudioClip slide_sound;
+	public Sound turn_sound;
+	public Sound slide_sound;
 	public int unfallen_obs = 0;	//落ちてこないお邪魔ぷちゅ
 	public int fallen_obs = 0;		//落ちてくるお邪魔ぷちゅ
 	
@@ -70,8 +63,8 @@ public class Field {
 			key = new Key(gm);
 			init_player(player);
 			create_puchu(player);
-			turn_sound = Applet.newAudioClip(getClass().getResource("ojama.wav"));
-			slide_sound = Applet.newAudioClip(getClass().getResource("slide.wav"));
+			turn_sound = new Sound(getClass().getResource("ojama.wav"));
+			slide_sound = new Sound(getClass().getResource("slide.wav"));
 			draw.addKeyListener(key);
 		} else {
 			draw = new Draw();

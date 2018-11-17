@@ -1,7 +1,5 @@
 import javax.swing.*;
 
-import java.applet.Applet;
-import java.applet.AudioClip;
 import java.awt.*;
 import java.net.URL;
 import java.text.DecimalFormat;
@@ -16,7 +14,7 @@ public class Overlay extends JPanel{
 	Mode paintMode = Mode.STOP;
 	float fadeAlpha;
 	GameMain gm;
-	BGM bgm;
+	Sound bgm;
 	boolean isPlay = false;
 	Image resultImg;
 	
@@ -47,7 +45,7 @@ public class Overlay extends JPanel{
 		titleBtn.addActionListener(event -> {
 			paintMode = Mode.STOP;
 			gm.fadeIn(GameMain.Status.GAME_TITLE);
-			AudioClip pushSound = Applet.newAudioClip(getClass().getResource("selectmode.wav"));
+			Sound pushSound = new Sound(getClass().getResource("selectmode.wav"));
 			pushSound.play();
 		});
 		
@@ -56,14 +54,15 @@ public class Overlay extends JPanel{
 	}
 	
 	public void setBGM(URL path) {
-		bgm = new BGM(path);
-		bgm.Play();
+		bgm = new Sound(path);
+		bgm.loop();
+		bgm.setVol(0.8f);
 		isPlay = true;
 	}
 	
 	public void stopBGM() {
 		if(isPlay) {
-			bgm.Stop();
+			bgm.stop();
 			isPlay = false;
 		}
 	}

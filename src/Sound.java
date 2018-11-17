@@ -1,13 +1,13 @@
 import java.net.URL;
 import javax.sound.sampled.*;
 
-public class BGM{
+public class Sound{
 	private AudioInputStream ais;
 	private Clip clip;
 	private FloatControl control;
 	
 	// コンストラクタ
-	BGM(URL url) {
+	Sound(URL url) {
 		try {
 			ais = AudioSystem.getAudioInputStream(url);
 			AudioFormat af = ais.getFormat();
@@ -20,16 +20,22 @@ public class BGM{
 		}
 	}
 	
-	// 再生(スレッドのメイン)
-	public void Play() {
+	// 再生
+	public void play() {
+		stop();
+		clip.start();
+	}
+	
+	// ループ再生
+	public void loop() {
 		clip.loop(Clip.LOOP_CONTINUOUSLY);
-		control.setValue((float)Math.log10(0.8f) * 20);
 	}
 	
 	// 停止
-	public void Stop() {
+	public void stop() {
 		clip.stop();
-		clip.close();
+		clip.flush();
+		clip.setFramePosition(0);
 	}
 	
 	// 音量調整
