@@ -2,13 +2,7 @@ import java.awt.*;
 import java.util.Random;
 import javax.swing.*;
 
-public class GameMain extends Thread {
-	// 画面サイズ
-	final int ScreenW = 960;
-	final int ScreenH = 640;
-	// 1フレームの時間
-	final long MSPF = 1000 / 60; //MilliSecond Per Frame
-	
+public class GameMain extends Thread {	
 	public static enum Status { GAME_TITLE, GAME_SOLO, GAME_DUO };
 	public static final int PPSIZE = 200;
 	public final JFrame frame = new JFrame();
@@ -20,6 +14,11 @@ public class GameMain extends Thread {
 	public int[][] nextRivalField;
 	public int score, fallenObs, unfallenObs;
 	
+	// 画面サイズ
+	private final int ScreenW = 960;
+	private final int ScreenH = 640;
+	// 1フレームの時間
+	private final long MSPF = 1000 / 60; //MilliSecond Per Frame
 	private Status gameStatus = Status.GAME_TITLE;
 	private Status nextStatus;
 	private long loopDelay = MSPF;

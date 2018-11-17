@@ -6,21 +6,16 @@ import java.awt.event.ActionListener;
 
 @SuppressWarnings("serial")
 public class Title extends JPanel{
-	final Toolkit tk = Toolkit.getDefaultToolkit();
-	final int fadeSpeed = 60;
-	final Font dispFont = new Font(Font.DIALOG, Font.PLAIN, 24);
-	final Font inputFont = new Font(Font.DIALOG, Font.PLAIN, 20);
-	final Font dialogFont = new Font(Font.DIALOG, Font.PLAIN, 16);
+	private final Font dispFont = new Font(Font.DIALOG, Font.PLAIN, 24);
+	private final Font inputFont = new Font(Font.DIALOG, Font.PLAIN, 20);
+	private final Font dialogFont = new Font(Font.DIALOG, Font.PLAIN, 16);
 	
-	GameMain gm;
-	Network nw;
-	Image bg;
-	JButton soloBtn, duoBtn;
-	JTextField rivalIP;
-	JLabel rival, myIP;
-	GameMain.Status next = null;
-	boolean isFade = false;
-	float fadeAlpha = 0.0f;
+	private GameMain gm;
+	private Network nw;
+	private Image bg;
+	private JButton soloBtn, duoBtn;
+	private JTextField rivalIP;
+	private JLabel rival, myIP;
 	
 	// コンストラクタ
 	Title(GameMain parent, Network client) {

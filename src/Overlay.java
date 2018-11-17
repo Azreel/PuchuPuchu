@@ -6,18 +6,18 @@ import java.text.DecimalFormat;
 
 @SuppressWarnings("serial")
 public class Overlay extends JPanel{
-	final int fadeSpeed = 60;
-	final Toolkit tk = Toolkit.getDefaultToolkit();
-	final Font btnFont = new Font(Font.DIALOG, Font.PLAIN, 24);
-	final Font labelFont = new Font(Font.DIALOG, Font.PLAIN, 40);
+	private final int fadeSpeed = 60;
+	private final Toolkit tk = Toolkit.getDefaultToolkit();
+	private final Font btnFont = new Font(Font.DIALOG, Font.PLAIN, 24);
+	private final Font labelFont = new Font(Font.DIALOG, Font.PLAIN, 40);
 	
-	static enum Mode {STOP, FADEIN, RESULT};
-	Mode paintMode = Mode.STOP;
-	float fadeAlpha;
-	GameMain gm;
-	Sound bgm;
-	boolean isPlay = false;
-	Image resultImg;
+	private static enum Mode {STOP, FADEIN, RESULT};
+	private Mode paintMode = Mode.STOP;
+	private float fadeAlpha;
+	private GameMain gm;
+	private Sound bgm;
+	private boolean isPlay = false;
+	private Image resultImg;
 	
 	Overlay(GameMain parent){
 		gm = parent;

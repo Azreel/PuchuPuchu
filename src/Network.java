@@ -2,19 +2,18 @@ import java.io.*;
 import java.net.*;
 
 public class Network extends Thread {
-	final int Port = 28385;
 	public static enum Mode { SERVER, CLIENT };
-	
 	public Mode programMode = Mode.SERVER;
 	public boolean isConnect = false;
 	public int index = 0; //操作中のぷちゅ
 	
-	GameMain gm;
-	boolean isAlive = true;
-	ServerSocket ss;
-	Socket sc;
-	BufferedReader br;
-	PrintWriter pw;
+	private final int Port = 28385;
+	private GameMain gm;
+	private boolean isAlive = true;
+	private ServerSocket ss;
+	private Socket sc;
+	private BufferedReader br;
+	private PrintWriter pw;
 	
 	// コンストラクタ
 	Network(GameMain parent){
