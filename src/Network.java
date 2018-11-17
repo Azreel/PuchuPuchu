@@ -28,6 +28,7 @@ public class Network extends Thread {
 	}
 	
 	// 接続待ち(スレッドのメイン)
+	@Override
 	public void run() {
 		while(!isConnect && isAlive) {
 			try {

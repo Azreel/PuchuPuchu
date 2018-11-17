@@ -19,17 +19,20 @@ public class Overlay extends JPanel{
 	private boolean isPlay = false;
 	private Image resultImg;
 	
+	// コンストラクタ
 	Overlay(GameMain parent){
 		gm = parent;
 		this.setOpaque(false);
 	}
 	
+	// フェードイン
 	public void FadeIn() {
 		this.removeAll();
 		paintMode = Mode.FADEIN;
 		fadeAlpha = 0.0f;
 	}
 	
+	// リザルト表示
 	public void Result(int score) {
 		paintMode = Mode.RESULT;
 		resultImg = tk.createImage(getClass().getResource("result.png"));
@@ -54,6 +57,7 @@ public class Overlay extends JPanel{
 		this.add(titleBtn);
 	}
 	
+	// BGMの再生
 	public void setBGM(URL path) {
 		bgm = new Sound(path);
 		bgm.loop();
@@ -61,6 +65,7 @@ public class Overlay extends JPanel{
 		isPlay = true;
 	}
 	
+	// BGMの停止
 	public void stopBGM() {
 		if(isPlay) {
 			bgm.stop();

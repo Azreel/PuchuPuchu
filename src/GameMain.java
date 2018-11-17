@@ -15,10 +15,8 @@ public class GameMain extends Thread {
 	public int[][] nextRivalField;
 	public int score, fallenObs, unfallenObs;
 	
-	// 画面サイズ
 	private final int ScreenW = 960;
 	private final int ScreenH = 640;
-	// 1フレームの時間
 	private final long MSPF = 1000 / 60; //MilliSecond Per Frame
 	private Status gameStatus = Status.GAME_TITLE;
 	private Status nextStatus;
@@ -40,11 +38,7 @@ public class GameMain extends Thread {
 	
 	// コンストラクタ
 	GameMain(){
-		MakeWindow();
-	}
-
-	// ウィンドウ生成
-	private void MakeWindow() {
+		// ウィンドウの初期化
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);// 終了処理
 		frame.setSize(ScreenW, ScreenH);
 	    frame.setLocationRelativeTo(null);
@@ -53,6 +47,7 @@ public class GameMain extends Thread {
 		frame.setLayout(null);
 		frame.getContentPane().setBackground(Color.BLACK);
 		frame.setVisible(true);
+		// 一番上のパネル
 		overlay = new Overlay(this);
 		overlay.setPreferredSize(new Dimension(ScreenW, ScreenH));
 		overlay.setBounds(0, 0, ScreenW, ScreenH);
@@ -60,211 +55,36 @@ public class GameMain extends Thread {
 	}
 	
 	// スレッドのメイン
+	@Override
 	public void run() {
-		long waitStart;
-		
 		while(true) {
-			// 60fps保つ
+			// 60fpsを保つ
 			try {
 				if(loopDelay > MSPF) sleep(MSPF);
 				else if(loopDelay > 0) sleep(loopDelay);
 			}catch(Exception e) {}
 			// ゲーム全体の管理
 			long start = System.currentTimeMillis();
-MAIN:		switch(gameStatus) {
+			switch(gameStatus) {
 			case GAME_TITLE: // タイトル
 				if(title == null) {
-					System.out.println("タイトル生成");
-					// 前のプレイデータを消去
-					if(me != null || rival != null) {
-						frame.remove(me.draw);
-						frame.remove(rival.draw);
-						me = null;
-						rival = null;
-						canStart = false;
-						rivalIndex = 1;
-						meIndex = 0;
-						isMeFinish = false;
-						isRivalFinish = false;
-						nowKey = 0;
-						nowKeyTime = -1;
-						isUpdate = true;
-						haveField = false;
-						nw.Close();
-						nw = null;
-					}
-					// ネットワーク開始
-					nw = new Network(this);
-					nw.start();
-					// タイトルパネル追加
-					title = new Title(this, nw);
-					title.setPreferredSize(new Dimension(ScreenW, ScreenH));
-					title.setBounds(0, 0, ScreenW, ScreenH);
-					frame.add(title);
-					frame.revalidate();
-					//BGM
-					overlay.setBGM(getClass().getResource("Title2.wav"));
+					initTitle();
 				} else {
-					if(!isOverlay) title.repaint();
-					else overlay.repaint();
+					updateTitle();
 				}
 				break;
 			case GAME_SOLO: // 1Pプレイ
 				if(me == null && rival == null) {
-					System.out.println("1Pモード");
-					// サーバーを閉じる
-					nw.Close();
-					// タイトル除去
-					frame.remove(title);
-					title = null;
-					// ぷちゅ生成
-					makePuchu();
-					// プレイヤーフィールド
-					me = new Field(this, ppInit, true);
-					me.draw.setBounds(0, 0, ScreenW/2, ScreenH);
-					// nullプレイヤーフィールド
-					rival = new Field(this, null, false);
-					rival.draw.setBounds(ScreenW/2, 0, ScreenW/2, ScreenH);
-					// フレームに追加
-					frame.add(me.draw);
-					frame.add(rival.draw);
-					frame.revalidate();
-					me.draw.requestFocus();
-					// BGM
-					overlay.setBGM(getClass().getResource("gamemusic.wav"));
-					// スタートアニメーション
-					me.draw.startReadyAnim();
+					initSolo();
 				} else {
-					// 状態更新
-					if(!isMeFinish) me.update();
-					// 画面描画
-					if(!isOverlay) {
-						me.draw.repaint();
-						rival.draw.repaint();
-					} else {
-						overlay.repaint();
-					}
+					updateSolo();
 				}
 				break;
 			case GAME_DUO: // 2Pプレイ
 				if(me == null && rival == null) {
-					System.out.println("2Pモード");
-					// タイトル除去
-					frame.remove(title);
-					title = null;
-					// ぷちゅ生成
-					if(nw.programMode == Network.Mode.SERVER) {
-						nw.sendPuchu(makePuchu());
-					} else {
-						waitStart = System.currentTimeMillis();
-						while(!canStart) {
-							nw.getRivalStatus();
-							try { sleep(100); } catch (Exception e) {}
-							// 1分経ってもデータが来なければ切断と判定する
-							if(System.currentTimeMillis() - waitStart > 60 * 1000) {
-								JLabel label = new JLabel("接続が切断されました");
-								label.setFont(dialogFont);
-							    JOptionPane.showMessageDialog(frame, label);
-							    gameStatus = Status.GAME_TITLE;
-							    break MAIN;
-							}
-						}
-					}
-					// プレイヤーフィールド
-					me = new Field(this, ppInit, true);
-					me.draw.setBounds(0, 0, ScreenW/2, ScreenH);
-					// ライバルプレイヤーフィールド
-					rival = new Field(this, ppInit, false);
-					rival.draw.setBounds(ScreenW/2, 0, ScreenW/2, ScreenH);
-					// 準備完了
-					nw.sendStatus("START");
-					waitStart = System.currentTimeMillis();
-					while(!canStart) {
-						nw.getRivalStatus();
-						try { sleep(100); } catch (Exception e) {}
-						// 1分経ってもデータが来なければ切断と判定する
-						if(System.currentTimeMillis() - waitStart > 60 * 1000) {
-							JLabel label = new JLabel("接続が切断されました");
-							label.setFont(dialogFont);
-						    JOptionPane.showMessageDialog(frame, label);
-						    gameStatus = Status.GAME_TITLE;
-						    break MAIN;
-						}
-					}
-					// フレームに追加
-					frame.add(me.draw);
-					frame.add(rival.draw);
-					frame.revalidate();
-					me.draw.requestFocus();
-					// BGM
-					overlay.setBGM(getClass().getResource("gamemusic.wav"));
-					// スタートアニメーション
-					me.draw.startReadyAnim();
-					rival.draw.startReadyAnim();
-					frameCount = 0;
-					stopCount = 0;
+					initDuo();
 				} else {
-					int temp;
-					
-					// スタート同期確認
-					if(canStart) {
-						// ネットワーク
-						if(nw.index >= rivalIndex) { //一致してるとき or 遅い場合
-							isUpdate = true;
-							stopCount = 0;
-							if(nowKeyTime <= frameCount) {
-								if(nowKey != 0) setRivalInput(nowKey);
-								// 次のデータを取り出し
-								// フィールドデータを持っている場合、同期待ちをする
-								if(!haveField && nw.getRivalStatus()) {
-									//フィールドデータを取り出したら次のインデックスも取り出す
-									nw.getRivalStatus();
-									haveField = true;
-								}
-							}
-						} else { //自分のほうが早い
-							isUpdate = false;
-							stopCount++;
-							// 強制切断検出
-							if(stopCount >= 500 && !isRivalFinish) disconnect();
-							// 次のデータを取得
-							// 相手よりも早いため即座にフィールドを反映する
-							if(nw.isConnect && nw.getRivalStatus()) {
-								//フィールドデータを取り出したら次のインデックスも取り出す
-								nw.getRivalStatus();
-								setRivalField();
-							}
-						}
-						// 自分の状態更新
-						if(!isMeFinish) {
-							temp = me.update();
-							if(temp != meIndex && temp != -1) {
-								meIndex = temp;
-								me.key.canKeyInput = false;
-								nw.sendField(me.cell, me.score, rival.fallen_obs, rival.unfallen_obs); //次のぷちゅになったらフィールド全体を送信
-								nw.sendPuchuIndex(meIndex);
-								resetInput(me.key); //長押し解除
-								me.key.canKeyInput = true;
-							}
-						}
-						// ライバルの状態更新
-						if(!isRivalFinish && isUpdate) {
-							temp = rival.update();
-							if(temp != rivalIndex && temp != -1) {
-								rivalIndex = temp;
-								if(haveField) setRivalField();
-								resetInput(rival.key); //長押し解除
-							}
-						}
-						frameCount++;
-						// 画面描画
-						if(!isOverlay) {
-							me.draw.repaint();
-							rival.draw.repaint();
-						} else {
-							overlay.repaint();
-						}
-					}
+					updateDuo();
 				}
 				break;
 			}
@@ -272,8 +92,215 @@ MAIN:		switch(gameStatus) {
 		}
 	}
 	
+	//---メインループ関係---
+	// タイトルの初期化処理
+	private void initTitle() {
+		System.out.println("タイトル生成");
+		// 前のプレイデータを消去
+		if(me != null || rival != null) {
+			frame.remove(me.draw);
+			frame.remove(rival.draw);
+			me = null;
+			rival = null;
+			canStart = false;
+			rivalIndex = 1;
+			meIndex = 0;
+			isMeFinish = false;
+			isRivalFinish = false;
+			nowKey = 0;
+			nowKeyTime = -1;
+			isUpdate = true;
+			haveField = false;
+			nw.Close();
+			nw = null;
+		}
+		// ネットワーク開始
+		nw = new Network(this);
+		nw.start();
+		// タイトルパネル追加
+		title = new Title(this, nw);
+		title.setPreferredSize(new Dimension(ScreenW, ScreenH));
+		title.setBounds(0, 0, ScreenW, ScreenH);
+		frame.add(title);
+		frame.revalidate();
+		//BGM
+		overlay.setBGM(getClass().getResource("Title2.wav"));
+	}
+	
+	// タイトルの更新処理
+	private void updateTitle() {
+		if(!isOverlay) title.repaint();
+		else overlay.repaint();
+	}
+	
+	// ソロプレイ時の初期化処理
+	private void initSolo() {
+		System.out.println("1Pモード");
+		// サーバーを閉じる
+		nw.Close();
+		// タイトル除去
+		frame.remove(title);
+		title = null;
+		// ぷちゅ生成
+		makePuchu();
+		// プレイヤーフィールド
+		me = new Field(this, ppInit, true);
+		me.draw.setBounds(0, 0, ScreenW/2, ScreenH);
+		// nullプレイヤーフィールド
+		rival = new Field(this, null, false);
+		rival.draw.setBounds(ScreenW/2, 0, ScreenW/2, ScreenH);
+		// フレームに追加
+		frame.add(me.draw);
+		frame.add(rival.draw);
+		frame.revalidate();
+		me.draw.requestFocus();
+		// BGM
+		overlay.setBGM(getClass().getResource("gamemusic.wav"));
+		// スタートアニメーション
+		me.draw.startReadyAnim();
+	}
+	
+	// ソロプレイ時の更新処理
+	private void updateSolo() {
+		// 状態更新
+		if(!isMeFinish) me.update();
+		// 画面描画
+		if(!isOverlay) {
+			me.draw.repaint();
+			rival.draw.repaint();
+		} else {
+			overlay.repaint();
+		}
+	}
+	
+	// 対戦プレイ時の初期化処理
+	private void initDuo() {
+		long waitStart;
+		
+		System.out.println("2Pモード");
+		// タイトル除去
+		frame.remove(title);
+		title = null;
+		// ぷちゅ生成
+		if(nw.programMode == Network.Mode.SERVER) {
+			nw.sendPuchu(makePuchu());
+		} else {
+			waitStart = System.currentTimeMillis();
+			while(!canStart) {
+				nw.getRivalStatus();
+				try { sleep(100); } catch (Exception e) {}
+				// 1分経ってもデータが来なければ切断と判定する
+				if(System.currentTimeMillis() - waitStart > 60 * 1000) {
+					JLabel label = new JLabel("接続が切断されました");
+					label.setFont(dialogFont);
+				    JOptionPane.showMessageDialog(frame, label);
+				    gameStatus = Status.GAME_TITLE;
+				    return;
+				}
+			}
+		}
+		// プレイヤーフィールド
+		me = new Field(this, ppInit, true);
+		me.draw.setBounds(0, 0, ScreenW/2, ScreenH);
+		// ライバルプレイヤーフィールド
+		rival = new Field(this, ppInit, false);
+		rival.draw.setBounds(ScreenW/2, 0, ScreenW/2, ScreenH);
+		// 準備完了
+		nw.sendStatus("START");
+		waitStart = System.currentTimeMillis();
+		while(!canStart) {
+			nw.getRivalStatus();
+			try { sleep(100); } catch (Exception e) {}
+			// 1分経ってもデータが来なければ切断と判定する
+			if(System.currentTimeMillis() - waitStart > 60 * 1000) {
+				JLabel label = new JLabel("接続が切断されました");
+				label.setFont(dialogFont);
+			    JOptionPane.showMessageDialog(frame, label);
+			    gameStatus = Status.GAME_TITLE;
+			    return;
+			}
+		}
+		// フレームに追加
+		frame.add(me.draw);
+		frame.add(rival.draw);
+		frame.revalidate();
+		me.draw.requestFocus();
+		// BGM
+		overlay.setBGM(getClass().getResource("gamemusic.wav"));
+		// スタートアニメーション
+		me.draw.startReadyAnim();
+		rival.draw.startReadyAnim();
+		frameCount = 0;
+		stopCount = 0;
+	}
+	
+	// 対戦プレイ時の更新処理
+	private void updateDuo() {
+		int temp;
+		
+		// スタート同期確認
+		if(canStart) {
+			// ネットワーク
+			if(nw.index >= rivalIndex) { //一致してるとき or 遅い場合
+				isUpdate = true;
+				stopCount = 0;
+				if(nowKeyTime <= frameCount) {
+					if(nowKey != 0) setRivalInput(nowKey);
+					// 次のデータを取り出し
+					// フィールドデータを持っている場合、同期待ちをする
+					if(!haveField && nw.getRivalStatus()) {
+						//フィールドデータを取り出したら次のインデックスも取り出す
+						nw.getRivalStatus();
+						haveField = true;
+					}
+				}
+			} else { //自分のほうが早い
+				isUpdate = false;
+				stopCount++;
+				// 強制切断検出
+				if(stopCount >= 500 && !isRivalFinish) disconnect();
+				// 次のデータを取得
+				// 相手よりも早いため即座にフィールドを反映する
+				if(nw.isConnect && nw.getRivalStatus()) {
+					//フィールドデータを取り出したら次のインデックスも取り出す
+					nw.getRivalStatus();
+					setRivalField();
+				}
+			}
+			// 自分の状態更新
+			if(!isMeFinish) {
+				temp = me.update();
+				if(temp != meIndex && temp != -1) {
+					meIndex = temp;
+					me.key.canKeyInput = false;
+					nw.sendField(me.cell, me.score, rival.fallen_obs, rival.unfallen_obs); //次のぷちゅになったらフィールド全体を送信
+					nw.sendPuchuIndex(meIndex);
+					resetInput(me.key); //長押し解除
+					me.key.canKeyInput = true;
+				}
+			}
+			// ライバルの状態更新
+			if(!isRivalFinish && isUpdate) {
+				temp = rival.update();
+				if(temp != rivalIndex && temp != -1) {
+					rivalIndex = temp;
+					if(haveField) setRivalField();
+					resetInput(rival.key); //長押し解除
+				}
+			}
+			frameCount++;
+			// 画面描画
+			if(!isOverlay) {
+				me.draw.repaint();
+				rival.draw.repaint();
+			} else {
+				overlay.repaint();
+			}
+		}
+	}
+	
 	//---Field関係---
-	//初期ぷちゅペア生成
+	// 初期ぷちゅペア生成
 	private String[] makePuchu() {
 		String[] ppList = new String[PPSIZE];
 		Random rnd = new Random();
@@ -426,7 +453,7 @@ MAIN:		switch(gameStatus) {
 	}
 	
 	//--------------------
-	//    プログラム実行本体
+	//   プログラム実行本体
 	//--------------------
 	public static void main(String[] args) {
 		GameMain gm = new GameMain();

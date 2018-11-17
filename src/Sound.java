@@ -22,8 +22,7 @@ public class Sound{
 	
 	// 再生
 	public void play() {
-		// 前回の状態を一旦リセット
-		stop();
+		stop(); // 前回の状態を一旦リセット
 		clip.start();
 	}
 	

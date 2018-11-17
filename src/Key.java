@@ -18,10 +18,12 @@ public class Key extends KeyAdapter {
 	}
 	
 	// キーボードが押された時の処理(文字)
+	@Override
 	public void keyTyped(KeyEvent e) {
 	}
 
 	// キーボードが押された時の処理(連続で入力あり)
+	@Override
 	public void keyPressed(KeyEvent e) {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:// ←キー
@@ -64,6 +66,7 @@ public class Key extends KeyAdapter {
 	}
 
 	// キーボードから離された時の処理
+	@Override
 	public void keyReleased(KeyEvent e) {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:// ←キー
