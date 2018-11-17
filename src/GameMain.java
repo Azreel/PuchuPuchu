@@ -14,10 +14,12 @@ public class GameMain extends Thread {
 	public static final int PPSIZE = 200;
 	public final JFrame frame = new JFrame();
 	public Network nw;
+	public String rivalIP = "0.0.0.0";
 	public boolean canStart = false;
 	public int rivalIndex = 1;
 	public long frameCount;
 	public int[][] nextRivalField;
+	public int score, fallenObs, unfallenObs;
 	
 	private Status gameStatus = Status.GAME_TITLE;
 	private Status nextStatus;
@@ -34,7 +36,7 @@ public class GameMain extends Thread {
 	private int nowKey = 0;
 	private long nowKeyTime = -1;
 	private boolean isUpdate = true;
-	private int oldRivalIndex = -1;
+	private boolean haveField = false;
 	private int stopCount;
 	
 	// コンストラクタ
@@ -85,7 +87,7 @@ public class GameMain extends Thread {
 						nowKey = 0;
 						nowKeyTime = -1;
 						isUpdate = true;
-						oldRivalIndex = -1;
+						haveField = false;
 						nw.Close();
 					}
 					// ネットワーク開始
@@ -99,8 +101,7 @@ public class GameMain extends Thread {
 					frame.add(title);
 					frame.revalidate();
 					//BGM
-					overlay.setBGM(getClass().getResource("Title.wav"));
-					//overlay.setBGM(getClass().getResource("Title2.wav"));
+					overlay.setBGM(getClass().getResource("Title2.wav"));
 				} else {
 					if(!isOverlay) title.repaint();
 					overlay.repaint();
@@ -185,9 +186,11 @@ public class GameMain extends Thread {
 							if(nowKeyTime <= frameCount) {
 								if(nowKey != 0) setRivalInput(nowKey);
 								// 次のデータを取り出し
-								if(nw.getRivalStatus()) {
+								// フィールドデータを持っている場合、同期待ちをする
+								if(!haveField && nw.getRivalStatus()) {
 									//フィールドデータを取り出したら次のインデックスも取り出す
 									nw.getRivalStatus();
+									haveField = true;
 								}
 							}
 						} else { //自分のほうが早い
@@ -196,9 +199,11 @@ public class GameMain extends Thread {
 							// 強制切断検出
 							if(stopCount >= 500 && !isRivalFinish) disconnect();
 							// 次のデータを取得
+							// 相手よりも早いため即座にフィールドを反映する
 							if(nw.isConnect && nw.getRivalStatus()) {
 								//フィールドデータを取り出したら次のインデックスも取り出す
 								nw.getRivalStatus();
+								setRivalField();
 							}
 						}
 						// 自分の状態更新
@@ -218,6 +223,7 @@ public class GameMain extends Thread {
 							temp = rival.update();
 							if(temp != rivalIndex && temp != -1) {
 								rivalIndex = temp;
+								if(haveField) setRivalField();
 								resetInput(rival.key); //長押し解除
 							}
 						}
@@ -363,15 +369,16 @@ public class GameMain extends Thread {
 	}
 	
 	// ライバルのフィールドを同期
-	public void setRivalField(int[][] type, int score, int fallenObs, int unfallenObs) {
+	public void setRivalField() {
 		rival.score = score;
 		me.fallen_obs = fallenObs;
 		me.unfallen_obs = unfallenObs;
 		for(int i = 0; i < 6; i++) {
 			for(int j = 0; j < 14; j++) {
-				rival.cell[i][j].setPuchu(type[i][j], i, j);
+				rival.cell[i][j].setPuchu(nextRivalField[i][j], i, j);
 			}
 		}
+		haveField = false;
 	}
 	
 	// ライバルの負けを検知
