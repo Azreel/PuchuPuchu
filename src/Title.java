@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+@SuppressWarnings("serial")
 public class Title extends JPanel{
 	final Toolkit tk = Toolkit.getDefaultToolkit();
 	final int fadeSpeed = 60;

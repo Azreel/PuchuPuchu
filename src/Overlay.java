@@ -4,6 +4,7 @@ import java.awt.*;
 import java.net.URL;
 import java.text.DecimalFormat;
 
+@SuppressWarnings("serial")
 public class Overlay extends JPanel{
 	final int fadeSpeed = 60;
 	final Toolkit tk = Toolkit.getDefaultToolkit();
