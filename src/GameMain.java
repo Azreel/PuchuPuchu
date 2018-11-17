@@ -158,14 +158,14 @@ public class GameMain extends Thread {
 					// ライバルプレイヤーフィールド
 					rival = new Field(this, ppInit, false);
 					rival.draw.setBounds(ScreenW/2, 0, ScreenW/2, ScreenH);
+					// 準備完了
+					nw.sendStatus("START");
+					while(!canStart) { nw.getRivalStatus(); }
 					// フレームに追加
 					frame.add(me.draw);
 					frame.add(rival.draw);
 					frame.revalidate();
 					me.draw.requestFocus();
-					// 準備完了
-					nw.sendStatus("START");
-					while(!canStart) { nw.getRivalStatus(); }
 					// BGM
 					overlay.setBGM(getClass().getResource("gamemusic.wav"));
 					// スタートアニメーション
