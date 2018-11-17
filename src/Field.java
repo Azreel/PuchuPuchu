@@ -148,24 +148,25 @@ public class Field {
 			} else if ( cell[now_x][now_y+1].type != Puchu.Emp ) {
 				bottom_p1_flag = true;
 				bottom_flag = true;
-			} else if ( now_x < 5 && cell[now_x+1][now_y+1].type != Puchu.Emp ) {
+			} else if ( cell[now_x+1][now_y+1].type != Puchu.Emp ) {
 				bottom_p2_flag = true;
 				bottom_flag = true;
 			}
-			if ( now_x >= 4 && cell[now_x-1][now_y].type != Puchu.Emp ) {
+			if ( now_x >= 4 ) {
 				slide_right_flag = false;
-				slide_left_flag = false;
-			} else if ( now_x <= 0 && cell[now_x+2][now_y].type != Puchu.Emp ) {
-				slide_left_flag = false;
-				slide_right_flag = false;
-			} else if ( now_x >= 4 ) {
-				slide_right_flag = false;
-			} else if ( now_x <= 0 ) {
-				slide_left_flag = false;
-			} else if ( cell[now_x-1][now_y].type != Puchu.Emp ) {
-				slide_left_flag = false;
+				if ( cell[now_x-1][now_y].type != Puchu.Emp ) {
+					slide_left_flag = false;
+				}
 			} else if ( cell[now_x+2][now_y].type != Puchu.Emp ) {
 				slide_right_flag = false;
+			}
+			if ( now_x <= 0 ) {
+				slide_left_flag = false;
+				if ( cell[now_x+2][now_y].type != Puchu.Emp ) {
+					slide_right_flag = false;
+				}
+			} else if ( cell[now_x-1][now_y].type != Puchu.Emp ) {
+				slide_left_flag = false;
 			}
 		} else if ( now.form == PuchuPair.Bottom ) {
 			now_x = ( now.puchu2.x ) / 40;
@@ -215,20 +216,21 @@ public class Field {
 				bottom_p2_flag = true;
 				bottom_flag = true;
 			}
-			if ( now_x >= 5 && cell[now_x-2][now_y].type != Puchu.Emp ) {
+			if ( now_x >= 5 ) {
 				slide_right_flag = false;
-				slide_left_flag = false;
-			} else if ( now_x <= 1 && cell[now_x+1][now_y].type != Puchu.Emp ) {
-				slide_right_flag = false;
-				slide_left_flag = false;
-			} else if ( now_x >= 5 ) {
-				slide_right_flag = false;
-			} else if ( now_x <= 1 ) {
-				slide_left_flag = false;
-			} else if ( cell[now_x-2][now_y].type != Puchu.Emp ) {
-				slide_left_flag = false;
+				if ( cell[now_x-2][now_y].type != Puchu.Emp ) {
+					slide_left_flag = false;
+				}
 			} else if ( cell[now_x+1][now_y].type != Puchu.Emp ) {
 				slide_right_flag = false;
+			}
+			if ( now_x <= 1 ) {
+				slide_left_flag = false;
+				if ( cell[now_x+1][now_y].type != Puchu.Emp ) {
+					slide_right_flag = false;
+				}
+			} else if ( cell[now_x-2][now_y].type != Puchu.Emp ) {
+				slide_left_flag = false;
 			}
 		}
 	}
