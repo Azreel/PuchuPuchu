@@ -6,6 +6,7 @@ public class GameMain extends Thread {
 	public static enum Status { GAME_TITLE, GAME_SOLO, GAME_DUO };
 	public static final int PPSIZE = 200;
 	public final JFrame frame = new JFrame();
+	public final Font dialogFont = new Font(Font.DIALOG, Font.PLAIN, 16);
 	public Network nw;
 	public String rivalIP = "0.0.0.0";
 	public boolean canStart = false;
@@ -50,14 +51,17 @@ public class GameMain extends Thread {
 		frame.setTitle("ぷちゅぷちゅ");
 		frame.setResizable(false);// サイズ変更不可
 		frame.setLayout(null);
+		frame.getContentPane().setBackground(Color.BLACK);
 		frame.setVisible(true);
 		overlay = new Overlay(this);
 		overlay.setPreferredSize(new Dimension(ScreenW, ScreenH));
 		overlay.setBounds(0, 0, ScreenW, ScreenH);
+		frame.add(overlay);
 	}
 	
 	// スレッドのメイン
 	public void run() {
+		long waitStart;
 		
 		while(true) {
 			// 60fps保つ
@@ -67,7 +71,7 @@ public class GameMain extends Thread {
 			}catch(Exception e) {}
 			// ゲーム全体の管理
 			long start = System.currentTimeMillis();
-			switch(gameStatus) {
+MAIN:		switch(gameStatus) {
 			case GAME_TITLE: // タイトル
 				if(title == null) {
 					System.out.println("タイトル生成");
@@ -87,6 +91,7 @@ public class GameMain extends Thread {
 						isUpdate = true;
 						haveField = false;
 						nw.Close();
+						nw = null;
 					}
 					// ネットワーク開始
 					nw = new Network(this);
@@ -95,14 +100,13 @@ public class GameMain extends Thread {
 					title = new Title(this, nw);
 					title.setPreferredSize(new Dimension(ScreenW, ScreenH));
 					title.setBounds(0, 0, ScreenW, ScreenH);
-					frame.add(overlay);
 					frame.add(title);
 					frame.revalidate();
 					//BGM
 					overlay.setBGM(getClass().getResource("Title2.wav"));
 				} else {
 					if(!isOverlay) title.repaint();
-					overlay.repaint();
+					else overlay.repaint();
 				}
 				break;
 			case GAME_SOLO: // 1Pプレイ
@@ -149,8 +153,23 @@ public class GameMain extends Thread {
 					frame.remove(title);
 					title = null;
 					// ぷちゅ生成
-					if(nw.programMode == Network.Mode.SERVER) nw.sendPuchu(makePuchu());
-					else while(!canStart) { nw.getRivalStatus(); }
+					if(nw.programMode == Network.Mode.SERVER) {
+						nw.sendPuchu(makePuchu());
+					} else {
+						waitStart = System.currentTimeMillis();
+						while(!canStart) {
+							nw.getRivalStatus();
+							try { sleep(100); } catch (Exception e) {}
+							// 1分経ってもデータが来なければ切断と判定する
+							if(System.currentTimeMillis() - waitStart > 60 * 1000) {
+								JLabel label = new JLabel("接続が切断されました");
+								label.setFont(dialogFont);
+							    JOptionPane.showMessageDialog(frame, label);
+							    gameStatus = Status.GAME_TITLE;
+							    break MAIN;
+							}
+						}
+					}
 					// プレイヤーフィールド
 					me = new Field(this, ppInit, true);
 					me.draw.setBounds(0, 0, ScreenW/2, ScreenH);
@@ -159,7 +178,19 @@ public class GameMain extends Thread {
 					rival.draw.setBounds(ScreenW/2, 0, ScreenW/2, ScreenH);
 					// 準備完了
 					nw.sendStatus("START");
-					while(!canStart) { nw.getRivalStatus(); }
+					waitStart = System.currentTimeMillis();
+					while(!canStart) {
+						nw.getRivalStatus();
+						try { sleep(100); } catch (Exception e) {}
+						// 1分経ってもデータが来なければ切断と判定する
+						if(System.currentTimeMillis() - waitStart > 60 * 1000) {
+							JLabel label = new JLabel("接続が切断されました");
+							label.setFont(dialogFont);
+						    JOptionPane.showMessageDialog(frame, label);
+						    gameStatus = Status.GAME_TITLE;
+						    break MAIN;
+						}
+					}
 					// フレームに追加
 					frame.add(me.draw);
 					frame.add(rival.draw);
