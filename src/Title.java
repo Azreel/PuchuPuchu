@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 public class Title extends JPanel{
 	private final Font dispFont = new Font(Font.DIALOG, Font.PLAIN, 24);
 	private final Font inputFont = new Font(Font.DIALOG, Font.PLAIN, 20);
-	private final Font dialogFont = new Font(Font.DIALOG, Font.PLAIN, 16);
 	
 	private GameMain gm;
 	private Network nw;
@@ -77,7 +76,7 @@ public class Title extends JPanel{
 				pushSound.play();
 			} else {
 				JLabel label = new JLabel("<html>接続に失敗しました<br>IPアドレスを確認してください<html>");
-				label.setFont(dialogFont);
+				label.setFont(gm.dialogFont);
 			    JOptionPane.showMessageDialog(gm.frame, label);
 			}
 		}
@@ -86,7 +85,7 @@ public class Title extends JPanel{
 	// クライアントの接続確認
 	public void rivalApply() {
 		JLabel label = new JLabel("相手の接続を受けました");
-		label.setFont(dialogFont);
+		label.setFont(gm.dialogFont);
 	    JOptionPane.showMessageDialog(gm.frame, label);
 	    setFade(GameMain.Status.GAME_DUO);
 	}

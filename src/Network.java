@@ -97,11 +97,11 @@ public class Network extends Thread {
             long start = System.currentTimeMillis();
             pw.println("PING");
             pw.flush();
-            // サーバーからの返事があるまで30秒待機
+            // サーバーからの返事があるまで10秒待機
             while(true) {
-            	if(System.currentTimeMillis() - start >= 30 * 1000) throw new SocketException();
-            	if(br.readLine().equals("PONG")) break;
-            	sleep(1);
+            	if(System.currentTimeMillis() - start >= 10 * 1000) throw new SocketException();
+            	if(br.ready() && br.readLine().equals("PONG")) break;
+            	sleep(100);
             }
             isConnect = true;
             return true;
