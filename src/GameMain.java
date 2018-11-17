@@ -15,7 +15,7 @@ public class GameMain extends Thread {
 	public final JFrame frame = new JFrame();
 	public Network nw;
 	public boolean canStart = false;
-	public int rivalIndex = 0;
+	public int rivalIndex = 1;
 	public long frameCount;
 	public int[][] nextRivalField;
 	
@@ -78,7 +78,7 @@ public class GameMain extends Thread {
 						me = null;
 						rival = null;
 						canStart = false;
-						rivalIndex = 0;
+						rivalIndex = 1;
 						meIndex = 0;
 						isMeFinish = false;
 						isRivalFinish = false;
@@ -172,6 +172,7 @@ public class GameMain extends Thread {
 					me.draw.startReadyAnim();
 					rival.draw.startReadyAnim();
 					frameCount = 0;
+					stopCount = 0;
 				} else {
 					int temp;
 					
@@ -181,10 +182,9 @@ public class GameMain extends Thread {
 						if(nw.index >= rivalIndex) { //一致してるとき or 遅い場合
 							isUpdate = true;
 							stopCount = 0;
-							if(nowKey != 0 && nowKeyTime <= frameCount) {
-								setRivalInput(nowKey);
-								nowKey = 0;
-							} else if(nowKey == 0) {
+							if(nowKeyTime <= frameCount) {
+								if(nowKey != 0) setRivalInput(nowKey);
+								// 次のデータを取り出し
 								if(nw.getRivalStatus()) {
 									//フィールドデータを取り出したら次のインデックスも取り出す
 									nw.getRivalStatus();
@@ -208,9 +208,9 @@ public class GameMain extends Thread {
 								meIndex = temp;
 								me.key.canKeyInput = false;
 								nw.sendField(me.cell, me.score, rival.fallen_obs, rival.unfallen_obs); //次のぷちゅになったらフィールド全体を送信
-								me.key.canKeyInput = true;
 								nw.sendPuchuIndex(meIndex);
 								resetInput(me.key); //長押し解除
+								me.key.canKeyInput = true;
 							}
 						}
 						// ライバルの状態更新
