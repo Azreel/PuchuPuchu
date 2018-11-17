@@ -14,6 +14,7 @@ public class GameMain extends Thread {
 	public static final int PPSIZE = 200;
 	public final JFrame frame = new JFrame();
 	public Network nw;
+	public String rivalIP = "0.0.0.0";
 	public boolean canStart = false;
 	public int rivalIndex = 1;
 	public long frameCount;
@@ -100,8 +101,7 @@ public class GameMain extends Thread {
 					frame.add(title);
 					frame.revalidate();
 					//BGM
-					overlay.setBGM(getClass().getResource("Title.wav"));
-					//overlay.setBGM(getClass().getResource("Title2.wav"));
+					overlay.setBGM(getClass().getResource("Title2.wav"));
 				} else {
 					if(!isOverlay) title.repaint();
 					overlay.repaint();
