@@ -35,6 +35,7 @@ public class GameMain extends Thread {
 	private boolean isUpdate = true;
 	private boolean haveField = false;
 	private int stopCount;
+	private boolean isPause = false;
 	
 	// コンストラクタ
 	GameMain(){
@@ -163,7 +164,7 @@ public class GameMain extends Thread {
 	// ソロプレイ時の更新処理
 	private void updateSolo() {
 		// 状態更新
-		if(!isMeFinish) me.update();
+		if(!isMeFinish && !isPause) me.update();
 		// 画面描画
 		if(!isOverlay) {
 			me.draw.repaint();
@@ -352,6 +353,22 @@ public class GameMain extends Thread {
 		if(isMe) {
 			isOverlay = true;
 			overlay.Result(score);
+		}
+	}
+	
+	// ポーズ画面
+	public void switchPause() {
+		// 1人モードのみ動作
+		if(gameStatus == Status.GAME_SOLO) {
+			if(isPause) {
+				isOverlay = false;
+				isPause = false;
+				overlay.Clear();
+			} else {
+				isOverlay = true;
+				isPause = true;
+				overlay.Pause();
+			}
 		}
 	}
 	

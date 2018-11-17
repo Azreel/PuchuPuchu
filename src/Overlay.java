@@ -11,13 +11,13 @@ public class Overlay extends JPanel{
 	private final Font btnFont = new Font(Font.DIALOG, Font.PLAIN, 24);
 	private final Font labelFont = new Font(Font.DIALOG, Font.PLAIN, 40);
 	
-	private static enum Mode {STOP, FADEIN, RESULT};
+	private static enum Mode {STOP, FADEIN, RESULT, PAUSE};
 	private Mode paintMode = Mode.STOP;
 	private float fadeAlpha;
 	private GameMain gm;
 	private Sound bgm;
 	private boolean isPlay = false;
-	private Image resultImg;
+	private Image resultImg, pauseImg;
 	
 	// コンストラクタ
 	Overlay(GameMain parent){
@@ -55,6 +55,24 @@ public class Overlay extends JPanel{
 		
 		this.add(scoreLabel);
 		this.add(titleBtn);
+	}
+	
+	// ポーズ画面
+	public void Pause() {
+		this.removeAll();
+		paintMode = Mode.PAUSE;
+		pauseImg = tk.createImage(getClass().getResource("pause.png"));
+		JLabel noticeLabel = new JLabel("もう一度Pを押すと解除します");
+		noticeLabel.setBounds(200, 300, 700, 40);
+		noticeLabel.setFont(labelFont);
+		noticeLabel.setForeground(new Color(255,255,255));
+		this.add(noticeLabel);
+	}
+	
+	// 画面消去
+	public void Clear() {
+		this.removeAll();
+		paintMode = Mode.STOP;
 	}
 	
 	// BGMの再生
@@ -99,6 +117,11 @@ public class Overlay extends JPanel{
             g2D.fillRect(0, 0, w, h);
         	g2D.drawImage(resultImg, 280, 50, null);
         	break;
+        case PAUSE:
+        	g2D.setColor(new Color(0,0,0,120));
+            g2D.fillRect(0, 0, w, h);
+            g2D.drawImage(pauseImg, 280, 50, null);
+            break;
         }
     }
 }

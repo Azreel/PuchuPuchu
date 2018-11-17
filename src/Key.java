@@ -8,7 +8,6 @@ public class Key extends KeyAdapter {
 	public boolean Down;
 	public boolean TurnLeft;
 	public boolean TurnRight;
-	public boolean Enter;
 	public boolean canKeyInput = false;
 	
 	private GameMain gm;
@@ -59,9 +58,6 @@ public class Key extends KeyAdapter {
 		case KeyEvent.VK_Q:// Qキー
 			System.exit(0);
 			break;
-		case KeyEvent.VK_ENTER:// Enterキー
-			Enter = true;
-			break;
 		}
 	}
 
@@ -99,8 +95,8 @@ public class Key extends KeyAdapter {
 				gm.nw.sendStatus(-5 + ":" + gm.frameCount);
 			}
 			break;
-		case KeyEvent.VK_ENTER:// Enterキー
-			Enter = false;
+		case KeyEvent.VK_P:// Pキー
+			gm.switchPause();
 			break;
 		}
 	}
