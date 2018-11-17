@@ -258,7 +258,7 @@ public class GameMain extends Thread {
 				isUpdate = false;
 				stopCount++;
 				// 強制切断検出
-				if(stopCount >= 500 && !isRivalFinish) disconnect();
+				if(stopCount >= 500 && !isRivalFinish) disConnect();
 				// 次のデータを取得
 				// 相手よりも早いため即座にフィールドを反映する
 				if(nw.isConnect && nw.getRivalStatus()) {
@@ -444,7 +444,7 @@ public class GameMain extends Thread {
 	}
 	
 	// ライバルの切断を検知
-	public void disconnect() {
+	public void disConnect() {
 		me.win();
 		rival.defeat();
 		isMeFinish = true;

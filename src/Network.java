@@ -159,7 +159,7 @@ public class Network extends Thread {
 			break;
 		// 強制切断発生
 		case "DISCONNECT":
-			gm.disconnect();
+			gm.disConnect();
 			Close();
 			break;
 		// 初期ぷちゅペア受信開始
