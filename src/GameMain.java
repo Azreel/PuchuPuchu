@@ -373,6 +373,7 @@ public class GameMain extends Thread {
 		rival.score = score;
 		me.fallen_obs = fallenObs;
 		me.unfallen_obs = unfallenObs;
+		me.draw.setObsNum(fallenObs+unfallenObs);
 		for(int i = 0; i < 6; i++) {
 			for(int j = 0; j < 14; j++) {
 				rival.cell[i][j].setPuchu(nextRivalField[i][j], i, j);
