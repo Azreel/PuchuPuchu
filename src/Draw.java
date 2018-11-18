@@ -164,7 +164,7 @@ public class Draw extends JPanel{
 	private void initSound() {
 		se_delete = new Sound(getClass().getResource("delpuchu.wav"));
 		se_drop = new Sound(getClass().getResource("rakka.wav"));
-		se_drop_obs = new Sound(getClass().getResource("lose.wav"));
+		se_drop_obs = new Sound(getClass().getResource("obs.wav"));
 		se_obs_update = new Sound(getClass().getResource("ojamaup.wav"));
 	}
 	
