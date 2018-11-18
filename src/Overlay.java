@@ -1,3 +1,4 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import java.awt.*;
@@ -7,7 +8,6 @@ import java.text.DecimalFormat;
 @SuppressWarnings("serial")
 public class Overlay extends JPanel{
 	private final int fadeSpeed = 60;
-	private final Toolkit tk = Toolkit.getDefaultToolkit();
 	private final Font btnFont = new Font(Font.DIALOG, Font.PLAIN, 24);
 	private final Font labelFont = new Font(Font.DIALOG, Font.PLAIN, 40);
 	
@@ -23,6 +23,10 @@ public class Overlay extends JPanel{
 	Overlay(GameMain parent){
 		gm = parent;
 		this.setOpaque(false);
+		try {
+			resultImg = ImageIO.read(getClass().getResource("result.png"));
+			pauseImg = ImageIO.read(getClass().getResource("pause.png"));
+		} catch(Exception e) {}
 	}
 	
 	// フェードイン
@@ -35,7 +39,6 @@ public class Overlay extends JPanel{
 	// リザルト表示
 	public void Result(int score) {
 		paintMode = Mode.RESULT;
-		resultImg = tk.createImage(getClass().getResource("result.png"));
 		DecimalFormat df = new DecimalFormat("0000000");
 		//スコア
 		JLabel scoreLabel = new JLabel("SCORE：" + df.format(score));
@@ -61,12 +64,13 @@ public class Overlay extends JPanel{
 	public void Pause() {
 		this.removeAll();
 		paintMode = Mode.PAUSE;
-		pauseImg = tk.createImage(getClass().getResource("pause.png"));
 		JLabel noticeLabel = new JLabel("もう一度Pを押すと解除します");
 		noticeLabel.setBounds(200, 300, 700, 40);
 		noticeLabel.setFont(labelFont);
 		noticeLabel.setForeground(new Color(255,255,255));
+		
 		this.add(noticeLabel);
+		
 	}
 	
 	// 画面消去
