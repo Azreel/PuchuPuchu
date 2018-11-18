@@ -22,7 +22,7 @@ public class Network extends Thread {
 			ss = new ServerSocket(Port);
 		}
 		catch(Exception e) {
-			System.out.println("サーバー作成失敗");
+			//System.out.println("サーバー作成失敗");
 			programMode = Mode.CLIENT;
 		}
 	}
@@ -54,7 +54,7 @@ public class Network extends Thread {
 					break;
 				}
 			}catch(Exception e) {
-				System.out.println("nw run: "+e);
+				//System.out.println("nw run: "+e);
 			}
 			try { sleep(10); } catch(Exception e) {}
 		}
@@ -68,7 +68,7 @@ public class Network extends Thread {
 		} catch(Exception e) {}
 		isAlive = false;
 		isConnect = false;
-		System.out.println("接続解除");
+		//System.out.println("接続解除");
 	}
 	
 	// 自分のIPアドレスを取得
@@ -108,7 +108,7 @@ public class Network extends Thread {
             return true;
         }
         catch(Exception e){
-        	System.out.println("nw connect: "+e);
+        	//System.out.println("nw connect: "+e);
         	try {
 	        	if(pw != null) pw.close();
 	        	if(br != null) br.close();
@@ -119,9 +119,9 @@ public class Network extends Thread {
         	try {
         		ss = new ServerSocket(Port);
         		programMode = Mode.SERVER;
-        		System.out.println("サーバー再生成");
+        		//System.out.println("サーバー再生成");
         	} catch(Exception ex) {
-        		System.out.println("サーバー作成失敗");
+        		//System.out.println("サーバー作成失敗");
     			programMode = Mode.CLIENT;
         	}
         	isConnect = false;
@@ -137,7 +137,7 @@ public class Network extends Thread {
 		try {
 			if(br.ready()) input = br.readLine();
 			else return isField;
-			System.out.println(input);
+			//System.out.println(input);
 		}catch(Exception e) {
 			System.out.println("nw get: "+e);
 			input = "DISCONNECT";
@@ -217,7 +217,7 @@ public class Network extends Thread {
 	private void getPuchuIndex(){
 		try {
 			index = Integer.parseInt(br.readLine());
-			System.out.println(index);
+			//System.out.println(index);
 		} catch(Exception e) {
 			System.out.println("nw get: " + e);
 		}

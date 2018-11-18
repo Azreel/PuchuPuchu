@@ -97,7 +97,7 @@ public class GameMain extends Thread {
 	//---メインループ関係---
 	// タイトルの初期化処理
 	private void initTitle() {
-		System.out.println("タイトル生成");
+		//System.out.println("タイトル生成");
 		// 前のプレイデータを消去
 		if(me != null || rival != null) {
 			frame.remove(me.draw);
@@ -137,7 +137,7 @@ public class GameMain extends Thread {
 	
 	// ソロプレイ時の初期化処理
 	private void initSolo() {
-		System.out.println("1Pモード");
+		//System.out.println("1Pモード");
 		// サーバーを閉じる
 		nw.Close();
 		// タイトル除去
@@ -181,7 +181,7 @@ public class GameMain extends Thread {
 	private void initDuo() {
 		long waitStart;
 		
-		System.out.println("2Pモード");
+		//System.out.println("2Pモード");
 		// タイトル除去
 		frame.remove(title);
 		title = null;
@@ -386,7 +386,7 @@ public class GameMain extends Thread {
 	// 初期ぷちゅペア生成(外部受信)
 	public void makePuchuByServer(int[][] list) {
 		if(list == null) {
-			System.out.println("ぷちゅ生成エラー");
+			//System.out.println("ぷちゅ生成エラー");
 			System.exit(0);
 		} else {
 			ppInit = list;
@@ -402,7 +402,7 @@ public class GameMain extends Thread {
 			nowKey = Integer.parseInt(keyData[0]);
 			nowKeyTime = Long.parseLong(keyData[1]);
 		} catch(Exception e) {
-			System.out.println("不正なキーデータ: "+key);
+			//System.out.println("不正なキーデータ: "+key);
 			return;
 		}
 	}
@@ -432,7 +432,7 @@ public class GameMain extends Thread {
 			rival.key.TurnRight = isPress;
 			break;
 		default:
-			System.out.println("不正なキーデータ: "+key);
+			//System.out.println("不正なキーデータ: "+key);
 			break;
 		}
 	}
