@@ -34,7 +34,8 @@ public class Draw extends JPanel{
 	private boolean is_chain_get = false;
 	private boolean is_chain_display = false;
 	
-	private Font score_font = new Font("Dialog", Font.BOLD, 36);
+	private Font score_font = new Font("Dialog", Font.PLAIN, 36);
+	private Font score_text_font = new Font("Dialog", Font.BOLD, 22);
 	private Color score_color = Color.black;
 	private int score_draw = 0, score_now = 0, score_update_value = 0;
 	private static final int score_update_span = 10;
@@ -657,8 +658,9 @@ public class Draw extends JPanel{
 			// スコア表示
 			if ( score_state != AnimState.end ) { updateScoreValue(); }
 			img_2d.setColor(score_color);
+			img_2d.setFont(score_text_font);
+			img_2d.drawString("SCORE", margin_w+Draw.Squares*6+5, 495 - img_2d.getFontMetrics().getHeight());
 			img_2d.setFont(score_font);
-			img_2d.drawString("SCORE", margin_w+Draw.Squares*6+5, 500 - img_2d.getFontMetrics().getHeight());
 			img_2d.drawString(String.format("%07d", score_draw ), margin_w+Draw.Squares*6+5, 500);
 			
 			// れんさテキスト描写
