@@ -28,7 +28,7 @@ Pキー --- ポーズ(1Pプレイでのみ動作)
 ぷちゅ(顔)を消すことでスコアが加算され、その加算量は連続で消える連鎖によって増えていきます。
 2Pプレイ時は消したぷちゅ(顔)に応じて相手に"おじゃまぷちゅ"を送って邪魔することができます。
 おじゃまぷちゅは隣にならんでいるぷちゅ(顔)を消すと、一緒に消すことができます。
-フィールドの中央上部にある「×」の位置までぷちゅ(顔)を積み上げてしまうと負けです。
+フィールドの中央上部にある「×」の位置までぷちゅ(顔)を積み上げてしまうとゲームオーバーです。
 
 【2Pプレイに関して】
 接続時はどちらか一方のプレイヤーがもう一方のPCのIPアドレスを指定することで接続を行ってください。
@@ -48,6 +48,7 @@ Java の標準入力で、最後に立ち止まってしまうあなたに - Qii
 java - Anti-aliased JLabel - Stack Overflow - https://stackoverflow.com/questions/21869693/anti-aliased-jlabel
 BufferedImage.subimageメソッド - ゆるゆるプログラミング - http://talavax.com/subimage.html
 2点間の距離と角度と座標の求め方 - Qiita - https://qiita.com/Hoshi_7/items/d04936883ff3eb1eed2d
-
+Algorithm of Puyo Connection - http://www.geocities.co.jp/Playtown/6524/connect.html
+得点計算 - ぷよぷよ用語辞典 - アットウィキ - https://www26.atwiki.jp/puyowords/pages/122.html
  [リソース]
  
