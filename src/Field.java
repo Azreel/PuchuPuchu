@@ -22,7 +22,6 @@ public class Field {
 	private boolean turn_right_flag = true;	//右回転できるか
 	private boolean slide_left_flag = true;	//左に移動できるか
 	private boolean slide_right_flag = true;//右に移動できるか
-	private boolean game_end_flag = false;
 	private boolean van_puchu = false;
 	private boolean is_drop = false;
 	private boolean is_me = true;
@@ -31,12 +30,7 @@ public class Field {
 	private int now_x = 0;
 	private int now_y = 0;
 	private int obs_count = 0;
-	private int time = 0;
-	private int landing_time = 0;
-	private static final int max_land_time = 0;
 	private int k = 0;
-	private int comb_figure1 = 0;
-	private int comb_figure2 = 0;
 	private int chain_count = 0;	//連鎖数
 	private int switch_figure;
 	private int speed = 1;
@@ -400,17 +394,13 @@ public class Field {
 		} else{							//ぷちゅが消えるとき
 			cal_color();
 			cal_link();
-			//System.out.println("link:" + link_count);
-			//System.out.println("color:" + color_count);
-			//System.out.println("puchu" + puchu_count);
+			
 			if ( moving_flag == false ) {	//連鎖が継続している場合
 				chain_count++;
 			}
 			sub_score = cal_score(puchu_count, chain_count, link_count, color_count);
 			score += sub_score;
-			//System.out.println("score:" + score);
 			cal_obs();
-			//System.out.println("obs:" + obs_count);
 			if ( unfallen_obs + fallen_obs > 0 ) {					//相殺処理
 				if ( obs_count >= unfallen_obs + fallen_obs ) {
 					obs_count = obs_count - (unfallen_obs + fallen_obs);
@@ -616,7 +606,6 @@ public class Field {
 	//お邪魔落下
 	private void obs_fall() {
 		
-		int line = 0;
 		int count = 0;
 		boolean obs_flag = false;
 		fallen = true;
@@ -629,7 +618,6 @@ public class Field {
 				}
 				for ( int k = 13; k >= 0; k-- ) {
 					if ( cell[j][k].type == Puchu.Emp ) {
-						if ( cell[j][k].y != (k-2)*Draw.Squares) { System.out.println(j+" : "+k+" :違うぞぉおおおおお");}
 						if ( k != 0 ) {
 							cell[j][k].dropDownObs(count/6+1);
 						} else {
