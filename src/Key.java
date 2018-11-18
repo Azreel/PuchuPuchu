@@ -28,31 +28,31 @@ public class Key extends KeyAdapter {
 		case KeyEvent.VK_LEFT:// ←キー
 			if(!Left && canKeyInput) {
 				Left = true;
-				gm.nw.sendStatus(1 + ":" + gm.frameCount);
+				//gm.nw.sendStatus(1 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_RIGHT:// →キー
 			if(!Right && canKeyInput) {
 				Right = true;
-				gm.nw.sendStatus(2 + ":" + gm.frameCount);
+				//gm.nw.sendStatus(2 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_DOWN:// ↓キー
 			if(!Down && canKeyInput) {
 				Down = true;
-				gm.nw.sendStatus(3 + ":" + gm.frameCount);
+				//gm.nw.sendStatus(3 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_Z:// Zキー
 			if(!TurnLeft && canKeyInput) {
 				TurnLeft = true;
-				gm.nw.sendStatus(4 + ":" + gm.frameCount);
+				//gm.nw.sendStatus(4 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_X:// Xキー
 			if(!TurnRight && canKeyInput) {
 				TurnRight = true;
-				gm.nw.sendStatus(5 + ":" + gm.frameCount);
+				//gm.nw.sendStatus(5 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_Q:// Qキー
@@ -68,31 +68,31 @@ public class Key extends KeyAdapter {
 		case KeyEvent.VK_LEFT:// ←キー
 			if(Left && canKeyInput) {
 				Left = false;
-				gm.nw.sendStatus(-1 + ":" + gm.frameCount);
+				//gm.nw.sendStatus(-1 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_RIGHT:// →キー
 			if(Right && canKeyInput) {
 				Right = false;
-				gm.nw.sendStatus(-2 + ":" + gm.frameCount);
+				//gm.nw.sendStatus(-2 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_DOWN:// ↓キー
 			if(Down && canKeyInput) {
 				Down = false;
-				gm.nw.sendStatus(-3 + ":" + gm.frameCount);
+				//gm.nw.sendStatus(-3 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_Z:// Zキー
 			if(TurnLeft && canKeyInput) {
 				TurnLeft = false;
-				gm.nw.sendStatus(-4 + ":" + gm.frameCount);
+				//gm.nw.sendStatus(-4 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_X:// Xキー
 			if(TurnRight && canKeyInput) {
 				TurnRight = false;
-				gm.nw.sendStatus(-5 + ":" + gm.frameCount);
+				//gm.nw.sendStatus(-5 + ":" + gm.frameCount);
 			}
 			break;
 		case KeyEvent.VK_P:// Pキー

@@ -178,7 +178,8 @@ public class Network extends Thread {
 			break;
 		// キー入力
 		default:
-			gm.getRivalInput(input);
+			//gm.getRivalInput(input);
+			gm.setNowPuchuPos(input);
 			break;
 		}
 		
@@ -264,7 +265,7 @@ public class Network extends Thread {
 	}
 	
 	// 初期ぷちゅペアリスト送信
-	public void sendPuchu(String[] list) {
+	public void sendPuchuList(String[] list) {
 		pw.println("MAKESTART");
 		for(String data : list) {
 			pw.println(data);
@@ -277,6 +278,11 @@ public class Network extends Thread {
 	public void sendStatus(String status) {
 		if(isAlive == false) return;
 		pw.println(status);
+		pw.flush();
+	}
+	
+	public void sendPuchu(PuchuPair data) {
+		pw.println(data.form + ":" + data.puchu1.x + ":" + data.puchu1.y + ":" + data.puchu2.x + ":" + data.puchu2.y);
 		pw.flush();
 	}
 	

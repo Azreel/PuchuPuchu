@@ -301,7 +301,7 @@ public class Field {
 			judge_key();
 			hit_puchu();
 			if ( bottom_flag != true ) {		//接地できていない
-				now.fallDown(speed);
+				if(is_me) now.fallDown(speed);
 				return_index = puchu_index;
 			} else {							//接地できている
 				if ( bottom_p1_flag == false ) {	//ぷちゅ1の下に何もない
