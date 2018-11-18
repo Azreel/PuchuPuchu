@@ -198,7 +198,7 @@ public class Draw extends JPanel{
 	private void finishReadyAnim() {
 		game = GameInfo.GAME_PLAYNOW;
 		ready_state = AnimState.state6;
-		System.out.println("ゲーム開始");
+//		System.out.println("ゲーム開始");
 		soundIgnition("pahu.wav");
 		fd.game_start();
 	}
@@ -337,7 +337,7 @@ public class Draw extends JPanel{
 	
 	//-- 決着時のアニメーション終了
 	private void finishEndAnim() {
-		System.out.println("おわり");
+//		System.out.println("おわり");
 		end_state = AnimState.end;
 		fd.game_end();
 	}
