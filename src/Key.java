@@ -8,20 +8,21 @@ public class Key extends KeyAdapter {
 	public boolean Down;
 	public boolean TurnLeft;
 	public boolean TurnRight;
-	public boolean Enter;
+	public boolean canKeyInput = false;
 	
 	private GameMain gm;
-	private boolean canKeyInput = false;
 
 	Key(GameMain _gm){
 		gm = _gm;
 	}
 	
 	// キーボードが押された時の処理(文字)
+	@Override
 	public void keyTyped(KeyEvent e) {
 	}
 
 	// キーボードが押された時の処理(連続で入力あり)
+	@Override
 	public void keyPressed(KeyEvent e) {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:// ←キー
@@ -57,13 +58,11 @@ public class Key extends KeyAdapter {
 		case KeyEvent.VK_Q:// Qキー
 			System.exit(0);
 			break;
-		case KeyEvent.VK_ENTER:// Enterキー
-			Enter = true;
-			break;
 		}
 	}
 
 	// キーボードから離された時の処理
+	@Override
 	public void keyReleased(KeyEvent e) {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:// ←キー
@@ -96,14 +95,9 @@ public class Key extends KeyAdapter {
 				gm.nw.sendStatus(-5 + ":" + gm.frameCount);
 			}
 			break;
-		case KeyEvent.VK_ENTER:// Enterキー
-			Enter = false;
+		case KeyEvent.VK_P:// Pキー
+			gm.switchPause();
 			break;
 		}
-	}
-	
-	// 入力の可否
-	public void canInput(boolean flag) {
-		canKeyInput = flag;
 	}
 }

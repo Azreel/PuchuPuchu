@@ -1,6 +1,3 @@
-import java.awt.*;
-import javax.swing.*;
-
 public class PuchuPair {
 	public static final int Up = 0;
 	public static final int Right = 1;
