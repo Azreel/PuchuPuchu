@@ -40,7 +40,7 @@ public class Sound{
 	
 	// 音量調整
 	public void setVol(float vol) {
-		if(vol <= 0.1f) vol = 0.0f;
+		if(vol <= 0.01f) vol = 0.0f;
 		control.setValue((float)Math.log10(vol) * 20);
 	}
 }

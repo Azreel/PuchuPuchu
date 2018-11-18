@@ -36,6 +36,7 @@ public class GameMain extends Thread {
 	private boolean haveField = false;
 	private int stopCount;
 	private boolean isPause = false;
+	private Sound pauseSE;
 	
 	// コンストラクタ
 	GameMain(){
@@ -157,6 +158,8 @@ public class GameMain extends Thread {
 		me.draw.requestFocus();
 		// BGM
 		overlay.setBGM(getClass().getResource("gamemusic.wav"));
+		// ポーズ用サウンド
+		pauseSE = new Sound(getClass().getResource("selectmode.wav"));
 		// スタートアニメーション
 		me.draw.startReadyAnim();
 	}
@@ -361,10 +364,12 @@ public class GameMain extends Thread {
 		// 1人モードのみ動作
 		if(gameStatus == Status.GAME_SOLO) {
 			if(isPause) {
+				pauseSE.play();
 				isOverlay = false;
 				isPause = false;
 				overlay.Clear();
 			} else {
+				pauseSE.play();
 				isOverlay = true;
 				isPause = true;
 				overlay.Pause();
