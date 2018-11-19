@@ -22,6 +22,7 @@ public class Overlay extends JPanel{
 	// コンストラクタ
 	Overlay(GameMain parent){
 		gm = parent;
+		this.setLayout(null);
 		this.setOpaque(false);
 		try {
 			resultImg = ImageIO.read(getClass().getResource("result.png"));

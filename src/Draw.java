@@ -16,13 +16,12 @@ public class Draw extends JPanel{
 	public static enum GameInfo { GAME_READY, GAME_PLAYNOW, GAME_WIN, GAME_LOSE };
 	private GameInfo game = GameInfo.GAME_PLAYNOW;
 	
-	private Toolkit tk;
+	private Toolkit tk = Toolkit.getDefaultToolkit();
 	private Image img_background, img_field;
 	private Image img_puchu[] = new Image[9];
 	private Image img_obs_notice;
 	private BufferedImage img_van_anim;
 	private BufferedImage[] imgs_van = new BufferedImage[10];
-	private JLabel lb;	//ラベル
 	private Field fd;
 	
 	private String chain_text;
@@ -99,29 +98,23 @@ public class Draw extends JPanel{
 	
 	Draw() {	//nullプレイヤー用
 		this.setPreferredSize(new Dimension(PanelW, PanelH));
-		lb = new JLabel();
-		lb.setPreferredSize(new Dimension(PanelW, PanelH));
-		tk = Toolkit.getDefaultToolkit();
 		try {
-			img_field = ImageIO.read(getClass().getResource("background.png"));			
+			img_field = ImageIO.read(getClass().getResource("background.png"));	
+			img_background = ImageIO.read(getClass().getResource("backmark.png"));
 		} catch(Exception e) {
 			System.out.println(e);
 		}
-		img_background = tk.getImage(getClass().getResource("backmark.png"));
 		
 		is_alive = false;
 	}
 	Draw(Field _fd) { //プレイ用
 		this.setPreferredSize(new Dimension(PanelW, PanelH));
-		lb = new JLabel();
-		lb.setPreferredSize(new Dimension(PanelW, PanelH));
-		tk = Toolkit.getDefaultToolkit();
 		try {
-			img_field = ImageIO.read(getClass().getResource("background.png"));			
+			img_field = ImageIO.read(getClass().getResource("background.png"));	
+			img_background = ImageIO.read(getClass().getResource("backmark.png"));
 		} catch(Exception e) {
 			System.out.println(e);
 		}
-		img_background = tk.getImage(getClass().getResource("backmark.png"));
 
 		is_alive = true;
 		fd = _fd;
@@ -141,11 +134,11 @@ public class Draw extends JPanel{
 	
 	//-- Image変数の初期化
 	private void initImages() {
-		for ( int i = 1; i <= 8; i++ ) {
-			img_puchu[i] = tk.getImage(getClass().getResource("puchu"+i+".png"));			
-		}
-		img_meteor = tk.getImage(getClass().getResource("light.png"));
 		try {
+			for ( int i = 1; i <= 8; i++ ) {
+				img_puchu[i] = ImageIO.read(getClass().getResource("puchu"+i+".png"));			
+			}
+			img_meteor = ImageIO.read(getClass().getResource("light.png"));
 			img_obs_notice = ImageIO.read(getClass().getResource("puchu8_notice.png"));
 			img_obs_change = ImageIO.read(getClass().getResource("obs_notice_change_anim.png"));
 			img_van_anim = ImageIO.read(getClass().getResource("vanishingAnime.png"));
