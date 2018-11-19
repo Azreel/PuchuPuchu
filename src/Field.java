@@ -299,8 +299,8 @@ public class Field {
 		
 		if ( moving_flag == true ) {
 			hit_puchu();
-			judge_key();
 			if ( bottom_flag != true ) {		//接地できていない
+				judge_key();
 				if(is_me) {
 					now.fallDown(speed);
 					gm.sendPuchu(now);
