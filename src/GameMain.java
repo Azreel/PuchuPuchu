@@ -30,8 +30,6 @@ public class GameMain extends Thread {
 	private int meIndex = 0;
 	private boolean isMeFinish = false;
 	private boolean isRivalFinish = false;
-	private int nowKey = 0;
-	private long nowKeyTime = -1;
 	private boolean isUpdate = true;
 	private boolean haveField = false;
 	private int stopCount;
@@ -109,8 +107,6 @@ public class GameMain extends Thread {
 			meIndex = 0;
 			isMeFinish = false;
 			isRivalFinish = false;
-			nowKey = 0;
-			nowKeyTime = -1;
 			isUpdate = true;
 			haveField = false;
 			nw.Close();
@@ -187,7 +183,7 @@ public class GameMain extends Thread {
 		title = null;
 		// ぷちゅ生成
 		if(nw.programMode == Network.Mode.SERVER) {
-			nw.sendPuchu(makePuchu());
+			nw.sendPuchuList(makePuchu());
 		} else {
 			waitStart = System.currentTimeMillis();
 			while(!canStart) {
@@ -248,15 +244,12 @@ public class GameMain extends Thread {
 			if(nw.index >= rivalIndex) { //一致してるとき or 遅い場合
 				isUpdate = true;
 				stopCount = 0;
-				if(nowKeyTime <= frameCount) {
-					if(nowKey != 0) setRivalInput(nowKey);
-					// 次のデータを取り出し
-					// フィールドデータを持っている場合、同期待ちをする
-					if(!haveField && nw.getRivalStatus()) {
-						//フィールドデータを取り出したら次のインデックスも取り出す
-						nw.getRivalStatus();
-						haveField = true;
-					}
+				// 次のデータを取り出し
+				// フィールドデータを持っている場合、同期待ちをする
+				if(nw.isConnect && !haveField && nw.getRivalStatus()) {
+					//フィールドデータを取り出したら次のインデックスも取り出す
+					nw.getRivalStatus();
+					haveField = true;
 				}
 			} else { //自分のほうが早い
 				isUpdate = false;
@@ -277,7 +270,7 @@ public class GameMain extends Thread {
 				if(temp != meIndex && temp != -1) {
 					meIndex = temp;
 					me.key.canKeyInput = false;
-					nw.sendField(me.cell, me.score, rival.fallen_obs, rival.unfallen_obs); //次のぷちゅになったらフィールド全体を送信
+					nw.sendField(me.cell, me.score); //次のぷちゅになったらフィールド全体を送信
 					nw.sendPuchuIndex(meIndex);
 					resetInput(me.key); //長押し解除
 					me.key.canKeyInput = true;
@@ -337,6 +330,11 @@ public class GameMain extends Thread {
 		else me.receive_obs(count);
 	}
 	
+	// ぷちゅの座標状態を送信
+	public void sendPuchu(PuchuPair now) {
+		if(gameStatus == Status.GAME_DUO) nw.sendPuchu(now);
+	}
+	
 	//---Overlay関係---
 	// フェードイン
 	public void fadeIn(Status next) {
@@ -393,48 +391,15 @@ public class GameMain extends Thread {
 		}
 	}
 	
-	// ライバルのキー入力を取得
-	public void getRivalInput(String key) {
-		String[] keyData = key.split(":");
-
-		// キー情報の取り出し
-		try {
-			nowKey = Integer.parseInt(keyData[0]);
-			nowKeyTime = Long.parseLong(keyData[1]);
-		} catch(Exception e) {
-			//System.out.println("不正なキーデータ: "+key);
-			return;
-		}
-	}
-	
-	// ライバルのキーを反映
-	private void setRivalInput(int key) {
-		boolean isPress = true;
-		
-		if(key < 0) {
-			isPress = false;
-			key *= -1;
-		}
-		switch(key) {
-		case 1: // ←キー
-			rival.key.Left = isPress;
-			break;
-		case 2: // →キー
-			rival.key.Right = isPress;
-			break;
-		case 3: // ↓キー
-			rival.key.Down = isPress;
-			break;
-		case 4: // Zキー
-			rival.key.TurnLeft = isPress;
-			break;
-		case 5: // Xキー
-			rival.key.TurnRight = isPress;
-			break;
-		default:
-			//System.out.println("不正なキーデータ: "+key);
-			break;
-		}
+	// ライバルのnowの座標を反映
+	public void setNowPuchuPos(String pos) {
+		if(rival.now == null) return;
+		String[] parse = pos.split(":");
+		rival.now.form = Integer.parseInt(parse[0]);
+		rival.now.puchu1.x = rival.now.puchu1.draw_x = Integer.parseInt(parse[1]);
+		rival.now.puchu1.y = rival.now.puchu1.draw_y = Integer.parseInt(parse[2]);
+		rival.now.puchu2.x = rival.now.puchu2.draw_x = Integer.parseInt(parse[3]);
+		rival.now.puchu2.y = rival.now.puchu2.draw_y = Integer.parseInt(parse[4]);
 	}
 	
 	// キーを一旦リセット
@@ -449,9 +414,6 @@ public class GameMain extends Thread {
 	// ライバルのフィールドを同期
 	public void setRivalField() {
 		rival.score = score;
-		me.fallen_obs = fallenObs;
-		me.unfallen_obs = unfallenObs;
-		me.draw.setObsNum(fallenObs+unfallenObs);
 		for(int i = 0; i < 6; i++) {
 			for(int j = 0; j < 14; j++) {
 				rival.cell[i][j].setPuchu(nextRivalField[i][j], i, j);
