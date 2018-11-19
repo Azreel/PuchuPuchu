@@ -336,7 +336,7 @@ public class GameMain extends Thread {
 	
 	// ぷちゅの座標状態を送信
 	public void sendPuchu(PuchuPair now) {
-		nw.sendPuchu(now);
+		if(gameStatus == Status.GAME_DUO) nw.sendPuchu(now);
 	}
 	
 	//---Overlay関係---

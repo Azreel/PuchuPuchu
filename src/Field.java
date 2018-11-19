@@ -298,8 +298,8 @@ public class Field {
 		int return_index = -1;
 		
 		if ( moving_flag == true ) {
-			judge_key();
 			hit_puchu();
+			judge_key();
 			if ( bottom_flag != true ) {		//接地できていない
 				if(is_me) {
 					now.fallDown(speed);
