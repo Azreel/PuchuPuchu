@@ -3,24 +3,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.applet.Applet;
-import java.applet.AudioClip;
 
+@SuppressWarnings("serial")
 public class Title extends JPanel{
-	final Toolkit tk = Toolkit.getDefaultToolkit();
-	final int fadeSpeed = 60;
-	final Font btnFont = new Font(Font.DIALOG, Font.PLAIN, 24);
-	final Font labelFont = new Font(Font.DIALOG, Font.PLAIN, 20);
+	private final Font dispFont = new Font(Font.DIALOG, Font.PLAIN, 24);
+	private final Font inputFont = new Font(Font.DIALOG, Font.PLAIN, 20);
 	
-	GameMain gm;
-	Network nw;
-	Image bg;
-	JButton soloBtn, duoBtn;
-	JTextField rivalIP;
-	JLabel rival, myIP;
-	GameMain.Status next = null;
-	boolean isFade = false;
-	float fadeAlpha = 0.0f;
+	private GameMain gm;
+	private Network nw;
+	private Image bg;
+	private JButton soloBtn, duoBtn;
+	private JTextField rivalIP;
+	private JLabel rival, myIP;
 	
 	// コンストラクタ
 	Title(GameMain parent, Network client) {
@@ -34,26 +28,26 @@ public class Title extends JPanel{
 		} catch (Exception e) {}
 		//自分のIPアドレス
         myIP = new JLabel(nw.getIPaddr());
-        myIP.setBounds(225, 470, 400, 30);
-        myIP.setFont(labelFont);
+        myIP.setBounds(200, 467, 400, 30);
+        myIP.setFont(dispFont);
         myIP.setForeground(Color.WHITE);
 		//1Pプレイ
 		soloBtn = new JButton("1Pプレイ");
-		soloBtn.setBounds(570, 450, 160, 60);
-		soloBtn.setFont(btnFont);
+		soloBtn.setBounds(580, 450, 160, 60);
+		soloBtn.setFont(dispFont);
 		soloBtn.addActionListener(new SoloPlayBtn());
 		//IPアドレス入力欄
 		rival = new JLabel("相手のIPアドレス:");
-		rival.setBounds(225, 550, 300, 30);
-		rival.setFont(labelFont);
+		rival.setBounds(200, 547, 300, 30);
+		rival.setFont(dispFont);
 		rival.setForeground(Color.WHITE);
-		rivalIP = new JTextField("0.0.0.0");
-		rivalIP.setBounds(400, 550, 160, 30);
-		rivalIP.setFont(labelFont);
+		rivalIP = new JTextField(gm.rivalIP);
+		rivalIP.setBounds(408, 547, 160, 30);
+		rivalIP.setFont(inputFont);
         //2Pプレイ
 		duoBtn = new JButton("2Pプレイ");
-		duoBtn.setBounds(570, 530, 160, 60);
-		duoBtn.setFont(btnFont);
+		duoBtn.setBounds(580, 530, 160, 60);
+		duoBtn.setFont(dispFont);
 		duoBtn.addActionListener(new DuoPlayBtn());
         
         this.add(soloBtn);
@@ -67,7 +61,7 @@ public class Title extends JPanel{
 	private class SoloPlayBtn implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
 			setFade(GameMain.Status.GAME_SOLO);
-			AudioClip pushSound = Applet.newAudioClip(getClass().getResource("selectmode.wav"));
+			Sound pushSound = new Sound(getClass().getResource("selectmode.wav"));
 			pushSound.play();
 		}
 	}
@@ -76,11 +70,13 @@ public class Title extends JPanel{
 	private class DuoPlayBtn implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
 			if(nw.Connect(rivalIP.getText())) {
+				gm.rivalIP = rivalIP.getText();
 				setFade(GameMain.Status.GAME_DUO);
-				AudioClip pushSound = Applet.newAudioClip(getClass().getResource("selectmode.wav"));
+				Sound pushSound = new Sound(getClass().getResource("selectmode.wav"));
 				pushSound.play();
 			} else {
-				JLabel label = new JLabel("接続に失敗しました");
+				JLabel label = new JLabel("<html>接続に失敗しました<br>IPアドレスを確認してください<html>");
+				label.setFont(gm.dialogFont);
 			    JOptionPane.showMessageDialog(gm.frame, label);
 			}
 		}
@@ -88,7 +84,9 @@ public class Title extends JPanel{
 	
 	// クライアントの接続確認
 	public void rivalApply() {
-	    JOptionPane.showMessageDialog(gm.frame, new JLabel("相手の接続を受けました"));
+		JLabel label = new JLabel("相手の接続を受けました");
+		label.setFont(gm.dialogFont);
+	    JOptionPane.showMessageDialog(gm.frame, label);
 	    setFade(GameMain.Status.GAME_DUO);
 	}
 	
@@ -101,8 +99,8 @@ public class Title extends JPanel{
 	// 描画
     @Override
     public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2D = (Graphics2D) g;
-        g2D.drawImage(bg, null, this);
+    	super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.drawImage(bg, null, this);
     }
 }

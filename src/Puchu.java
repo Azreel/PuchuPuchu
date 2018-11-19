@@ -1,6 +1,3 @@
-import java.awt.*;
-import javax.swing.*;
-
 public class Puchu {
 	
 	public static final int Emp = 0, Pat1 = 1, Pat2 = 2, Pat3 = 3, Pat4 = 4, Pat5 = 5, Pat6 = 6, Van = 7, Obs = 8, Vanishing = 9;
@@ -38,12 +35,11 @@ public class Puchu {
 	public void copyPuchu(Puchu _puchu) {
 		this.type = _puchu.type;
 		this.x = this.draw_x = _puchu.x;
-		this.y = this.draw_y = _puchu.y;
+		this.draw_y = _puchu.y;
 	}
 	
 	//-- ぷちゅの落下処理
-	public void dropDown(int arr_i) {
-		y = (arr_i - 2) * Draw.Squares;
+	public void dropDown() {
 		is_match_position_drop = false;
 		drop_bound_time = 0;
 		bound_anim_count = 1;

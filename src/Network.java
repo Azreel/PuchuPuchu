@@ -2,19 +2,18 @@ import java.io.*;
 import java.net.*;
 
 public class Network extends Thread {
-	final int Port = 28385;
 	public static enum Mode { SERVER, CLIENT };
-	
 	public Mode programMode = Mode.SERVER;
 	public boolean isConnect = false;
 	public int index = 0; //操作中のぷちゅ
 	
-	GameMain gm;
-	boolean isAlive = true;
-	ServerSocket ss;
-	Socket sc;
-	BufferedReader br;
-	PrintWriter pw;
+	private final int Port = 28385;
+	private GameMain gm;
+	private boolean isAlive = true;
+	private ServerSocket ss;
+	private Socket sc;
+	private BufferedReader br;
+	private PrintWriter pw;
 	
 	// コンストラクタ
 	Network(GameMain parent){
@@ -23,12 +22,13 @@ public class Network extends Thread {
 			ss = new ServerSocket(Port);
 		}
 		catch(Exception e) {
-			System.out.println("サーバー作成失敗");
+			//System.out.println("サーバー作成失敗");
 			programMode = Mode.CLIENT;
 		}
 	}
 	
 	// 接続待ち(スレッドのメイン)
+	@Override
 	public void run() {
 		while(!isConnect && isAlive) {
 			try {
@@ -54,7 +54,7 @@ public class Network extends Thread {
 					break;
 				}
 			}catch(Exception e) {
-				System.out.println("nw run: "+e);
+				//System.out.println("nw run: "+e);
 			}
 			try { sleep(10); } catch(Exception e) {}
 		}
@@ -68,7 +68,7 @@ public class Network extends Thread {
 		} catch(Exception e) {}
 		isAlive = false;
 		isConnect = false;
-		System.out.println("接続解除");
+		//System.out.println("接続解除");
 	}
 	
 	// 自分のIPアドレスを取得
@@ -98,17 +98,17 @@ public class Network extends Thread {
             long start = System.currentTimeMillis();
             pw.println("PING");
             pw.flush();
-            // サーバーからの返事があるまで30秒待機
+            // サーバーからの返事があるまで10秒待機
             while(true) {
-            	if(System.currentTimeMillis() - start >= 30 * 1000) throw new SocketException();
-            	if(br.readLine().equals("PONG")) break;
-            	sleep(1);
+            	if(System.currentTimeMillis() - start >= 10 * 1000) throw new SocketException();
+            	if(br.ready() && br.readLine().equals("PONG")) break;
+            	sleep(100);
             }
             isConnect = true;
             return true;
         }
         catch(Exception e){
-        	System.out.println("nw connect: "+e);
+        	//System.out.println("nw connect: "+e);
         	try {
 	        	if(pw != null) pw.close();
 	        	if(br != null) br.close();
@@ -119,9 +119,9 @@ public class Network extends Thread {
         	try {
         		ss = new ServerSocket(Port);
         		programMode = Mode.SERVER;
-        		System.out.println("サーバー再生成");
+        		//System.out.println("サーバー再生成");
         	} catch(Exception ex) {
-        		System.out.println("サーバー作成失敗");
+        		//System.out.println("サーバー作成失敗");
     			programMode = Mode.CLIENT;
         	}
         	isConnect = false;
@@ -137,7 +137,7 @@ public class Network extends Thread {
 		try {
 			if(br.ready()) input = br.readLine();
 			else return isField;
-			System.out.println(input);
+			//System.out.println(input);
 		}catch(Exception e) {
 			System.out.println("nw get: "+e);
 			input = "DISCONNECT";
@@ -159,7 +159,7 @@ public class Network extends Thread {
 			break;
 		// 強制切断発生
 		case "DISCONNECT":
-			gm.disconnect();
+			gm.disConnect();
 			Close();
 			break;
 		// 初期ぷちゅペア受信開始
@@ -178,7 +178,8 @@ public class Network extends Thread {
 			break;
 		// キー入力
 		default:
-			gm.getRivalInput(input);
+			//gm.getRivalInput(input);
+			gm.setNowPuchuPos(input);
 			break;
 		}
 		
@@ -217,7 +218,7 @@ public class Network extends Thread {
 	private void getPuchuIndex(){
 		try {
 			index = Integer.parseInt(br.readLine());
-			System.out.println(index);
+			//System.out.println(index);
 		} catch(Exception e) {
 			System.out.println("nw get: " + e);
 		}
@@ -228,12 +229,12 @@ public class Network extends Thread {
 		int[][] cell = new int[6][14];
 		String temp;
 		String[] splited;
-		int column = 0, score = 0, fallenObs = 0, unfallenObs = 0;
+		int column = 0;
 		
 		try {
-			score = Integer.parseInt(br.readLine());
-			fallenObs = Integer.parseInt(br.readLine());
-			unfallenObs = Integer.parseInt(br.readLine());
+			gm.score = Integer.parseInt(br.readLine());
+			gm.fallenObs = Integer.parseInt(br.readLine());
+			gm.unfallenObs = Integer.parseInt(br.readLine());
 		} catch (Exception e) {
 			System.out.println("nw get: " + e);
 			return;
@@ -260,11 +261,11 @@ public class Network extends Thread {
 			}
 			column++;
 		}
-		gm.setRivalField(cell, score, fallenObs, unfallenObs);
+		gm.nextRivalField = cell;
 	}
 	
 	// 初期ぷちゅペアリスト送信
-	public void sendPuchu(String[] list) {
+	public void sendPuchuList(String[] list) {
 		pw.println("MAKESTART");
 		for(String data : list) {
 			pw.println(data);
@@ -277,6 +278,11 @@ public class Network extends Thread {
 	public void sendStatus(String status) {
 		if(isAlive == false) return;
 		pw.println(status);
+		pw.flush();
+	}
+	
+	public void sendPuchu(PuchuPair data) {
+		pw.println(data.form + ":" + data.puchu1.x + ":" + data.puchu1.y + ":" + data.puchu2.x + ":" + data.puchu2.y);
 		pw.flush();
 	}
 	

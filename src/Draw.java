@@ -1,15 +1,9 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-import java.io.File;
-import java.nio.Buffer;
-import java.util.*;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.applet.Applet;
-import java.applet.AudioClip;
 
+@SuppressWarnings("serial")
 public class Draw extends JPanel{
 	
 	public static final int Squares = 40;
@@ -40,7 +34,8 @@ public class Draw extends JPanel{
 	private boolean is_chain_get = false;
 	private boolean is_chain_display = false;
 	
-	private Font score_font = new Font("Dialog", Font.BOLD, 40);
+	private Font score_font = new Font("Dialog", Font.PLAIN, 36);
+	private Font score_text_font = new Font("Dialog", Font.BOLD, 22);
 	private Color score_color = Color.black;
 	private int score_draw = 0, score_now = 0, score_update_value = 0;
 	private static final int score_update_span = 10;
@@ -100,9 +95,7 @@ public class Draw extends JPanel{
 	private AnimState obs_update_state = AnimState.end;
 	private int obs_update_time = 0;
 	
-	
-	
-	private AudioClip se_drop, se_delete, se_obs_update;
+	private Sound se_drop, se_drop_obs, se_delete, se_obs_update;
 	
 	Draw() {	//nullプレイヤー用
 		this.setPreferredSize(new Dimension(PanelW, PanelH));
@@ -169,14 +162,15 @@ public class Draw extends JPanel{
 	
 	//-- よく発火するSEの初期化
 	private void initSound() {
-		se_delete = Applet.newAudioClip(getClass().getResource("delpuchu.wav"));
-		se_drop = Applet.newAudioClip(getClass().getResource("rakka.wav"));
-		se_obs_update = Applet.newAudioClip(getClass().getResource("ojamaup.wav"));
+		se_delete = new Sound(getClass().getResource("delpuchu.wav"));
+		se_drop = new Sound(getClass().getResource("rakka.wav"));
+		se_drop_obs = new Sound(getClass().getResource("obs.wav"));
+		se_obs_update = new Sound(getClass().getResource("ojamaup.wav"));
 	}
 	
 	//-- SE発火
 	private void soundIgnition(String _wav) {
-		AudioClip _se = Applet.newAudioClip(getClass().getResource(_wav));
+		Sound _se = new Sound(getClass().getResource(_wav));
 		_se.play();
 	}
 	
@@ -204,7 +198,7 @@ public class Draw extends JPanel{
 	private void finishReadyAnim() {
 		game = GameInfo.GAME_PLAYNOW;
 		ready_state = AnimState.state6;
-		System.out.println("ゲーム開始");
+//		System.out.println("ゲーム開始");
 		soundIgnition("pahu.wav");
 		fd.game_start();
 	}
@@ -213,6 +207,11 @@ public class Draw extends JPanel{
 	public void startDropAnim() {
 		is_drop_anim = true;
 		se_drop.play();
+	}
+	
+	public void startDropObsAnim() {
+		is_drop_anim = true;
+		se_drop_obs.play();
 	}
 	
 	//-- 落下アニメーション終了
@@ -234,7 +233,7 @@ public class Draw extends JPanel{
 		fd.switch_next();
 		
 		//最大連鎖セット
-//		fd.next[0].puchu1.type = 6;
+//		fd.next[0].puchu1.type = 5;
 //		fd.next[0].puchu2.type = 5;
 //		fd.switch_next();
 	}
@@ -338,7 +337,7 @@ public class Draw extends JPanel{
 	
 	//-- 決着時のアニメーション終了
 	private void finishEndAnim() {
-		System.out.println("おわり");
+//		System.out.println("おわり");
 		end_state = AnimState.end;
 		fd.game_end();
 	}
@@ -386,6 +385,7 @@ public class Draw extends JPanel{
 			start_image_height += start_image_speed/10;
 			if ( ready_anim_time > 300 ) { ready_state = AnimState.end; }
 			break;
+		default:
 		}
 	}
 	
@@ -413,6 +413,7 @@ public class Draw extends JPanel{
 			end_anim_time++;
 			if ( end_anim_time > end_time ) { finishEndAnim(); }
 			break;
+		default:
 		}
 	}
 	
@@ -475,6 +476,7 @@ public class Draw extends JPanel{
 			send_anim_speed += send_anim_accel;
 			if ( send_image_y < -100 ) { send_state = AnimState.end; }
 			break;
+		default:
 		}
 	}
 	
@@ -487,6 +489,7 @@ public class Draw extends JPanel{
 				send_image_y += (int)(send_anim_speed*Math.cos(send_image_angle));
 				send_image_x += (int)(send_anim_speed*Math.sin(send_image_angle));
 				break;
+			default:
 		}
 	}
 	
@@ -504,6 +507,7 @@ public class Draw extends JPanel{
 			send_anim_speed += send_anim_accel;
 			if ( send_image_y < -100 ) { send_state = AnimState.end; }
 			break;
+		default:
 		}	
 	}
 	
@@ -520,6 +524,7 @@ public class Draw extends JPanel{
 			damage_image_y += damage_anim_speed;
 			if ( damage_image_y + damage_anim_speed > obs_center_y ) { setObsNum(obs_change); startObsUpdateAnim(); damage_state = AnimState.end; break;}
 			break;
+		default:
 		}
 	}
 	
@@ -556,6 +561,7 @@ public class Draw extends JPanel{
 			obs_width = obs_anim_time - obs_width_max;
 			if ( obs_width >= obs_width_max ) { obs_state = AnimState.end; }
 			break;
+		default:
 		}
 	}
 	
@@ -563,6 +569,7 @@ public class Draw extends JPanel{
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D img_2d = (Graphics2D) g;
+		img_2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		img_2d.drawImage(img_background, 0, 0, this);
 
 		if ( is_alive ) {
@@ -586,6 +593,7 @@ public class Draw extends JPanel{
 					case GAME_LOSE: // 敗北時の盤面更新
 						fd.cell[i][j].endGameAnim(false, end_anim_time - i*end_anim_delay);
 						break;
+					default:
 					}
 					if ( fd.cell[i][j].type == Puchu.Vanishing ) {
 						img_2d.drawImage(imgs_van[fd.cell[i][j].van_flame_count], fd.cell[i][j].draw_x + margin_w - Draw.Squares/2, fd.cell[i][j].draw_y + margin_h - Draw.Squares/2, this);
@@ -650,6 +658,8 @@ public class Draw extends JPanel{
 			// スコア表示
 			if ( score_state != AnimState.end ) { updateScoreValue(); }
 			img_2d.setColor(score_color);
+			img_2d.setFont(score_text_font);
+			img_2d.drawString("SCORE", margin_w+Draw.Squares*6+5, 495 - img_2d.getFontMetrics().getHeight());
 			img_2d.setFont(score_font);
 			img_2d.drawString(String.format("%07d", score_draw ), margin_w+Draw.Squares*6+5, 500);
 			
