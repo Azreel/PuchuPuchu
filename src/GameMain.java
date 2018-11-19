@@ -187,7 +187,7 @@ public class GameMain extends Thread {
 		title = null;
 		// ぷちゅ生成
 		if(nw.programMode == Network.Mode.SERVER) {
-			nw.sendPuchu(makePuchu());
+			nw.sendPuchuList(makePuchu());
 		} else {
 			waitStart = System.currentTimeMillis();
 			while(!canStart) {
@@ -248,15 +248,12 @@ public class GameMain extends Thread {
 			if(nw.index >= rivalIndex) { //一致してるとき or 遅い場合
 				isUpdate = true;
 				stopCount = 0;
-				if(nowKeyTime <= frameCount) {
-					if(nowKey != 0) setRivalInput(nowKey);
-					// 次のデータを取り出し
-					// フィールドデータを持っている場合、同期待ちをする
-					if(!haveField && nw.getRivalStatus()) {
-						//フィールドデータを取り出したら次のインデックスも取り出す
-						nw.getRivalStatus();
-						haveField = true;
-					}
+				// 次のデータを取り出し
+				// フィールドデータを持っている場合、同期待ちをする
+				if(nw.isConnect && !haveField && nw.getRivalStatus()) {
+					//フィールドデータを取り出したら次のインデックスも取り出す
+					nw.getRivalStatus();
+					haveField = true;
 				}
 			} else { //自分のほうが早い
 				isUpdate = false;
@@ -282,6 +279,7 @@ public class GameMain extends Thread {
 					resetInput(me.key); //長押し解除
 					me.key.canKeyInput = true;
 				}
+				if(me.now != null) nw.sendPuchu(me.now);
 			}
 			// ライバルの状態更新
 			if(!isRivalFinish && isUpdate) {
@@ -435,6 +433,17 @@ public class GameMain extends Thread {
 			//System.out.println("不正なキーデータ: "+key);
 			break;
 		}
+	}
+	
+	// ライバルのnowの座標を反映
+	public void setNowPuchuPos(String pos) {
+		if(rival.now == null) return;
+		String[] parse = pos.split(":");
+		rival.now.form = Integer.parseInt(parse[0]);
+		rival.now.puchu1.x = rival.now.puchu1.draw_x = Integer.parseInt(parse[1]);
+		rival.now.puchu1.y = rival.now.puchu1.draw_y = Integer.parseInt(parse[2]);
+		rival.now.puchu2.x = rival.now.puchu2.draw_x = Integer.parseInt(parse[3]);
+		rival.now.puchu2.y = rival.now.puchu2.draw_y = Integer.parseInt(parse[4]);
 	}
 	
 	// キーを一旦リセット
