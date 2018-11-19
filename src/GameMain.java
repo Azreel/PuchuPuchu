@@ -187,7 +187,7 @@ public class GameMain extends Thread {
 		title = null;
 		// ぷちゅ生成
 		if(nw.programMode == Network.Mode.SERVER) {
-			nw.sendPuchu(makePuchu());
+			nw.sendPuchuList(makePuchu());
 		} else {
 			waitStart = System.currentTimeMillis();
 			while(!canStart) {
@@ -248,15 +248,12 @@ public class GameMain extends Thread {
 			if(nw.index >= rivalIndex) { //一致してるとき or 遅い場合
 				isUpdate = true;
 				stopCount = 0;
-				if(nowKeyTime <= frameCount) {
-					if(nowKey != 0) setRivalInput(nowKey);
-					// 次のデータを取り出し
-					// フィールドデータを持っている場合、同期待ちをする
-					if(!haveField && nw.getRivalStatus()) {
-						//フィールドデータを取り出したら次のインデックスも取り出す
-						nw.getRivalStatus();
-						haveField = true;
-					}
+				// 次のデータを取り出し
+				// フィールドデータを持っている場合、同期待ちをする
+				if(nw.isConnect && !haveField && nw.getRivalStatus()) {
+					//フィールドデータを取り出したら次のインデックスも取り出す
+					nw.getRivalStatus();
+					haveField = true;
 				}
 			} else { //自分のほうが早い
 				isUpdate = false;
@@ -277,7 +274,7 @@ public class GameMain extends Thread {
 				if(temp != meIndex && temp != -1) {
 					meIndex = temp;
 					me.key.canKeyInput = false;
-					nw.sendField(me.cell, me.score, rival.fallen_obs, rival.unfallen_obs); //次のぷちゅになったらフィールド全体を送信
+					nw.sendField(me.cell, me.score); //次のぷちゅになったらフィールド全体を送信
 					nw.sendPuchuIndex(meIndex);
 					resetInput(me.key); //長押し解除
 					me.key.canKeyInput = true;
@@ -335,6 +332,11 @@ public class GameMain extends Thread {
 	public void sendObs(int count, boolean isMe) {
 		if(isMe) rival.receive_obs(count);
 		else me.receive_obs(count);
+	}
+	
+	// ぷちゅの座標状態を送信
+	public void sendPuchu(PuchuPair now) {
+		if(gameStatus == Status.GAME_DUO) nw.sendPuchu(now);
 	}
 	
 	//---Overlay関係---
@@ -437,6 +439,17 @@ public class GameMain extends Thread {
 		}
 	}
 	
+	// ライバルのnowの座標を反映
+	public void setNowPuchuPos(String pos) {
+		if(rival.now == null) return;
+		String[] parse = pos.split(":");
+		rival.now.form = Integer.parseInt(parse[0]);
+		rival.now.puchu1.x = rival.now.puchu1.draw_x = Integer.parseInt(parse[1]);
+		rival.now.puchu1.y = rival.now.puchu1.draw_y = Integer.parseInt(parse[2]);
+		rival.now.puchu2.x = rival.now.puchu2.draw_x = Integer.parseInt(parse[3]);
+		rival.now.puchu2.y = rival.now.puchu2.draw_y = Integer.parseInt(parse[4]);
+	}
+	
 	// キーを一旦リセット
 	public void resetInput(Key key) {
 		key.Left = false;
@@ -449,9 +462,6 @@ public class GameMain extends Thread {
 	// ライバルのフィールドを同期
 	public void setRivalField() {
 		rival.score = score;
-		me.fallen_obs = fallenObs;
-		me.unfallen_obs = unfallenObs;
-		me.draw.setObsNum(fallenObs+unfallenObs);
 		for(int i = 0; i < 6; i++) {
 			for(int j = 0; j < 14; j++) {
 				rival.cell[i][j].setPuchu(nextRivalField[i][j], i, j);
