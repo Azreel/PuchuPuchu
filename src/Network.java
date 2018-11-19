@@ -233,8 +233,6 @@ public class Network extends Thread {
 		
 		try {
 			gm.score = Integer.parseInt(br.readLine());
-			gm.fallenObs = Integer.parseInt(br.readLine());
-			gm.unfallenObs = Integer.parseInt(br.readLine());
 		} catch (Exception e) {
 			System.out.println("nw get: " + e);
 			return;
@@ -281,6 +279,7 @@ public class Network extends Thread {
 		pw.flush();
 	}
 	
+	// 落下中のぷちゅペアの座標を送信
 	public void sendPuchu(PuchuPair data) {
 		pw.println(data.form + ":" + data.puchu1.x + ":" + data.puchu1.y + ":" + data.puchu2.x + ":" + data.puchu2.y);
 		pw.flush();
@@ -294,12 +293,10 @@ public class Network extends Thread {
 	}
 	
 	// フィールド情報送信
-	public void sendField(Puchu[][] cell, int score, int fallenObs, int unfallenObs) {
+	public void sendField(Puchu[][] cell, int score) {
 		String column = "";
 		pw.println("FIELDSTART");
 		pw.println(score);
-		pw.println(fallenObs);
-		pw.println(unfallenObs);
 		for(int i = 0; i < 6; i++) {
 			for(int j = 0; j < 14; j++) {
 				column += cell[i][j].type + ",";

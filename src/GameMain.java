@@ -274,12 +274,11 @@ public class GameMain extends Thread {
 				if(temp != meIndex && temp != -1) {
 					meIndex = temp;
 					me.key.canKeyInput = false;
-					nw.sendField(me.cell, me.score, rival.fallen_obs, rival.unfallen_obs); //次のぷちゅになったらフィールド全体を送信
+					nw.sendField(me.cell, me.score); //次のぷちゅになったらフィールド全体を送信
 					nw.sendPuchuIndex(meIndex);
 					resetInput(me.key); //長押し解除
 					me.key.canKeyInput = true;
 				}
-				if(me.now != null) nw.sendPuchu(me.now);
 			}
 			// ライバルの状態更新
 			if(!isRivalFinish && isUpdate) {
@@ -333,6 +332,11 @@ public class GameMain extends Thread {
 	public void sendObs(int count, boolean isMe) {
 		if(isMe) rival.receive_obs(count);
 		else me.receive_obs(count);
+	}
+	
+	// ぷちゅの座標状態を送信
+	public void sendPuchu(PuchuPair now) {
+		nw.sendPuchu(now);
 	}
 	
 	//---Overlay関係---
@@ -458,9 +462,6 @@ public class GameMain extends Thread {
 	// ライバルのフィールドを同期
 	public void setRivalField() {
 		rival.score = score;
-		me.fallen_obs = fallenObs;
-		me.unfallen_obs = unfallenObs;
-		me.draw.setObsNum(fallenObs+unfallenObs);
 		for(int i = 0; i < 6; i++) {
 			for(int j = 0; j < 14; j++) {
 				rival.cell[i][j].setPuchu(nextRivalField[i][j], i, j);
