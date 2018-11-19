@@ -30,8 +30,6 @@ public class GameMain extends Thread {
 	private int meIndex = 0;
 	private boolean isMeFinish = false;
 	private boolean isRivalFinish = false;
-	private int nowKey = 0;
-	private long nowKeyTime = -1;
 	private boolean isUpdate = true;
 	private boolean haveField = false;
 	private int stopCount;
@@ -109,8 +107,6 @@ public class GameMain extends Thread {
 			meIndex = 0;
 			isMeFinish = false;
 			isRivalFinish = false;
-			nowKey = 0;
-			nowKeyTime = -1;
 			isUpdate = true;
 			haveField = false;
 			nw.Close();
@@ -392,50 +388,6 @@ public class GameMain extends Thread {
 			System.exit(0);
 		} else {
 			ppInit = list;
-		}
-	}
-	
-	// ライバルのキー入力を取得
-	public void getRivalInput(String key) {
-		String[] keyData = key.split(":");
-
-		// キー情報の取り出し
-		try {
-			nowKey = Integer.parseInt(keyData[0]);
-			nowKeyTime = Long.parseLong(keyData[1]);
-		} catch(Exception e) {
-			//System.out.println("不正なキーデータ: "+key);
-			return;
-		}
-	}
-	
-	// ライバルのキーを反映
-	private void setRivalInput(int key) {
-		boolean isPress = true;
-		
-		if(key < 0) {
-			isPress = false;
-			key *= -1;
-		}
-		switch(key) {
-		case 1: // ←キー
-			rival.key.Left = isPress;
-			break;
-		case 2: // →キー
-			rival.key.Right = isPress;
-			break;
-		case 3: // ↓キー
-			rival.key.Down = isPress;
-			break;
-		case 4: // Zキー
-			rival.key.TurnLeft = isPress;
-			break;
-		case 5: // Xキー
-			rival.key.TurnRight = isPress;
-			break;
-		default:
-			//System.out.println("不正なキーデータ: "+key);
-			break;
 		}
 	}
 	
