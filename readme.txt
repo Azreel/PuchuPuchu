@@ -51,4 +51,7 @@ BufferedImage.subimageメソッド - ゆるゆるプログラミング - http://
 Algorithm of Puyo Connection - http://www.geocities.co.jp/Playtown/6524/connect.html
 得点計算 - ぷよぷよ用語辞典 - アットウィキ - https://www26.atwiki.jp/puyowords/pages/122.html
  [リソース]
- 
+効果音ラボ - フリー、商用無料、報告不用の効果音素材をダウンロード - https://soundeffect-lab.info/
+フリー効果音素材 くらげ工匠: トップページ - http://www.kurage-kosho.info/system.html
+フリー効果音 On-Jin ～音人～ - https://on-jin.com/
+フリーBGM（音楽素材）無料ダウンロード｜DOVA-SYNDROME - https://dova-s.jp/
